@@ -1,0 +1,269 @@
+/* General styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* ----------------------- */
+/* 🔹 LOGIN PAGE STYLING  */
+/* ----------------------- */
+.login-container {
+    background: #1e1e1e;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Logo */
+.logo {
+    width: 50px;
+    margin-bottom: 10px;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 14px;
+    color: #bbb;
+    margin-bottom: 20px;
+}
+
+/* Input Fields */
+input {
+    width: 90%;
+    padding: 12px;
+    margin-top: 10px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+}
+
+/* Forgot Password */
+.forgot-password {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Guest Mode Info */
+.guest-mode {
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 20px;
+}
+
+.guest-mode a {
+    color: #8ab4f8;
+}
+
+/* Buttons */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.create-account-btn {
+    background: none;
+    color: white;
+}
+
+.create-account-btn:hover {
+    background: #333;
+}
+
+.next-btn {
+    background: #8ab4f8;
+    color: black;
+}
+
+/* Dropdown */
+.dropdown {
+    position: absolute;
+    background: #333;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.1);
+    margin-top: 10px;
+}
+
+.dropdown button {
+    background: none;
+    color: white;
+    padding: 8px;
+    width: 100%;
+    text-align: left;
+    border: none;
+}
+
+.dropdown button:hover {
+    background: #444;
+}
+
+/* Hide Dropdown Initially */
+.hidden {
+    display: none;
+}
+
+/* ---------------------------- */
+/* 🔹 REGISTRATION PAGE STYLING */
+/* ---------------------------- */
+.register-container {
+    background: #1e1e1e;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width: 400px;
+}
+
+/* Logo */
+.register-container img {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+/* Input fields */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: #333;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+}
+
+input::placeholder {
+    color: #bbb;
+}
+
+/* Next & Sign Up Buttons */
+button {
+    width: 100%;
+    background-color: #1a73e8;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+button:hover {
+    background-color: #0f5ecb;
+}
+
+/* Email Selection */
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Show Password */
+input[type="checkbox"] {
+    margin-top: 10px;
+}
+
+/* -------------------------------- */
+/* 🔹 INBOX PAGE STYLING           */
+/* -------------------------------- */
+.inbox-container {
+    background: #1e1e1e;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width: 400px;
+    margin: auto;
+    margin-top: 100px;
+}
+
+.inbox-container h2 {
+    color: #ffffff;
+}
+
+.inbox-container p {
+    color: #bbbbbb;
+}
+
+.inbox-container button {
+    width: 100%;
+    background-color: #1a73e8;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+.inbox-container button:hover {
+    background-color: #0f5ecb;
+}
+
+/* ------------------------------- */
+/* 🔹 DASHBOARD EMPLOYEE STYLING  */
+/* ------------------------------- */
+.dashboard-container {
+    background: #1e1e1e;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width: 600px;
+    margin: auto;
+    margin-top: 50px;
+}
+
+.dashboard-container h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.dashboard-container .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.stat-box {
+    background: #2c2c2c;
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    flex: 1;
+    margin: 5px;
+}
+
+.stat-box h3 {
+    font-size: 18px;
+    color: #8ab4f8;
+}

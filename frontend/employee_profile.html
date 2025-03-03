@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pmail - Employee Profile</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <!-- Reuse the same CSS for consistency (jobs.css contains the top nav styles) -->
+  <link rel="stylesheet" href="../public/css/jobs.css" />
+  <script src="../public/js/profile.js" defer></script>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+    </div>
+    <div class="nav-right">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="jobs.html" class="nav-link">Find Jobs</a>
+      <a href="employee_inbox.html" class="nav-link">Inbox</a>
+      <a href="employee_profile.html" class="nav-link">My Profile</a>
+    </div>
+  </div>
+
+  <!-- Profile Container -->
+  <div class="profile-container" style="margin-top: 80px;">
+    <h1>My Profile</h1>
+    <form id="profile-form">
+      <label for="first_name">First Name:</label>
+      <input type="text" id="first_name" name="first_name" placeholder="John" />
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" id="last_name" name="last_name" placeholder="Doe" />
+
+      <label for="birthdate">Birthdate:</label>
+      <input type="date" id="birthdate" name="birthdate" />
+
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" name="phone" placeholder="(555) 123-4567" />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" placeholder="user@pmail.com" disabled />
+
+      <button type="submit">Update Profile</button>
+    </form>
+  </div>
+</body>
+</html>

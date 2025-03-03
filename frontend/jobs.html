@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pmail - Find Jobs</title>
+
+  <!-- Favicon (Pmail Logo) -->
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../public/css/jobs.css" />
+</head>
+<body>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <!-- Left: Logo -->
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+    </div>
+    <!-- Right: Links -->
+    <div class="nav-right">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="jobs.html" class="nav-link">Find Jobs</a>
+      <a href="employee_inbox.html" class="nav-link">Inbox</a>
+      <a href="employee_profile.html" class="nav-link">My Profile</a>
+    </div>
+  </div>
+
+  <!-- Main Jobs Container -->
+  <div class="jobs-container">
+    <!-- Filter Section (Sticky Panel) -->
+    <div class="filter-panel">
+      <h3>Filter by</h3>
+      
+      <!-- Category Filter -->
+      <label for="category-select">Category (Industry):</label>
+      <select id="category-select">
+        <option value="">All</option>
+        <option value="Arts">Arts</option>
+        <option value="Business">Business</option>
+        <option value="Communications">Communications</option>
+        <option value="Education">Education</option>
+        <option value="Healthcare">Healthcare</option>
+        <option value="Hospitality">Hospitality</option>
+        <option value="Information technology">Information technology</option>
+        <option value="Law enforcement">Law enforcement</option>
+        <option value="Sales and Marketing">Sales and Marketing</option>
+        <option value="Science">Science</option>
+        <option value="Transportation">Transportation</option>
+      </select>
+
+      <!-- Job Type Filter -->
+      <label for="jobtype-select">Job Type:</label>
+      <select id="jobtype-select">
+        <option value="">All</option>
+        <option value="Internship">Internship</option>
+        <option value="Student">Student</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Freelance">Freelance</option>
+      </select>
+
+      <button id="filter-btn">Filter</button>
+    </div>
+
+    <!-- Job Listings Section -->
+    <div class="job-listings" id="job-listings">
+      <!-- Jobs will be dynamically inserted by JavaScript (jobs.js) -->
+    </div>
+  </div>
+
+  <!-- JavaScript for Jobs (loading/filtering) -->
+  <script src="../public/js/jobs.js"></script>
+</body>
+</html>

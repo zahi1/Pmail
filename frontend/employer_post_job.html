@@ -1,0 +1,272 @@
+<!-- frontend/employer_post_job.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pmail - Post a New Job</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <!-- Reuse your dark theme CSS (e.g. inbox.css) or jobs.css -->
+  <link rel="stylesheet" href="../public/css/inbox.css" />
+  <!-- Additional custom styling for fancy layout -->
+  <style>
+    .page-container {
+      margin-top: 80px; 
+      padding: 20px; 
+      max-width: 900px; 
+      margin-left: auto; 
+      margin-right: auto;
+    }
+    .job-form-card, .job-listing-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .job-form-card h2 {
+      margin-top: 0;
+      color: #8ab4f8;
+    }
+    .job-form-card label {
+      display: block;
+      margin-top: 10px;
+      color: #bbb;
+      font-size: 14px;
+    }
+    .job-form-card input, .job-form-card select, .job-form-card textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 14px;
+    }
+    .job-form-card button {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #8ab4f8;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .job-form-card button:hover {
+      background-color: #6e9ad0;
+    }
+
+    .jobs-section-title {
+      color: #8ab4f8;
+      margin: 30px 0 10px;
+    }
+
+    /* Job listing card styling */
+    .job-listing-card h3 {
+      margin-top: 0;
+      color: #8ab4f8;
+    }
+    .job-listing-card p {
+      margin: 5px 0;
+      color: #bbb;
+    }
+    .job-listing-card .modify-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #8ab4f8;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .job-listing-card .modify-btn:hover {
+      background-color: #6e9ad0;
+    }
+
+    /* Edit Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      width: 400px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+    .modal h2 {
+      margin-top: 0;
+      color: #8ab4f8;
+    }
+    .modal label {
+      display: block;
+      margin-top: 10px;
+      color: #bbb;
+      font-size: 14px;
+    }
+    .modal input, .modal select, .modal textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 14px;
+    }
+    .modal .modal-btns {
+      margin-top: 15px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .modal-btns button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .save-edit-btn {
+      background-color: #8ab4f8;
+      color: #000;
+    }
+    .save-edit-btn:hover {
+      background-color: #6e9ad0;
+    }
+    .cancel-edit-btn {
+      background-color: #444;
+      color: #fff;
+    }
+    .cancel-edit-btn:hover {
+      background-color: #666;
+    }
+  </style>
+  <script src="../public/js/post_job.js" defer></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+    </div>
+    <div class="nav-right">
+      <a href="employer_home.html" class="nav-link">Home</a>
+      <a href="employer_post_job.html" class="nav-link">Post a Job</a>
+      <a href="employer_inbox.html" class="nav-link">Inbox</a>
+      <a href="employer_profile.html" class="nav-link">My Profile</a>
+    </div>
+  </div>
+
+  <div class="page-container">
+    <!-- Post Job Form Card -->
+    <div class="job-form-card">
+      <h2>Post a New Job</h2>
+      <form id="post-job-form">
+        <label for="title">Job Title:</label>
+        <input type="text" id="title" name="title" placeholder="e.g. Senior Developer" required />
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4" placeholder="Describe the position..." required></textarea>
+
+        <label for="category">Category (Industry):</label>
+        <select id="category" name="category" required>
+          <option value="">-- Select a Category --</option>
+          <option value="Arts">Arts</option>
+          <option value="Business">Business</option>
+          <option value="Communications">Communications</option>
+          <option value="Education">Education</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Hospitality">Hospitality</option>
+          <option value="Information technology">Information technology</option>
+          <option value="Law enforcement">Law enforcement</option>
+          <option value="Sales and Marketing">Sales and Marketing</option>
+          <option value="Science">Science</option>
+          <option value="Transportation">Transportation</option>
+        </select>
+
+        <label for="job_type">Job Type:</label>
+        <select id="job_type" name="job_type" required>
+          <option value="">-- Select a Job Type --</option>
+          <option value="Internship">Internship</option>
+          <option value="Student">Student</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Freelance">Freelance</option>
+        </select>
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" placeholder="e.g. New York, Remote" required />
+
+        <button type="submit">Post Job</button>
+      </form>
+    </div>
+
+    <!-- Employer's Existing Jobs -->
+    <h2 class="jobs-section-title">Your Posted Jobs</h2>
+    <div id="employer-jobs-container">
+      <!-- Job cards will be inserted here by JS -->
+    </div>
+  </div>
+
+  <!-- Edit Job Modal -->
+  <div class="modal-backdrop" id="edit-modal-backdrop">
+    <div class="modal" id="edit-modal">
+      <h2>Edit Job</h2>
+      <input type="hidden" id="edit-job-id" />
+      
+      <label for="edit-title">Job Title:</label>
+      <input type="text" id="edit-title" required />
+
+      <label for="edit-description">Description:</label>
+      <textarea id="edit-description" rows="4" required></textarea>
+
+      <label for="edit-category">Category (Industry):</label>
+      <select id="edit-category" required>
+        <option value="">-- Select a Category --</option>
+        <option value="Arts">Arts</option>
+        <option value="Business">Business</option>
+        <option value="Communications">Communications</option>
+        <option value="Education">Education</option>
+        <option value="Healthcare">Healthcare</option>
+        <option value="Hospitality">Hospitality</option>
+        <option value="Information technology">Information technology</option>
+        <option value="Law enforcement">Law enforcement</option>
+        <option value="Sales and Marketing">Sales and Marketing</option>
+        <option value="Science">Science</option>
+        <option value="Transportation">Transportation</option>
+      </select>
+
+      <label for="edit-job-type">Job Type:</label>
+      <select id="edit-job-type" required>
+        <option value="">-- Select a Job Type --</option>
+        <option value="Internship">Internship</option>
+        <option value="Student">Student</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Freelance">Freelance</option>
+      </select>
+
+      <label for="edit-location">Location:</label>
+      <input type="text" id="edit-location" required />
+
+      <div class="modal-btns">
+        <button class="save-edit-btn" onclick="saveJobEdits()">Save</button>
+        <button class="cancel-edit-btn" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

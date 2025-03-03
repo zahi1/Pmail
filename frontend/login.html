@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pmail - Login</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <link rel="stylesheet" href="../public/css/style.css">
+</head>
+<body>
+  <div class="login-container">
+    <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="logo">
+    <h2>Sign in</h2>
+    <p class="subtitle">to continue to Pmail</p>
+    
+    <!-- Step 1: Email Input -->
+    <div id="step-1" class="login-step">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <button id="next-btn" class="next-btn" onclick="goToPasswordStep()">Next</button>
+    </div>
+    
+    <!-- Step 2: Password Input -->
+    <div id="step-2" class="login-step" style="display: none;">
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button id="login-btn" class="next-btn" onclick="login()">Sign In</button>
+    </div>
+    
+    <p class="forgot-password">Forgot email?</p>
+    <p class="guest-mode">
+      Not your computer? Use a private browsing window to sign in.
+      <a href="#">Learn more</a>
+    </p>
+    
+    <div class="button-container">
+      <button class="create-account-btn" id="create-account-btn" onclick="toggleDropdown()">Create account</button>
+    </div>
+    
+    <!-- Dropdown Menu for Account Creation -->
+    <div id="dropdown" class="dropdown hidden">
+      <button onclick="redirectToRegister('employee')">For Employee</button>
+      <button onclick="redirectToRegister('employer')">For Employer</button>
+    </div>
+  </div>
+  
+  <script src="../public/js/auth.js"></script>
+  <script>
+    // Toggle dropdown visibility for "Create account"
+    function toggleDropdown() {
+      let dropdown = document.getElementById("dropdown");
+      dropdown.classList.toggle("hidden");
+    }
+    
+    // Redirect to registration page with the chosen role
+    function redirectToRegister(role) {
+      window.location.href = `register.html?role=${role}`;
+    }
+    
+    // Move from email step to password step
+    function goToPasswordStep() {
+      let email = document.getElementById("login-email").value.trim();
+      if (!email) {
+        alert("Please enter your email.");
+        return;
+      }
+      // (Optional: You can add further email validation here.)
+      document.getElementById("step-1").style.display = "none";
+      document.getElementById("step-2").style.display = "block";
+    }
+  </script>
+</body>
+</html>

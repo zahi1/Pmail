@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pmail - Register</title>
+    <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+
+    <div class="register-container">
+        <img src="/public/images/Pmail1.png" alt="Pmail Logo">
+        <h2>Create a Pmail Account</h2>
+
+        <!-- Hidden input for role selection -->
+        <input type="hidden" id="role">
+
+        <!-- Step 1: Name -->
+        <div id="step-1" class="form-step">
+            <input type="text" id="first_name" placeholder="First name" required>
+            <input type="text" id="last_name" placeholder="Last name" required>
+            <button onclick="nextStep(1)">Next</button>
+        </div>
+
+        <!-- Step 2: Birthdate Validation -->
+        <div id="step-2" class="form-step" style="display: none;">
+            <label>Birthdate:</label>
+            <input type="date" id="birthdate" required>
+            <p id="age-error" class="error-message" style="display: none; color: red;">
+              You must be at least 13 years old to register.
+            </p>
+            <button onclick="validateBirthdate()">Next</button>
+        </div>
+
+        <!-- Step 3: Choose Email -->
+        <div id="step-3" class="form-step" style="display: none;">
+            <h3>Choose your Pmail address</h3>
+            <p>Pick a Pmail address or create your own:</p>
+            
+            <input type="radio" id="email_option1" name="email_option" value="user123@pmail.com">
+            <label for="email_option1">user123@pmail.com</label><br>
+            
+            <input type="radio" id="email_option2" name="email_option" value="jobseeker@pmail.com">
+            <label for="email_option2">jobseeker@pmail.com</label><br>
+            
+            <input type="radio" id="custom_email_option" name="email_option" onclick="enableCustomEmail()">
+            <input type="email" id="email_input" placeholder="Create your own Pmail address" disabled required>
+        
+            <p id="email-error" class="error-message" style="display: none; color: red;">
+              Email must end with @pmail.com.
+            </p>
+            <button onclick="validateEmail()">Next</button>
+        </div>
+
+        <!-- Step 4: Password Setup -->
+        <div id="step-4" class="form-step" style="display: none;">
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirm_password" placeholder="Confirm Password" required>
+            <input type="checkbox" onclick="togglePassword()"> Show Password
+            <p id="password-error" class="error-message" style="display: none; color: red;">
+              Passwords do not match.
+            </p>
+            <button onclick="validatePassword()">Next</button>
+        </div>
+
+        <!-- Step 5: Phone Number & Final Sign Up -->
+        <div id="step-5" class="form-step" style="display: none;">
+            <input type="tel" id="phone" placeholder="Phone Number" required>
+            <!-- The external JS (auth.js) will handle the click event for register-btn -->
+            <button id="register-btn">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- External script for login & register calls -->
+    <script src="/public/js/auth.js"></script>
+
+    <!-- Inline script for multi-step logic ONLY -->
+    <script>
+        // 1) On page load, check the URL for a valid role (employee/employer)
+        function getRoleFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            let role = params.get("role");
+            if (!role || (role !== "employee" && role !== "employer")) {
+                alert("Invalid role. Redirecting...");
+                window.location.href = "login.html"; 
+            }
+            document.getElementById("role").value = role;
+        }
+        document.addEventListener("DOMContentLoaded", getRoleFromURL);
+
+        // 2) nextStep: hides the current step, shows the next
+        function nextStep(step) {
+            document.getElementById("step-" + step).style.display = "none";
+            document.getElementById("step-" + (step + 1)).style.display = "block";
+        }
+
+        // 3) Enable custom email input if user selects that radio
+        function enableCustomEmail() {
+            document.getElementById("email_input").disabled = false;
+        }
+
+        // 4) Toggle password fields from type=password to text
+        function togglePassword() {
+            let password = document.getElementById("password");
+            let confirmPassword = document.getElementById("confirm_password");
+            password.type = (password.type === "password") ? "text" : "password";
+            confirmPassword.type = (confirmPassword.type === "password") ? "text" : "password";
+        }
+
+        // 5) Validate birthdate (13+ years old)
+        function validateBirthdate() {
+            let birthdate = document.getElementById("birthdate").value;
+            let birthDateObj = new Date(birthdate);
+            let today = new Date();
+            let age = today.getFullYear() - birthDateObj.getFullYear();
+            let monthDiff = today.getMonth() - birthDateObj.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+                age--;
+            }
+
+            if (age < 13) {
+                document.getElementById("age-error").style.display = "block";
+            } else {
+                document.getElementById("age-error").style.display = "none";
+                nextStep(2);
+            }
+        }
+
+        // 6) Validate email radio choice or custom input
+        function validateEmail() {
+            let selectedEmailOption = document.querySelector('input[name="email_option"]:checked');
+            let customEmailInput   = document.getElementById("email_input");
+            let emailError         = document.getElementById("email-error");
+            
+            let email = "";
+
+            // If user picked a standard radio option (not custom)
+            if (selectedEmailOption && selectedEmailOption.id !== "custom_email_option") {
+                email = selectedEmailOption.value;
+            }
+            // Else if user typed a custom email
+            else if (customEmailInput && !customEmailInput.disabled) {
+                email = customEmailInput.value.trim();
+            }
+
+            // Must end with @pmail.com
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@pmail\.com$/;
+
+            if (email === "") {
+                emailError.textContent = "Please select or enter a Pmail address.";
+                emailError.style.display = "block";
+            } else if (!emailPattern.test(email)) {
+                emailError.textContent = "Email must end with @pmail.com.";
+                emailError.style.display = "block";
+            } else {
+                emailError.style.display = "none";
+                nextStep(3);
+            }
+        }
+
+        // 7) Validate password match
+        function validatePassword() {
+            let password        = document.getElementById("password").value;
+            let confirmPassword = document.getElementById("confirm_password").value;
+            let passwordError   = document.getElementById("password-error");
+
+            if (password !== confirmPassword) {
+                passwordError.style.display = "block";
+            } else {
+                passwordError.style.display = "none";
+                nextStep(4);
+            }
+        }
+    </script>
+</body>
+</html>

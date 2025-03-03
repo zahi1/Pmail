@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pmail - Employer Inbox</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <link rel="stylesheet" href="../public/css/inbox.css" />
+  <script src="../public/js/inbox.js" defer></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+    </div>
+    <div class="nav-right">
+      <a href="employer_home.html" class="nav-link">Home</a>
+      <a href="employer_post_job.html" class="nav-link">Post a Job</a>
+      <a href="employer_inbox.html" class="nav-link">Inbox</a>
+      <a href="employer_profile.html" class="nav-link">My Profile</a>
+    </div>
+  </div>
+
+  <!-- Sidebar for Mail Folders (Employer side: no Compose button) -->
+  <aside class="sidebar" id="sidebar">
+    <ul class="nav-links">
+      <li onclick="loadInbox()">
+        <img src="../public/images/inbox_icon.png" alt="Inbox Icon" />
+        <span>Inbox</span>
+      </li>
+      <li>
+        <img src="../public/images/star_icon.png" alt="Star Icon" />
+        <span>Starred</span>
+      </li>
+      <li>
+        <img src="../public/images/sent_icon.png" alt="Sent Icon" />
+        <span>Sent</span>
+      </li>
+      <li>
+        <img src="../public/images/draft_icon.png" alt="Draft Icon" />
+        <span>Drafts</span>
+      </li>
+      <li>
+        <img src="../public/images/trash_icon.png" alt="Trash Icon" />
+        <span>Trash</span>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content: Employer Inbox Messages -->
+  <main class="main-content">
+    <div id="inbox-messages" class="email-list">
+      <!-- JavaScript will load the messages here -->
+    </div>
+  </main>
+</body>
+</html>
