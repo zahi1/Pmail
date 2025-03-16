@@ -13,6 +13,7 @@
   <div class="top-nav">
     <!-- Left: Logo -->
     <div class="nav-left">
+      <img src="../public/images/burger_icon.png" alt="Menu" class="menu-toggle" id="menu-toggle" />
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
     <!-- Right: Navigation Links -->
@@ -26,15 +27,14 @@
 
   <!-- Sidebar for Mail Folders -->
   <aside class="sidebar" id="sidebar">
-    <button class="compose-btn" id="compose-btn">Compose</button>
+    <button class="compose-btn" id="compose-btn">
+      <img src="../public/images/pen_icon.png" alt="Compose" class="compose-icon" />
+      <span class="compose-text">Compose</span>
+    </button>
     <ul class="nav-links">
       <li onclick="loadInbox()">
         <img src="../public/images/inbox_icon.png" alt="Inbox Icon" />
         <span>Inbox</span>
-      </li>
-      <li>
-        <img src="../public/images/star_icon.png" alt="Star Icon" />
-        <span>Starred</span>
       </li>
       <li>
         <img src="../public/images/sent_icon.png" alt="Sent Icon" />
@@ -83,5 +83,13 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Add toggle functionality for sidebar
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.querySelector('.main-content').classList.toggle('expanded');
+    });
+  </script>
 </body>
 </html>

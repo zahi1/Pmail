@@ -12,6 +12,7 @@
   <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="nav-left">
+      <img src="../public/images/burger_icon.png" alt="Menu" class="menu-toggle" id="menu-toggle" />
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
     <div class="nav-right">
@@ -29,10 +30,7 @@
         <img src="../public/images/inbox_icon.png" alt="Inbox Icon" />
         <span>Inbox</span>
       </li>
-      <li>
-        <img src="../public/images/star_icon.png" alt="Star Icon" />
-        <span>Starred</span>
-      </li>
+      <!-- Starred item removed -->
       <li>
         <img src="../public/images/sent_icon.png" alt="Sent Icon" />
         <span>Sent</span>
@@ -54,5 +52,13 @@
       <!-- JavaScript will load the messages here -->
     </div>
   </main>
+
+  <script>
+    // Add toggle functionality for sidebar
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.querySelector('.main-content').classList.toggle('expanded');
+    });
+  </script>
 </body>
 </html>

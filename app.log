@@ -6126,3 +6126,352 @@
 2025-03-12 19:39:48,762 - INFO - 127.0.0.1 - - [12/Mar/2025 19:39:48] "GET /public/js/auth.js HTTP/1.1" 200 -
 2025-03-12 19:39:49,302 - INFO - Serving public file: images/Pmail1.png
 2025-03-12 19:39:49,302 - INFO - 127.0.0.1 - - [12/Mar/2025 19:39:49] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 01:47:00,829 - INFO - Starting the application...
+2025-03-16 01:47:01,040 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-03-16 01:47:01,040 - INFO - [33mPress CTRL+C to quit[0m
+2025-03-16 01:47:01,044 - INFO -  * Restarting with stat
+2025-03-16 01:47:02,290 - INFO - Starting the application...
+2025-03-16 01:47:02,329 - WARNING -  * Debugger is active!
+2025-03-16 01:47:02,349 - INFO -  * Debugger PIN: 275-397-529
+2025-03-16 02:31:49,199 - INFO - 127.0.0.1 - - [16/Mar/2025 02:31:49] "GET /frontend/login.html HTTP/1.1" 200 -
+2025-03-16 02:31:49,225 - INFO - Serving public file: css/style.css
+2025-03-16 02:31:49,235 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:31:49,236 - INFO - Serving public file: js/auth.js
+2025-03-16 02:31:49,243 - INFO - 127.0.0.1 - - [16/Mar/2025 02:31:49] "GET /public/css/style.css HTTP/1.1" 200 -
+2025-03-16 02:31:49,252 - INFO - 127.0.0.1 - - [16/Mar/2025 02:31:49] "GET /public/images/Pmail1.png HTTP/1.1" 200 -
+2025-03-16 02:31:49,283 - INFO - 127.0.0.1 - - [16/Mar/2025 02:31:49] "GET /public/js/auth.js HTTP/1.1" 200 -
+2025-03-16 02:36:19,853 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:19] "POST /auth/login HTTP/1.1" 200 -
+2025-03-16 02:36:21,480 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /frontend/employer_inbox.html HTTP/1.1" 200 -
+2025-03-16 02:36:21,513 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:36:21,522 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:36:21,523 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:36:21,525 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:36:21,528 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:36:21,539 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:36:21,540 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/images/inbox_icon.png HTTP/1.1" 200 -
+2025-03-16 02:36:21,562 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/js/inbox.js HTTP/1.1" 200 -
+2025-03-16 02:36:21,722 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:36:21,725 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:36:21,726 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:36:21,730 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:36:21,755 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/images/trash_icon.png HTTP/1.1" 200 -
+2025-03-16 02:36:21,756 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/images/sent_icon.png HTTP/1.1" 200 -
+2025-03-16 02:36:21,756 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/images/draft_icon.png HTTP/1.1" 200 -
+2025-03-16 02:36:21,756 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /public/images/star_icon.png HTTP/1.1" 200 -
+2025-03-16 02:36:21,818 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:21] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:36:46,521 - INFO - 127.0.0.1 - - [16/Mar/2025 02:36:46] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:40:21,621 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,662 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:40:21,668 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:40:21,670 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:40:21,676 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:40:21,680 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,681 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,714 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:40:21,740 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "GET /public/js/inbox.js HTTP/1.1" 200 -
+2025-03-16 02:40:21,862 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:40:21,864 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:40:21,865 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,866 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:40:21,868 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,869 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:40:21,873 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,879 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:21,906 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:40:21,908 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:40:21,912 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:21] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:40:33,796 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:33] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:40:51,008 - INFO - 127.0.0.1 - - [16/Mar/2025 02:40:51] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:46:21,489 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,522 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:46:21,541 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:46:21,541 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:46:21,542 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:21,544 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:46:21,548 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,548 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,572 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "GET /public/js/inbox.js HTTP/1.1" 200 -
+2025-03-16 02:46:21,646 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:46:21,656 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,657 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:46:21,658 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:46:21,660 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,665 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:46:21,666 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,671 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:21,696 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:21,704 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:46:21,705 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:21] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:27,185 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:27] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:46:28,906 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:28] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:46:28,933 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:46:28,935 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:28] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-03-16 02:46:28,937 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:46:28,939 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:28,943 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:46:28,943 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:28] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:28,944 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:28] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:46:28,945 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:28] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:29,015 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:46:29,016 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:46:29,018 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:46:29,018 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:29,020 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:29,021 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:46:29,021 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:29,024 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:29,047 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:46:29,055 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:29,060 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:29] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:35,926 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:35] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:46:35,970 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:46:35,976 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:46:35,979 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:35,980 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:35] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:46:35,981 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:46:35,983 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:35] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:46:35,985 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:35] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:35,989 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:35] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:36,113 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:46:36,114 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:46:36,115 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:46:36,115 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:36,116 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:46:36,120 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:36,121 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:36,124 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:36,143 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:46:36,170 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:46:36,174 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:36] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:46:39,122 - INFO - 127.0.0.1 - - [16/Mar/2025 02:46:39] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:48:01,017 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,042 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:48:01,045 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:48:01,047 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:48:01,049 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:01,052 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,053 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:48:01,055 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,058 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,141 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:48:01,143 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:48:01,143 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,144 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:48:01,144 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,147 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,148 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:48:01,152 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,169 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:48:01,174 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:01,178 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,754 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,781 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:48:01,783 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,786 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:48:01,787 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:01,793 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:48:01,793 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,793 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,795 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,875 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:48:01,877 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:48:01,879 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,881 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:48:01,886 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:48:01,894 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,897 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,913 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,926 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:01,935 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:01,936 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:01] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:48:02,453 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,481 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:48:02,482 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,487 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:48:02,489 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:02,490 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:48:02,492 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,493 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,493 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,582 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:48:02,583 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:48:02,584 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,585 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:48:02,586 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,587 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:48:02,591 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,600 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:02,606 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:48:02,636 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:48:02,637 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:02] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:48:04,124 - INFO - 127.0.0.1 - - [16/Mar/2025 02:48:04] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:49:42,334 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,369 - INFO - Serving public file: css/inbox.css
+2025-03-16 02:49:42,373 - INFO - Serving public file: js/inbox.js
+2025-03-16 02:49:42,375 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:49:42,378 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,385 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 02:49:42,386 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,388 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,398 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 02:49:42,503 - INFO - Serving public file: images/star_icon.png
+2025-03-16 02:49:42,504 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 02:49:42,506 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,507 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 02:49:42,509 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,510 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 02:49:42,515 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,518 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:42,540 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:49:42,543 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 02:49:42,546 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:42] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 02:49:44,176 - INFO - 127.0.0.1 - - [16/Mar/2025 02:49:44] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 02:50:51,984 - INFO - 127.0.0.1 - - [16/Mar/2025 02:50:51] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:06:02,826 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:02] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 03:06:02,870 - INFO - Serving public file: css/inbox.css
+2025-03-16 03:06:02,875 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:06:02,877 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 03:06:02,880 - INFO - Serving public file: js/inbox.js
+2025-03-16 03:06:02,883 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:02] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 03:06:02,888 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:02] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:02,889 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:02] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:02,909 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:02] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 03:06:03,052 - INFO - Serving public file: images/star_icon.png
+2025-03-16 03:06:03,053 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 03:06:03,054 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:03,054 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 03:06:03,057 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 03:06:03,058 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:03,061 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:03,066 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:03,088 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:06:03,115 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:06:03,120 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:03] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:06:05,837 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:05] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:06:07,617 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:07] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:06:19,258 - INFO - 127.0.0.1 - - [16/Mar/2025 03:06:19] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:10:55,083 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,115 - INFO - Serving public file: css/inbox.css
+2025-03-16 03:10:55,120 - INFO - Serving public file: js/inbox.js
+2025-03-16 03:10:55,124 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:10:55,125 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,127 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 03:10:55,127 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,130 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,138 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 03:10:55,202 - INFO - Serving public file: images/star_icon.png
+2025-03-16 03:10:55,204 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 03:10:55,205 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,205 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 03:10:55,206 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,209 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 03:10:55,211 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,218 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:10:55,231 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:10:55,237 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:10:55,238 - INFO - 127.0.0.1 - - [16/Mar/2025 03:10:55] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,028 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,062 - INFO - Serving public file: css/inbox.css
+2025-03-16 03:13:00,068 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 03:13:00,070 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:13:00,073 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 03:13:00,073 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,075 - INFO - Serving public file: js/inbox.js
+2025-03-16 03:13:00,079 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,081 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,173 - INFO - Serving public file: images/star_icon.png
+2025-03-16 03:13:00,174 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 03:13:00,175 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 03:13:00,176 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 03:13:00,177 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,177 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,177 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,179 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,219 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:13:00,222 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:13:00,223 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:00] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:13:03,932 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:03] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:13:09,995 - INFO - 127.0.0.1 - - [16/Mar/2025 03:13:09] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:26,198 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:26] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:27,831 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:27] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:29,235 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:29] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:30,646 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:30] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:33,093 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:33] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:35,999 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:35] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:20:38,187 - INFO - 127.0.0.1 - - [16/Mar/2025 03:20:38] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:25:40,438 - INFO - 127.0.0.1 - - [16/Mar/2025 03:25:40] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:25:43,838 - INFO - 127.0.0.1 - - [16/Mar/2025 03:25:43] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:31:09,522 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /frontend/employer_inbox.html HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,557 - INFO - Serving public file: css/inbox.css
+2025-03-16 03:31:09,564 - INFO - Serving public file: js/inbox.js
+2025-03-16 03:31:09,565 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-03-16 03:31:09,567 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:31:09,570 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 03:31:09,570 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,571 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,574 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,803 - INFO - Serving public file: images/star_icon.png
+2025-03-16 03:31:09,804 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 03:31:09,806 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,806 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,815 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 03:31:09,819 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,821 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 03:31:09,830 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,847 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:31:09,850 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:31:09,857 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:09] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:31:11,443 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:11] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:31:12,881 - ERROR - Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-03-16 03:31:12,882 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:12] "[33mGET /messages/sent/63 HTTP/1.1[0m" 404 -
+2025-03-16 03:31:15,769 - ERROR - Page not found: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2025-03-16 03:31:15,770 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:15] "[33mGET /messages/sent/63 HTTP/1.1[0m" 404 -
+2025-03-16 03:31:17,857 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:17] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:31:17,865 - INFO - 127.0.0.1 - - [16/Mar/2025 03:31:17] "GET /messages/inbox/63 HTTP/1.1" 200 -
+2025-03-16 03:32:49,986 - INFO - 127.0.0.1 - - [16/Mar/2025 03:32:49] "GET /frontend/login.html HTTP/1.1" 200 -
+2025-03-16 03:32:50,091 - INFO - Serving public file: css/style.css
+2025-03-16 03:32:50,095 - INFO - 127.0.0.1 - - [16/Mar/2025 03:32:50] "GET /public/css/style.css HTTP/1.1" 200 -
+2025-03-16 03:32:50,099 - INFO - Serving public file: js/auth.js
+2025-03-16 03:32:50,101 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:32:50,102 - INFO - 127.0.0.1 - - [16/Mar/2025 03:32:50] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:32:50,103 - INFO - 127.0.0.1 - - [16/Mar/2025 03:32:50] "GET /public/js/auth.js HTTP/1.1" 200 -
+2025-03-16 03:33:00,673 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:00] "[36mGET /frontend/login.html HTTP/1.1[0m" 304 -
+2025-03-16 03:33:00,728 - INFO - Serving public file: css/style.css
+2025-03-16 03:33:00,731 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:00] "[36mGET /public/css/style.css HTTP/1.1[0m" 304 -
+2025-03-16 03:33:00,736 - INFO - Serving public file: js/auth.js
+2025-03-16 03:33:00,739 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:00] "[36mGET /public/js/auth.js HTTP/1.1[0m" 304 -
+2025-03-16 03:33:00,741 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:33:00,743 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:00] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:00,942 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:33:00,943 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:00] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:13,722 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:13] "[36mGET /frontend/login.html HTTP/1.1[0m" 304 -
+2025-03-16 03:33:13,788 - INFO - Serving public file: css/style.css
+2025-03-16 03:33:13,791 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:13] "[36mGET /public/css/style.css HTTP/1.1[0m" 304 -
+2025-03-16 03:33:13,802 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:33:13,805 - INFO - Serving public file: js/auth.js
+2025-03-16 03:33:13,810 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:13] "[36mGET /public/js/auth.js HTTP/1.1[0m" 304 -
+2025-03-16 03:33:13,810 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:13] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:13,950 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:33:13,955 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:13] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:21,151 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:21] "POST /auth/login HTTP/1.1" 200 -
+2025-03-16 03:33:22,411 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "GET /frontend/employee_inbox.html HTTP/1.1" 200 -
+2025-03-16 03:33:22,482 - INFO - Serving public file: js/inbox.js
+2025-03-16 03:33:22,487 - INFO - Serving public file: css/inbox.css
+2025-03-16 03:33:22,494 - INFO - Serving public file: images/Pmail1.png
+2025-03-16 03:33:22,495 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/js/inbox.js HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,503 - INFO - Serving public file: images/inbox_icon.png
+2025-03-16 03:33:22,505 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,510 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,512 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,713 - INFO - Serving public file: images/star_icon.png
+2025-03-16 03:33:22,718 - INFO - Serving public file: images/sent_icon.png
+2025-03-16 03:33:22,724 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/star_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,727 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/sent_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,730 - INFO - Serving public file: images/draft_icon.png
+2025-03-16 03:33:22,737 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/draft_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,770 - INFO - Serving public file: images/trash_icon.png
+2025-03-16 03:33:22,785 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "[36mGET /public/images/trash_icon.png HTTP/1.1[0m" 304 -
+2025-03-16 03:33:22,803 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:22] "GET /messages/inbox/65 HTTP/1.1" 200 -
+2025-03-16 03:33:26,317 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:26] "GET /messages/inbox/65 HTTP/1.1" 200 -
+2025-03-16 03:33:30,576 - INFO - 127.0.0.1 - - [16/Mar/2025 03:33:30] "GET /messages/inbox/65 HTTP/1.1" 200 -

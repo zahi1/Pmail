@@ -78,7 +78,9 @@ body {
 }
 
 .compose-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 20px auto;
   background-color: #8ab4f8;
   color: #000;
@@ -92,6 +94,12 @@ body {
 
 .compose-btn:hover {
   background-color: #6e9ad0;
+}
+
+.compose-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 16px; /* Increased from 8px to move pen more to the left */
 }
 
 .nav-links {
@@ -131,6 +139,60 @@ body {
 .sidebar-collapsed .compose-btn,
 .sidebar-collapsed .nav-links li span {
   display: none;
+}
+
+/* Improved collapsed sidebar styling */
+.sidebar.collapsed {
+  width: 60px; /* Keep icons visible */
+  padding: 20px 10px; /* Reduce padding in collapsed state */
+}
+
+.sidebar.collapsed .compose-btn {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.sidebar.collapsed .compose-btn span {
+  display: none;
+}
+
+.sidebar.collapsed .compose-icon {
+  margin-right: 0; /* Remove margin when collapsed */
+}
+
+.sidebar.collapsed .nav-links li {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar.collapsed .nav-links li span {
+  display: none; /* Hide text but keep icons */
+}
+
+.sidebar.collapsed .nav-links li img {
+  margin-right: 0; /* Remove margin when collapsed */
+}
+
+/* Update these styles to ensure only the pen icon is visible when collapsed */
+.sidebar.collapsed .compose-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.sidebar.collapsed .compose-text {
+  display: none;
+}
+
+/* Make sure the pen icon stays visible and centered */
+.sidebar.collapsed .compose-icon {
+  margin-right: 0;
 }
 
 /* -------------------------------------- */
@@ -376,4 +438,30 @@ body {
       width: 90%;
       right: 5%;
   }
+}
+
+/* Add these styles to your existing CSS file */
+
+.menu-toggle {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.sidebar.collapsed {
+  width: 60px; /* Keep icons visible */
+}
+
+.sidebar.collapsed .nav-links li span {
+  display: none; /* Hide text but keep icons */
+}
+
+.main-content.expanded {
+  margin-left: 60px; /* Adjust based on collapsed sidebar width */
+}
+
+/* Add transition for smooth animation */
+.sidebar, .main-content {
+  transition: all 0.3s ease;
 }
