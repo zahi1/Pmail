@@ -160,3 +160,46 @@ def get_job_detail(job_id):
         "company_name": job.company_name,
         "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S")
     }), 200
+
+# ---------------------------------
+# GET /jobs/titles - Get all job titles for email subjects
+# ---------------------------------
+@jobs_bp.route("/jobs/titles", methods=["GET"])
+def get_job_titles():
+    # Get all job titles with their employer company names
+    jobs = Job.query.with_entities(Job.id, Job.title, Job.company_name).all()
+    results = []
+    for job in jobs:
+        results.append({
+            "id": job.id,
+            "title": job.title,
+            "company_name": job.company_name
+        })
+    return jsonify(results), 200
+
+# ---------------------------------
+# GET /jobs/titles/employer/<email> - Get job titles for a specific employer
+# ---------------------------------
+@jobs_bp.route("/jobs/titles/employer/<email>", methods=["GET"])
+def get_job_titles_by_employer(email):
+    # Extract company name from email (e.g., "techcorp@example.com" -> "techcorp")
+    company_name = email.split('@')[0].lower()
+    
+    # Find the actual employer in the database
+    employer = User.query.filter(func.lower(User.email) == email.lower()).first()
+    
+    if employer:
+        # Use the employer's actual company name if available
+        company_name = employer.company_name
+    
+    # Get jobs for this company
+    jobs = Job.query.filter(func.lower(Job.company_name).like(f"%{company_name}%")).all()
+    
+    results = []
+    for job in jobs:
+        results.append({
+            "id": job.id,
+            "title": job.title,
+            "company_name": job.company_name
+        })
+    return jsonify(results), 200
