@@ -56,10 +56,29 @@ function setupSidebarNavigation() {
     inboxLink.addEventListener('click', loadInbox);
   }
 
-  // Add click event listener for "Sent" link
-  const sentLink = document.querySelector('.nav-links li:nth-child(3)');
+  // Add click event listener for "Sent" link - corrected to be 2nd item
+  const sentLink = document.querySelector('.nav-links li:nth-child(2)');
   if (sentLink) {
     sentLink.addEventListener('click', loadSentMessages);
+  }
+  
+  // Add visual indicator for active section
+  document.querySelectorAll('.nav-links li').forEach(item => {
+    item.addEventListener('click', function() {
+      // Remove active class from all items
+      document.querySelectorAll('.nav-links li').forEach(li => {
+        li.classList.remove('active-nav');
+      });
+      
+      // Add active class to clicked item
+      this.classList.add('active-nav');
+    });
+  });
+  
+  // Set inbox as active by default
+  const defaultActive = document.querySelector('.nav-links li:nth-child(1)');
+  if (defaultActive) {
+    defaultActive.classList.add('active-nav');
   }
 }
 
@@ -258,6 +277,9 @@ function loadInbox() {
     inboxMessages.classList.remove("hidden");
   }
 
+  // Show loading indicator
+  inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
+
   fetch(`/messages/inbox/${currentUserId}`)
     .then(res => res.json())
     .then(data => {
@@ -265,7 +287,7 @@ function loadInbox() {
     })
     .catch(err => {
       console.error("Error loading inbox:", err);
-      alert("An error occurred while loading your inbox.");
+      inboxMessages.innerHTML = '<p style="padding:20px; color:#f44336;">Failed to load inbox messages.</p>';
     });
 }
 
@@ -287,6 +309,9 @@ function loadSentMessages() {
     inboxMessages.classList.remove("hidden");
   }
 
+  // Show loading indicator
+  inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
+
   fetch(`/messages/sent/${currentUserId}`)
     .then(res => res.json())
     .then(data => {
@@ -294,7 +319,7 @@ function loadSentMessages() {
     })
     .catch(err => {
       console.error("Error loading sent messages:", err);
-      alert("An error occurred while loading your sent messages.");
+      inboxMessages.innerHTML = '<p style="padding:20px; color:#f44336;">Failed to load sent messages.</p>';
     });
 }
 
@@ -329,7 +354,7 @@ function renderInbox(messages, view = 'inbox') {
         <div class="subject">${msg.subject} ${statusBadge}</div>
         <div class="time">${msg.created_at}</div>
       `;
-    } else {
+    } else if (view === 'sent') {
       item.innerHTML = `
         <div class="recipient">To: ${msg.recipient_email}</div>
         <div class="subject">${msg.subject} ${statusBadge}</div>
@@ -413,7 +438,14 @@ function viewMessage(message, source = 'inbox') {
   const backButton = document.getElementById("back-to-inbox");
   if (backButton) {
     backButton.addEventListener("click", () => {
-      source === 'inbox' ? loadInbox() : loadSentMessages();
+      // Navigate back to the correct view
+      if (source === 'inbox') {
+        loadInbox();
+      } else if (source === 'sent') {
+        loadSentMessages();
+      } else {
+        loadInbox(); // Default fallback
+      }
     });
   }
   

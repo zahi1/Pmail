@@ -132,6 +132,29 @@ body {
   flex: 1;
 }
 
+/* Add styling for active navigation item */
+.nav-links li.active-nav {
+  background-color: rgba(138, 180, 248, 0.2);
+  border-radius: 4px;
+  position: relative;
+}
+
+.nav-links li.active-nav::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #8ab4f8;
+  border-radius: 2px;
+}
+
+.nav-links li.active-nav span {
+  font-weight: bold;
+  color: #8ab4f8;
+}
+
 /* Collapsed sidebar (if needed) */
 .sidebar-collapsed {
   width: 60px;
