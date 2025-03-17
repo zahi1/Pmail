@@ -9,4 +9,5 @@ class Message(db.Model):
     recipient_id = db.Column(db.Integer, nullable=False)
     subject = db.Column(db.String(255), nullable=False)
     body = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default="Pending", nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())

@@ -425,6 +425,100 @@ body {
 }
 
 /* -------------------------------------- */
+/* 🔹 MESSAGE STATUS STYLING              */
+/* -------------------------------------- */
+.status-container {
+  margin-top: 12px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #333;
+}
+
+.status-label {
+  font-weight: bold;
+  margin-right: 12px;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.status-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+.status-pending {
+  background-color: #3a3a3a;
+  color: #bdbdbd;
+  border: 1px solid #4a4a4a;
+}
+
+.status-under-review {
+  background-color: #554b29;
+  color: #ffd54f;
+  border: 1px solid #7a7045;
+}
+
+.status-accepted {
+  background-color: #1e4620;
+  color: #81c784;
+  border: 1px solid #2e6732;
+}
+
+.status-rejected {
+  background-color: #621b16;
+  color: #ef9a9a;
+  border: 1px solid #832722;
+}
+
+.status-select {
+  margin-left: 15px;
+  padding: 5px 10px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.status-select:focus {
+  border-color: #8ab4f8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+}
+
+.status-badge-small {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-left: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* -------------------------------------- */
 /* RESPONSIVE STYLES FOR SMALLER SCREENS  */
 /* -------------------------------------- */
 @media (max-width: 800px) {

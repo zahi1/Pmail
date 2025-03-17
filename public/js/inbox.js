@@ -43,6 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Create message detail view container if it doesn't exist
   createMessageDetailContainer();
+
+  // Determine if user is employer or employee based on current URL path
+  const isEmployerPage = window.location.pathname.includes('employer');
+  localStorage.setItem('isEmployer', isEmployerPage);
 });
 
 function setupSidebarNavigation() {
@@ -314,17 +318,21 @@ function renderInbox(messages, view = 'inbox') {
     const item = document.createElement("div");
     item.classList.add("email-item");
     
+    // Get status (default to 'Pending' if not present)
+    const status = msg.status || 'Pending';
+    const statusBadge = `<span class="status-badge-small status-${status.toLowerCase().replace(' ', '-')}">${status}</span>`;
+    
     // Display different info based on view (inbox vs sent)
     if (view === 'inbox') {
       item.innerHTML = `
         <div class="sender">${msg.sender_email}</div>
-        <div class="subject">${msg.subject}</div>
+        <div class="subject">${msg.subject} ${statusBadge}</div>
         <div class="time">${msg.created_at}</div>
       `;
     } else {
       item.innerHTML = `
         <div class="recipient">To: ${msg.recipient_email}</div>
-        <div class="subject">${msg.subject}</div>
+        <div class="subject">${msg.subject} ${statusBadge}</div>
         <div class="time">${msg.created_at}</div>
       `;
     }
@@ -356,6 +364,36 @@ function viewMessage(message, source = 'inbox') {
   const headerType = source === 'inbox' ? 'From' : 'To';
   const contactEmail = source === 'inbox' ? message.sender_email : message.recipient_email;
   
+  // Get status (if not present, default to 'Pending')
+  const status = message.status || 'Pending';
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  
+  // Create status display based on user role
+  let statusHtml = '';
+  if (isEmployer && source === 'inbox') {
+    // For employers viewing received messages: editable status
+    statusHtml = `
+      <div class="status-container">
+        <span class="status-label">Status:</span>
+        <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+        <select class="status-select" id="status-select" data-message-id="${message.id}">
+          <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+          <option value="Under Review" ${status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+          <option value="Accepted" ${status === 'Accepted' ? 'selected' : ''}>Accepted</option>
+          <option value="Rejected" ${status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+        </select>
+      </div>
+    `;
+  } else {
+    // For employees or sent messages: read-only status
+    statusHtml = `
+      <div class="status-container">
+        <span class="status-label">Status:</span>
+        <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+      </div>
+    `;
+  }
+  
   messageDetail.innerHTML = `
     <div class="message-header">
       <button id="back-to-inbox" class="back-btn">← Back</button>
@@ -363,6 +401,7 @@ function viewMessage(message, source = 'inbox') {
       <div class="message-info">
         <div><strong>${headerType}:</strong> ${contactEmail}</div>
         <div><strong>Date:</strong> ${message.created_at}</div>
+        ${statusHtml}
       </div>
     </div>
     <div class="message-body">
@@ -377,6 +416,55 @@ function viewMessage(message, source = 'inbox') {
       source === 'inbox' ? loadInbox() : loadSentMessages();
     });
   }
+  
+  // Add event listener to status select if present
+  const statusSelect = document.getElementById('status-select');
+  if (statusSelect) {
+    statusSelect.addEventListener('change', updateMessageStatus);
+  }
+}
+
+// Function to update message status
+function updateMessageStatus(event) {
+  const messageId = event.target.dataset.messageId;
+  const newStatus = event.target.value;
+  
+  // Send status update to backend
+  fetch(`/messages/${messageId}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: newStatus })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to update status');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Update the displayed status badge
+    const statusBadge = document.querySelector('.status-badge');
+    if (statusBadge) {
+      statusBadge.textContent = newStatus;
+      
+      // Remove all status classes and add the new one
+      statusBadge.className = 'status-badge';
+      statusBadge.classList.add(`status-${newStatus.toLowerCase().replace(' ', '-')}`);
+    }
+    
+    // Update the current message object
+    if (currentMessage) {
+      currentMessage.status = newStatus;
+    }
+    
+    console.log('Status updated successfully');
+  })
+  .catch(error => {
+    console.error('Error updating status:', error);
+    alert('Failed to update message status');
+  });
 }
 
 function hideMessageDetail() {
@@ -384,29 +472,4 @@ function hideMessageDetail() {
   if (messageDetail) {
     messageDetail.classList.add("hidden");
   }
-}
-
-function renderInbox(messages) {
-  const container = document.getElementById("inbox-messages");
-  if (!container) return;
-  container.innerHTML = "";
-
-  if (!messages || messages.length === 0) {
-    container.innerHTML = "<p style='padding:20px;'>No messages found.</p>";
-    return;
-  }
-
-  messages.forEach(msg => {
-    const item = document.createElement("div");
-    item.classList.add("email-item");
-    // Display sender email, subject, and time
-    item.innerHTML = `
-      <div class="sender">${msg.sender_email}</div>
-      <div class="subject">${msg.subject}</div>
-      <div class="time">${msg.created_at}</div>
-    `;
-    // Add click event to view message details
-    item.addEventListener("click", () => viewMessage(msg, 'inbox'));
-    container.appendChild(item);
-  });
 }
