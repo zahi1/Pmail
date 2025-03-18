@@ -2,18 +2,19 @@
 
 // Retrieve the user_id from localStorage; default to "0" if not set
 let currentUserId = localStorage.getItem("user_id") || "0";
-let currentView = 'inbox'; // Track current view: 'inbox', 'sent', or 'message'
+let currentView = 'inbox'; // Track current view: 'inbox', 'sent', 'drafts', or 'message'
 let currentMessage = null; // Store the currently viewed message
+let currentDraftId = null; // Store the draft ID (if editing a draft)
 
 document.addEventListener("DOMContentLoaded", () => {
   // Retrieve user_id again (in case it was updated) and log for debugging
   currentUserId = localStorage.getItem("user_id") || "0";
   console.log("currentUserId:", currentUserId);
 
-  // If there's a Compose button, attach event listener
+  // If there's a Compose button, attach event listener that always starts a new email
   const composeBtn = document.getElementById("compose-btn");
   if (composeBtn) {
-    composeBtn.addEventListener("click", openCompose);
+    composeBtn.addEventListener("click", () => openCompose(true));
   }
 
   // Check if we have URL parameters (from job application)
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add event listeners to sidebar navigation
   setupSidebarNavigation();
 
-  // Load the inbox messages
+  // Load the inbox messages by default
   loadInbox();
   
   // Create message detail view container if it doesn't exist
@@ -49,17 +50,40 @@ document.addEventListener("DOMContentLoaded", () => {
   localStorage.setItem('isEmployer', isEmployerPage);
 });
 
+// Toast notification helper for in‑app messages
+function showToast(message) {
+  let toast = document.createElement("div");
+  toast.className = "toast-notification";
+  toast.innerText = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add("visible");
+  }, 100);
+  setTimeout(() => {
+    toast.classList.remove("visible");
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 500);
+  }, 3000);
+}
+
 function setupSidebarNavigation() {
-  // Add click event listener for "Inbox" link
+  // Add click event listener for "Inbox" link (first item)
   const inboxLink = document.querySelector('.nav-links li:nth-child(1)');
   if (inboxLink) {
     inboxLink.addEventListener('click', loadInbox);
   }
 
-  // Add click event listener for "Sent" link - corrected to be 2nd item
+  // Add click event listener for "Sent" link (second item)
   const sentLink = document.querySelector('.nav-links li:nth-child(2)');
   if (sentLink) {
     sentLink.addEventListener('click', loadSentMessages);
+  }
+  
+  // Add click event listener for "Drafts" link (third item)
+  const draftsLink = document.querySelector('.nav-links li:nth-child(3)');
+  if (draftsLink) {
+    draftsLink.addEventListener('click', loadDraftMessages);
   }
   
   // Add visual indicator for active section
@@ -69,7 +93,6 @@ function setupSidebarNavigation() {
       document.querySelectorAll('.nav-links li').forEach(li => {
         li.classList.remove('active-nav');
       });
-      
       // Add active class to clicked item
       this.classList.add('active-nav');
     });
@@ -83,10 +106,8 @@ function setupSidebarNavigation() {
 }
 
 function createMessageDetailContainer() {
-  // Check if container already exists
   if (document.getElementById("message-detail")) return;
   
-  // Create container for message details (initially hidden)
   const messageContainer = document.createElement("div");
   messageContainer.id = "message-detail";
   messageContainer.classList.add("message-detail", "hidden");
@@ -102,29 +123,53 @@ function toggleSidebar() {
   sidebar.classList.toggle("sidebar-collapsed");
 }
 
-function openCompose() {
+/**
+ * openCompose(isNew)
+ * @param {boolean} isNew - If true, start a new email (clear fields and draft id).
+ *                          If false, keep currentDraftId and loaded content (for editing).
+ */
+function openCompose(isNew = true) {
   const modal = document.getElementById("compose-modal");
   if (modal) {
     modal.classList.remove("hidden");
   }
-
-  // Clear previous form values
-  document.getElementById('recipient-email').value = '';
-  document.getElementById('subject-dropdown').selectedIndex = 0;
-  document.getElementById('message-body').value = '';
-
-  // Clear job titles - we'll load them when an employer email is entered
+  if (isNew) {
+    // When composing a new email, clear any existing draft id and clear fields.
+    currentDraftId = null;
+    document.getElementById('recipient-email').value = '';
+    document.getElementById('subject-dropdown').selectedIndex = 0;
+    document.getElementById('message-body').value = '';
+  }
+  // Clear job titles; they will be reloaded if needed
   clearJobTitles();
 }
 
 function closeCompose() {
   const modal = document.getElementById("compose-modal");
-  if (modal) {
+  if (!modal) return;
+  
+  // Grab the current compose field values
+  const recipientEmail = document.getElementById('recipient-email').value.trim();
+  const subject = document.getElementById('subject-dropdown').value.trim();
+  const body = document.getElementById('message-body').value.trim();
+  
+  // If there is any content, save (or update) the draft before hiding the modal.
+  if (recipientEmail || subject || body) {
+    saveDraft().then(() => {
+      modal.classList.add("hidden");
+      // If we're currently viewing drafts, refresh the drafts list.
+      if (currentView === 'drafts') {
+        loadDraftMessages();
+      }
+    }).catch(err => {
+      console.error("Error saving draft on close:", err);
+      modal.classList.add("hidden");
+    });
+  } else {
     modal.classList.add("hidden");
   }
 }
 
-// Function to clear job titles dropdown except the default option
 function clearJobTitles() {
   const dropdown = document.getElementById('subject-dropdown');
   if (dropdown) {
@@ -134,7 +179,6 @@ function clearJobTitles() {
   }
 }
 
-// Function to fetch job titles for a specific employer
 function loadJobTitlesByEmployer(employerEmail) {
   if (!employerEmail) return;
   
@@ -142,12 +186,8 @@ function loadJobTitlesByEmployer(employerEmail) {
     .then(response => response.json())
     .then(jobs => {
       const dropdown = document.getElementById('subject-dropdown');
-      
-      // Clear existing options except the default one
       clearJobTitles();
-      
       if (jobs.length === 0) {
-        // Add a note if no jobs found for this employer
         const option = document.createElement('option');
         option.value = "";
         option.text = "No jobs found for this employer";
@@ -155,8 +195,6 @@ function loadJobTitlesByEmployer(employerEmail) {
         dropdown.appendChild(option);
         return;
       }
-      
-      // Add job titles as options
       jobs.forEach(job => {
         const option = document.createElement('option');
         option.value = `Application for: ${job.title}`;
@@ -169,24 +207,12 @@ function loadJobTitlesByEmployer(employerEmail) {
     .catch(error => console.error('Error loading job titles:', error));
 }
 
-// Replace the old loadJobTitles function with the employer-specific one
-function loadJobTitles() {
-  // This is now a no-op - we'll load job titles when employer email is entered
-  // The old loadJobTitles functionality is replaced by loadJobTitlesByEmployer
-}
-
-// Function to open compose with job details pre-filled
 function openComposeWithJobDetails(company, jobTitle) {
-  openCompose();
-  
-  // Set the company email and trigger job title loading
+  // When opening with job details, we are composing a new email.
+  openCompose(true);
   const emailField = document.getElementById('recipient-email');
   emailField.value = `${company.toLowerCase().replace(/\s+/g, '')}@example.com`;
-  
-  // Load job titles for this company
   loadJobTitlesByEmployer(emailField.value);
-  
-  // Wait for job titles to load, then select the matching one
   setTimeout(() => {
     const dropdown = document.getElementById('subject-dropdown');
     for (let i = 0; i < dropdown.options.length; i++) {
@@ -195,11 +221,10 @@ function openComposeWithJobDetails(company, jobTitle) {
         break;
       }
     }
-  }, 500); // Give time for job titles to load
+  }, 500);
 }
 
 function sendMessage() {
-  // Check that currentUserId is set (should be a valid nonzero value)
   if (!currentUserId || currentUserId === "0") {
     alert("User is not logged in.");
     return;
@@ -215,7 +240,6 @@ function sendMessage() {
     return;
   }
 
-  // Get selected job data
   let jobId = null;
   let companyName = null;
   if (subjectDropdown.selectedIndex > 0) {
@@ -230,7 +254,8 @@ function sendMessage() {
     subject: subject,
     body: body,
     job_id: jobId,
-    company_name: companyName
+    company_name: companyName,
+    draft_id: currentDraftId // If editing an existing draft, include its ID
   };
 
   fetch("/messages/send", {
@@ -240,45 +265,86 @@ function sendMessage() {
   })
     .then(res => res.json())
     .then(data => {
-      if (data.message === "Message sent successfully") {
-        alert("Message sent!");
-        closeCompose();
-        // Optionally, clear the form fields:
+      if (data.message && (data.message === "Message sent successfully" || data.message === "Draft sent successfully")) {
+        showToast("Message sent!");
+        // Clear the compose form and reset currentDraftId
+        currentDraftId = null;
         document.getElementById("recipient-email").value = "";
-        document.getElementById("subject-dropdown").value = "";
+        document.getElementById('subject-dropdown').selectedIndex = 0;
         document.getElementById("message-body").value = "";
-        // Optionally reload the inbox
+        const modal = document.getElementById("compose-modal");
+        if (modal) modal.classList.add("hidden");
         loadInbox();
       } else {
-        alert("Error: " + data.error);
+        showToast("Error: " + data.error);
       }
     })
     .catch(err => {
       console.error("Error:", err);
-      alert("An error occurred while sending the message.");
+      showToast("An error occurred while sending the message.");
+    });
+}
+
+function saveDraft() {
+  const recipientEmail = document.getElementById("recipient-email").value.trim();
+  const subjectDropdown = document.getElementById('subject-dropdown');
+  const subject = subjectDropdown.value.trim();
+  const body = document.getElementById("message-body").value.trim();
+  
+  let jobId = null;
+  let companyName = null;
+  if (subjectDropdown.selectedIndex > 0) {
+    const selectedOption = subjectDropdown.options[subjectDropdown.selectedIndex];
+    jobId = selectedOption.dataset.jobId;
+    companyName = selectedOption.dataset.companyName;
+  }
+  
+  const payload = {
+    sender_id: currentUserId,
+    recipient_email: recipientEmail,
+    subject: subject,
+    body: body,
+    job_id: jobId,
+    company_name: companyName,
+    draft_id: currentDraftId  // If updating an existing draft
+  };
+
+  // Return the promise so the caller can wait on it
+  return fetch("/messages/draft", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.draft_id) {
+        currentDraftId = data.draft_id;
+        console.log("Draft saved/updated with id:", data.draft_id);
+      } else {
+        console.log("Draft saved/updated");
+      }
+      showToast("Your message is saved in drafts.");
+    })
+    .catch(err => {
+      console.error("Error saving draft:", err);
+      throw err;
     });
 }
 
 function loadInbox() {
-  // Ensure a valid currentUserId is set
   if (!currentUserId || currentUserId === "0") {
     console.error("User not logged in: cannot load inbox.");
     return;
   }
 
   currentView = 'inbox';
-  
-  // Hide message detail view if visible
   hideMessageDetail();
   
-  // Show inbox message list
   const inboxMessages = document.getElementById("inbox-messages");
   if (inboxMessages) {
     inboxMessages.classList.remove("hidden");
+    inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
   }
-
-  // Show loading indicator
-  inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
 
   fetch(`/messages/inbox/${currentUserId}`)
     .then(res => res.json())
@@ -292,25 +358,19 @@ function loadInbox() {
 }
 
 function loadSentMessages() {
-  // Ensure a valid currentUserId is set
   if (!currentUserId || currentUserId === "0") {
     console.error("User not logged in: cannot load sent messages.");
     return;
   }
 
   currentView = 'sent';
-  
-  // Hide message detail view if visible
   hideMessageDetail();
   
-  // Show inbox message list
   const inboxMessages = document.getElementById("inbox-messages");
   if (inboxMessages) {
     inboxMessages.classList.remove("hidden");
+    inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
   }
-
-  // Show loading indicator
-  inboxMessages.innerHTML = '<p style="padding:20px;">Loading messages...</p>';
 
   fetch(`/messages/sent/${currentUserId}`)
     .then(res => res.json())
@@ -320,6 +380,32 @@ function loadSentMessages() {
     .catch(err => {
       console.error("Error loading sent messages:", err);
       inboxMessages.innerHTML = '<p style="padding:20px; color:#f44336;">Failed to load sent messages.</p>';
+    });
+}
+
+function loadDraftMessages() {
+  if (!currentUserId || currentUserId === "0") {
+    console.error("User not logged in: cannot load drafts.");
+    return;
+  }
+
+  currentView = 'drafts';
+  hideMessageDetail();
+  
+  const inboxMessages = document.getElementById("inbox-messages");
+  if (inboxMessages) {
+    inboxMessages.classList.remove("hidden");
+    inboxMessages.innerHTML = '<p style="padding:20px;">Loading drafts...</p>';
+  }
+
+  fetch(`/messages/drafts/${currentUserId}`)
+    .then(res => res.json())
+    .then(data => {
+      renderInbox(data, 'drafts');
+    })
+    .catch(err => {
+      console.error("Error loading drafts:", err);
+      inboxMessages.innerHTML = '<p style="padding:20px; color:#f44336;">Failed to load drafts.</p>';
     });
 }
 
@@ -333,37 +419,42 @@ function renderInbox(messages, view = 'inbox') {
     return;
   }
 
-  // Add a header to show which messages are displayed
   const header = document.createElement("div");
   header.classList.add("inbox-header");
-  header.textContent = view === 'inbox' ? "Inbox" : "Sent Messages";
+  header.textContent = (view === 'inbox') ? "Inbox" :
+                         (view === 'sent') ? "Sent Messages" :
+                         (view === 'drafts') ? "Drafts" : "";
   container.appendChild(header);
 
   messages.forEach(msg => {
     const item = document.createElement("div");
     item.classList.add("email-item");
     
-    // Get status (default to 'Pending' if not present)
     const status = msg.status || 'Pending';
     const statusBadge = `<span class="status-badge-small status-${status.toLowerCase().replace(' ', '-')}">${status}</span>`;
     
-    // Display different info based on view (inbox vs sent)
     if (view === 'inbox') {
       item.innerHTML = `
         <div class="sender">${msg.sender_email}</div>
         <div class="subject">${msg.subject} ${statusBadge}</div>
         <div class="time">${msg.created_at}</div>
       `;
+      item.addEventListener("click", () => viewMessage(msg, view));
     } else if (view === 'sent') {
       item.innerHTML = `
         <div class="recipient">To: ${msg.recipient_email}</div>
         <div class="subject">${msg.subject} ${statusBadge}</div>
         <div class="time">${msg.created_at}</div>
       `;
+      item.addEventListener("click", () => viewMessage(msg, view));
+    } else if (view === 'drafts') {
+      item.innerHTML = `
+        <div class="recipient">Draft</div>
+        <div class="subject">${msg.subject} ${statusBadge}</div>
+        <div class="time">${msg.created_at}</div>
+      `;
+      item.addEventListener("click", () => viewDraft(msg));
     }
-    
-    // Add click event to view message details
-    item.addEventListener("click", () => viewMessage(msg, view));
     
     container.appendChild(item);
   });
@@ -373,30 +464,24 @@ function viewMessage(message, source = 'inbox') {
   currentView = 'message';
   currentMessage = message;
   
-  // Hide inbox messages list
   const inboxMessages = document.getElementById("inbox-messages");
   if (inboxMessages) {
     inboxMessages.classList.add("hidden");
   }
   
-  // Show and populate message detail view
   const messageDetail = document.getElementById("message-detail");
   if (!messageDetail) return;
   
   messageDetail.classList.remove("hidden");
   
-  // Determine if this is "From" or "To" depending on inbox vs. sent view
   const headerType = source === 'inbox' ? 'From' : 'To';
   const contactEmail = source === 'inbox' ? message.sender_email : message.recipient_email;
   
-  // Get status (if not present, default to 'Pending')
   const status = message.status || 'Pending';
   const isEmployer = localStorage.getItem('isEmployer') === 'true';
   
-  // Create status display based on user role
   let statusHtml = '';
   if (isEmployer && source === 'inbox') {
-    // For employers viewing received messages: editable status
     statusHtml = `
       <div class="status-container">
         <span class="status-label">Status:</span>
@@ -410,7 +495,6 @@ function viewMessage(message, source = 'inbox') {
       </div>
     `;
   } else {
-    // For employees or sent messages: read-only status
     statusHtml = `
       <div class="status-container">
         <span class="status-label">Status:</span>
@@ -434,39 +518,57 @@ function viewMessage(message, source = 'inbox') {
     </div>
   `;
   
-  // Add event listener to back button
   const backButton = document.getElementById("back-to-inbox");
   if (backButton) {
     backButton.addEventListener("click", () => {
-      // Navigate back to the correct view
       if (source === 'inbox') {
         loadInbox();
       } else if (source === 'sent') {
         loadSentMessages();
       } else {
-        loadInbox(); // Default fallback
+        loadInbox();
       }
     });
   }
   
-  // Add event listener to status select if present
   const statusSelect = document.getElementById('status-select');
   if (statusSelect) {
     statusSelect.addEventListener('change', updateMessageStatus);
   }
 }
 
-// Function to update message status
+function viewDraft(draft) {
+  // When a draft is clicked, load it for editing and set currentDraftId so that
+  // any modifications will update the same draft record.
+  currentDraftId = draft.id;
+  openCompose(false); // false indicates we're editing an existing draft
+  document.getElementById("recipient-email").value = draft.recipient_email || "";
+  const subjectDropdown = document.getElementById('subject-dropdown');
+  let found = false;
+  for (let i = 0; i < subjectDropdown.options.length; i++) {
+    if (subjectDropdown.options[i].text === draft.subject) {
+      subjectDropdown.selectedIndex = i;
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    const option = document.createElement('option');
+    option.value = draft.subject;
+    option.text = draft.subject;
+    subjectDropdown.appendChild(option);
+    subjectDropdown.selectedIndex = subjectDropdown.options.length - 1;
+  }
+  document.getElementById("message-body").value = draft.body;
+}
+
 function updateMessageStatus(event) {
   const messageId = event.target.dataset.messageId;
   const newStatus = event.target.value;
   
-  // Send status update to backend
   fetch(`/messages/${messageId}/status`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: newStatus })
   })
   .then(response => {
@@ -476,21 +578,15 @@ function updateMessageStatus(event) {
     return response.json();
   })
   .then(data => {
-    // Update the displayed status badge
     const statusBadge = document.querySelector('.status-badge');
     if (statusBadge) {
       statusBadge.textContent = newStatus;
-      
-      // Remove all status classes and add the new one
       statusBadge.className = 'status-badge';
       statusBadge.classList.add(`status-${newStatus.toLowerCase().replace(' ', '-')}`);
     }
-    
-    // Update the current message object
     if (currentMessage) {
       currentMessage.status = newStatus;
     }
-    
     console.log('Status updated successfully');
   })
   .catch(error => {

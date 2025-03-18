@@ -29,22 +29,17 @@ app.register_blueprint(jobs_bp, url_prefix='')  # Jobs endpoints will be availab
 app.register_blueprint(messages_bp, url_prefix='')
 app.register_blueprint(profile_bp, url_prefix="/")
 
-
-
-# Root Route to Check if API is Running
 @app.route('/')
 def home():
     logging.info('API is running!')
     return jsonify({"message": "Pmail API is running!"})
 
-# Serve Frontend Files
 @app.route('/frontend/<path:filename>')
 def serve_frontend(filename):
     frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../frontend'))
     logging.info(f'Serving frontend file: {filename}')
     return send_from_directory(frontend_dir, filename)
 
-# Serve Public Files (CSS, JS, Images)
 @app.route('/public/<path:filename>')
 def serve_public(filename):
     public_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../public'))
