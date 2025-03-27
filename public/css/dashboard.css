@@ -1,0 +1,113 @@
+/* frontend/public/css/dashboard.css */
+
+/* Force black background, white text */
+body {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-container {
+  margin-top: 80px; /* Avoid top nav overlap */
+  padding: 20px;
+}
+
+/* Title */
+.dashboard-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: #8ab4f8;
+}
+
+/* 2 columns x 2 rows for exactly 4 charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* Exactly 2 columns */
+  gap: 20px;
+  margin-bottom: 40px;
+  justify-items: center;
+}
+
+/* Base styling for all chart boxes */
+.chart-box {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* 1) The first chart box (Application Status Distribution) */
+.charts-grid .chart-box:nth-child(1) {
+  width: 450px;
+  min-height: 450px;
+}
+
+/* 2) The other three chart boxes (time series, category, day of week) */
+.charts-grid .chart-box:nth-child(2),
+.charts-grid .chart-box:nth-child(3),
+.charts-grid .chart-box:nth-child(4) {
+  width: 700px;
+  min-height: 450px;
+}
+
+/* Canvas sizing for the first chart */
+.charts-grid .chart-box:nth-child(1) canvas {
+  width: 100% !important;
+  height: 400px !important; /* e.g. slightly smaller than container */
+}
+
+/* Canvas sizing for the other three charts */
+.charts-grid .chart-box:nth-child(2) canvas,
+.charts-grid .chart-box:nth-child(3) canvas,
+.charts-grid .chart-box:nth-child(4) canvas {
+  width: 100% !important;
+  height: 400px !important; /* same height, but box is wider */
+}
+
+/* Table Container */
+.table-container {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  margin-top: 20px;
+}
+
+/* Table Title */
+.table-container h2 {
+  margin-bottom: 15px;
+  color: #8ab4f8;
+  text-align: center;
+}
+
+/* Applications Table */
+#applicationsTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: #ffffff;
+}
+
+#applicationsTable th,
+#applicationsTable td {
+  padding: 10px;
+  border: 1px solid #333;
+  text-align: left;
+}
+
+#applicationsTable th {
+  background-color: #333;
+  font-weight: 600;
+}
+
+#applicationsTable tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+
+/* Optional: row hover for a slightly fancier table */
+#applicationsTable tbody tr:hover {
+  background-color: #3a3a3a;
+  transition: background-color 0.2s;
+}

@@ -5,6 +5,7 @@ from backend.routes.jobs import jobs_bp  # Import the jobs routes blueprint
 from backend.routes.messages import messages_bp
 from backend.models.database import db
 from backend.routes.profile import profile_bp
+from backend.routes.dashboard import dashboard_bp
 
 import os
 import logging
@@ -28,6 +29,8 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(jobs_bp, url_prefix='')  # Jobs endpoints will be available as defined (e.g., /jobs)
 app.register_blueprint(messages_bp, url_prefix='')
 app.register_blueprint(profile_bp, url_prefix="/")
+app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+
 
 @app.route('/')
 def home():

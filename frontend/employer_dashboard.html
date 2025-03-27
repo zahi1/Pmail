@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+  <title>Employer Dashboard</title>
+  <link rel="stylesheet" href="../public/css/inbox.css">
+  <link rel="stylesheet" href="../public/css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar (employer version) -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+    </div>
+    <div class="nav-right">
+      <a href="employer_home.html" class="nav-link"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
+      <a href="employer_post_job.html" class="nav-link"><img src="../public/images/postjob_icon.png" alt="Post a Job" class="nav-icon"> Post a Job</a>
+      <a href="employer_dashboard.html" class="nav-link"><img src="../public/images/dashboard_icon.png" alt="Dashboard" class="nav-icon"> Dashboard</a>
+      <a href="employer_inbox.html" class="nav-link"><img src="../public/images/inbox_icon.png" alt="Inbox" class="nav-icon"> Inbox</a>
+      <a href="employer_profile.html" class="nav-link"><img src="../public/images/person_icon.png" alt="Profile" class="nav-icon"> My Profile</a>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <h1 class="dashboard-title">Employer Dashboard</h1>
+
+    <!-- 2x2 Grid for 4 Charts -->
+    <div class="charts-grid">
+      <!-- Top row (2 charts) -->
+      <div class="chart-box">
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <canvas id="timeSeriesChart"></canvas>
+      </div>
+
+      <!-- Bottom row (2 charts) -->
+      <div class="chart-box">
+        <canvas id="categoryChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <canvas id="dayOfWeekChart"></canvas>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <h2>All Received Applications</h2>
+      <table id="applicationsTable">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Sent Date</th>
+            <th>Applicant</th>
+            <th>Category</th>
+            <th>Job Type</th>
+            <th>Location</th>
+            <th>Company</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled by employer_dashboard.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Employer dashboard script -->
+  <script src="../public/js/employer_dashboard.js"></script>
+</body>
+</html>
