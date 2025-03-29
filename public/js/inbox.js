@@ -409,6 +409,57 @@ function loadDraftMessages() {
     });
 }
 
+/**
+ * Loads spam messages for the current user
+ * Displays a "No spam messages" notice if none are found
+ */
+function loadSpam() {
+  const currentUserId = localStorage.getItem("user_id") || "0";
+  const inboxContainer = document.getElementById('inbox-messages');
+  
+  // Clear active class from all nav items and add to spam
+  document.querySelectorAll('.nav-links li').forEach(item => {
+    item.classList.remove('active-nav');
+  });
+  document.querySelector('.nav-links li:nth-child(4)').classList.add('active-nav');
+  
+  // Show loading state
+  inboxContainer.innerHTML = '<div style="padding: 20px; text-align: center;">Loading spam messages...</div>';
+  
+  // Fetch spam messages
+  fetch(`/messages/spam/${currentUserId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.messages && data.messages.length > 0) {
+        // Display spam messages
+        let messagesHTML = '';
+        data.messages.forEach(message => {
+          messagesHTML += `
+            <div class="email-item" onclick="viewMessage(${message.id})">
+              <div class="sender">${message.sender_name}</div>
+              <div class="subject">${message.subject}</div>
+              <div class="time">${message.created_at}</div>
+            </div>
+          `;
+        });
+        inboxContainer.innerHTML = messagesHTML;
+      } else {
+        // No spam messages
+        inboxContainer.innerHTML = `
+          <div style="padding: 40px; text-align: center; color: #bbb;">
+            <img src="../public/images/spam_icon.png" alt="No Spam" style="width: 50px; margin-bottom: 15px; opacity: 0.5;">
+            <p>No spam messages found.</p>
+            <p style="font-size: 14px;">Messages identified as spam will appear here.</p>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      console.error('Error loading spam messages:', error);
+      inboxContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #ff6b6b;">Error loading spam messages. Please try again later.</div>';
+    });
+}
+
 function renderInbox(messages, view = 'inbox') {
   const container = document.getElementById("inbox-messages");
   if (!container) return;
