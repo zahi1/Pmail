@@ -1,0 +1,49 @@
+/* splash.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+  
+.splash-container {
+    text-align: center;
+    padding-bottom: 30vh; /* This shifts content upward from center */
+}
+  
+.splash-logo {
+    width: 200px;
+    margin-bottom: 20px;
+}
+  
+.welcome-message {
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+  
+.loading-bar-container {
+    width: 300px;
+    height: 12px;
+    background-color: #333;
+    border-radius: 6px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+  
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #8ab4f8;
+    animation: loading 3s forwards;
+}
+  
+@keyframes loading {
+    from { width: 0%; }
+    to { width: 100%; }
+}

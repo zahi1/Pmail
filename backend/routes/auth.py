@@ -101,5 +101,7 @@ def login():
     return jsonify({
         "message": "Login successful",
         "redirect": redirect_url,
-        "user_id": user.id  # <-- Make sure this is returned!
+        "user_id": user.id,
+        "first_name": user.first_name,  # Include first name in response
+        "role": user.role
     }), 200
