@@ -622,3 +622,43 @@ body {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* Spam message styling */
+.spam-subtitle {
+  font-size: 12px;
+  color: #999;
+  font-weight: normal;
+  margin-left: 10px;
+}
+
+.spam-warning {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin: 10px 0;
+}
+
+.spam-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  opacity: 0.8;
+}
+
+.not-spam-btn {
+  margin-left: auto;
+  background-color: #2a2a2a;
+  color: #8ab4f8;
+  border: 1px solid #8ab4f8;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.not-spam-btn:hover {
+  background-color: #333;
+}

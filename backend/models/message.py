@@ -11,4 +11,5 @@ class Message(db.Model):
     body = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="Pending", nullable=False)
     is_draft = db.Column(db.Boolean, default=False, nullable=False)
+    is_spam = db.Column(db.Boolean, default=False, nullable=False)  # Add is_spam column
     created_at = db.Column(db.DateTime, server_default=db.func.now())

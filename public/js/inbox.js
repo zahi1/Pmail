@@ -414,14 +414,11 @@ function loadDraftMessages() {
  * Displays a "No spam messages" notice if none are found
  */
 function loadSpam() {
-  const currentUserId = localStorage.getItem("user_id") || "0";
-  const inboxContainer = document.getElementById('inbox-messages');
+  currentView = 'spam';
+  hideMessageDetail();
   
-  // Clear active class from all nav items and add to spam
-  document.querySelectorAll('.nav-links li').forEach(item => {
-    item.classList.remove('active-nav');
-  });
-  document.querySelector('.nav-links li:nth-child(4)').classList.add('active-nav');
+  const inboxContainer = document.getElementById('inbox-messages');
+  inboxContainer.classList.remove('hidden');
   
   // Show loading state
   inboxContainer.innerHTML = '<div style="padding: 20px; text-align: center;">Loading spam messages...</div>';
@@ -432,20 +429,29 @@ function loadSpam() {
     .then(data => {
       if (data.messages && data.messages.length > 0) {
         // Display spam messages
-        let messagesHTML = '';
+        let html = `
+          <div class="inbox-header">
+            <span>Spam</span>
+            <span class="spam-subtitle">Messages detected as spam</span>
+          </div>
+        `;
+        
         data.messages.forEach(message => {
-          messagesHTML += `
-            <div class="email-item" onclick="viewMessage(${message.id})">
-              <div class="sender">${message.sender_name}</div>
+          html += `
+            <div class="email-item" onclick="viewSpamMessage(${JSON.stringify(message).replace(/"/g, '&quot;')})">
+              <div class="sender">${message.sender_name || message.sender_email}</div>
               <div class="subject">${message.subject}</div>
               <div class="time">${message.created_at}</div>
             </div>
           `;
         });
-        inboxContainer.innerHTML = messagesHTML;
+        inboxContainer.innerHTML = html;
       } else {
         // No spam messages
         inboxContainer.innerHTML = `
+          <div class="inbox-header">
+            <span>Spam</span>
+          </div>
           <div style="padding: 40px; text-align: center; color: #bbb;">
             <img src="../public/images/spam_icon.png" alt="No Spam" style="width: 50px; margin-bottom: 15px; opacity: 0.5;">
             <p>No spam messages found.</p>
@@ -458,6 +464,68 @@ function loadSpam() {
       console.error('Error loading spam messages:', error);
       inboxContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #ff6b6b;">Error loading spam messages. Please try again later.</div>';
     });
+}
+
+function viewSpamMessage(message) {
+  currentView = 'message';
+  currentMessage = message;
+  
+  const inboxMessages = document.getElementById("inbox-messages");
+  if (inboxMessages) {
+    inboxMessages.classList.add("hidden");
+  }
+  
+  const messageDetail = document.getElementById("message-detail");
+  if (!messageDetail) return;
+  
+  messageDetail.classList.remove("hidden");
+  
+  messageDetail.innerHTML = `
+    <div class="message-header">
+      <button id="back-to-spam" class="back-btn">← Back to Spam</button>
+      <div class="spam-warning">
+        <img src="../public/images/spam_icon.png" alt="Spam Warning" class="spam-icon">
+        <span>This message was detected as spam</span>
+        <button id="not-spam-btn" class="not-spam-btn" data-message-id="${message.id}">Not Spam</button>
+      </div>
+      <h2>${message.subject}</h2>
+      <div class="message-info">
+        <div><strong>From:</strong> ${message.sender_name || message.sender_email}</div>
+        <div><strong>Date:</strong> ${message.created_at}</div>
+      </div>
+    </div>
+    <div class="message-body">
+      ${message.body}
+    </div>
+  `;
+  
+  // Add event listeners
+  document.getElementById("back-to-spam").addEventListener("click", loadSpam);
+  
+  const notSpamBtn = document.getElementById("not-spam-btn");
+  if (notSpamBtn) {
+    notSpamBtn.addEventListener("click", function() {
+      moveMessageFromSpam(this.getAttribute("data-message-id"));
+    });
+  }
+}
+
+function moveMessageFromSpam(messageId) {
+  fetch(`/messages/not-spam/${messageId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    showToast("Message moved to inbox");
+    loadInbox(); // Return to inbox where the message should now appear
+  })
+  .catch(error => {
+    console.error('Error moving message from spam:', error);
+    showToast("Error moving message from spam");
+  });
 }
 
 function renderInbox(messages, view = 'inbox') {

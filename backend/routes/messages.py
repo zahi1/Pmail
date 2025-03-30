@@ -4,8 +4,44 @@ from backend.models.database import db
 from backend.models.message import Message
 from backend.models.user import User
 from sqlalchemy import func
+import pickle
+import os
 
 messages_bp = Blueprint('messages', __name__)
+
+# Load the trained spam detection model
+SPAM_MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'models', 'spam_detector_model.pkl')
+
+try:
+    with open(SPAM_MODEL_PATH, 'rb') as f:
+        spam_model = pickle.load(f)
+    print(f"✅ Spam detection model loaded successfully from {SPAM_MODEL_PATH}")
+except Exception as e:
+    print(f"❌ Error loading spam model: {e}")
+    print(f"Attempted to load from: {os.path.abspath(SPAM_MODEL_PATH)}")
+    spam_model = None
+
+def is_spam(subject, body):
+    """Check if a message is spam based on subject and body"""
+    if spam_model is None:
+        print("⚠️ Spam model not loaded, defaulting to non-spam")
+        return False
+    
+    try:
+        combined_text = f"{subject} {body}"
+        print(f"📝 Analyzing message: '{combined_text[:50]}...'")
+        
+        # Get probability of being spam (index 1 is spam probability)
+        spam_prob = spam_model.predict_proba([combined_text])[0][1]
+        is_spam_result = spam_prob > 0.5  # Threshold for classifying as spam
+        
+        print(f"📊 Spam probability: {spam_prob:.4f} - {'SPAM' if is_spam_result else 'NOT SPAM'}")
+        return is_spam_result
+    except Exception as e:
+        print(f"❌ Error in spam detection: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 @messages_bp.route('/messages/send', methods=['POST'])
 def send_message():
@@ -24,32 +60,49 @@ def send_message():
     # Find recipient by email (case-insensitive)
     recipient = User.query.filter(func.lower(User.email) == recipient_email.lower()).first()
     if not recipient:
+        print(f"❌ Recipient not found: {recipient_email}")
         return jsonify({"error": "Recipient not found"}), 404
 
-    if draft_id:
-        # Update an existing draft and send it
-        message = Message.query.get(draft_id)
-        if not message:
-            return jsonify({"error": "Draft not found"}), 404
-        message.recipient_id = recipient.id
-        message.subject = subject
-        message.body = body
-        message.status = "Pending"
-        message.is_draft = False
-        db.session.commit()
-        return jsonify({"message": "Draft sent successfully"}), 200
-    else:
-        new_message = Message(
-            sender_id=sender_id,
-            recipient_id=recipient.id,
-            subject=subject,
-            body=body,
-            status="Pending",
-            is_draft=False
-        )
-        db.session.add(new_message)
-        db.session.commit()
-        return jsonify({"message": "Message sent successfully"}), 201
+    print(f"👤 Recipient found: ID {recipient.id}, Email: {recipient.email}")
+
+    # Check if message is spam
+    spam_detected = is_spam(subject, body)
+    
+    try:
+        if draft_id:
+            # Update an existing draft and send it
+            message = Message.query.get(draft_id)
+            if not message:
+                return jsonify({"error": "Draft not found"}), 404
+            message.recipient_id = recipient.id
+            message.subject = subject
+            message.body = body
+            message.status = "Pending"
+            message.is_draft = False
+            message.is_spam = spam_detected  # Set is_spam flag
+            db.session.commit()
+            
+            print(f"📤 Draft sent with ID {message.id}, is_spam: {message.is_spam}")
+            return jsonify({"message": "Draft sent successfully"}), 200
+        else:
+            new_message = Message(
+                sender_id=sender_id,
+                recipient_id=recipient.id,
+                subject=subject,
+                body=body,
+                status="Pending",
+                is_draft=False,
+                is_spam=spam_detected  # Set is_spam flag
+            )
+            db.session.add(new_message)
+            db.session.commit()
+            
+            print(f"📤 New message sent with ID {new_message.id}, is_spam: {new_message.is_spam}")
+            return jsonify({"message": "Message sent successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error saving message: {e}")
+        return jsonify({"error": "Database error while saving message"}), 500
 
 @messages_bp.route('/messages/draft', methods=['POST'])
 def save_draft():
@@ -97,22 +150,34 @@ def save_draft():
 
 @messages_bp.route('/messages/inbox/<int:user_id>', methods=['GET'])
 def get_inbox(user_id):
-    # Fetch messages where user_id is the recipient and that are not drafts
-    messages = Message.query.filter_by(recipient_id=user_id, is_draft=False).order_by(Message.created_at.desc()).all()
+    # Fetch messages where user_id is the recipient and that are not drafts or spam
+    try:
+        messages = Message.query.filter(
+            Message.recipient_id == user_id,
+            Message.is_draft == False,
+            Message.is_spam == False  # Exclude spam messages from inbox
+        ).order_by(Message.created_at.desc()).all()
+        
+        print(f"📥 Loaded {len(messages)} non-spam messages for inbox of user {user_id}")
 
-    results = []
-    for msg in messages:
-        sender = User.query.get(msg.sender_id)
-        results.append({
-            "id": msg.id,
-            "sender_id": msg.sender_id,
-            "sender_email": sender.email if sender else "Unknown",
-            "subject": msg.subject,
-            "body": msg.body,
-            "status": msg.status,
-            "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        })
-    return jsonify(results), 200
+        results = []
+        for msg in messages:
+            sender = User.query.get(msg.sender_id)
+            results.append({
+                "id": msg.id,
+                "sender_id": msg.sender_id,
+                "sender_email": sender.email if sender else "Unknown",
+                "subject": msg.subject,
+                "body": msg.body,
+                "status": msg.status,
+                "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        return jsonify(results), 200
+    except Exception as e:
+        print(f"❌ Error loading inbox: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 @messages_bp.route('/messages/sent/<int:user_id>', methods=['GET'])
 def get_sent_messages(user_id):
@@ -170,3 +235,49 @@ def update_message_status(message_id):
         "message_id": message_id,
         "status": new_status
     }), 200
+
+@messages_bp.route('/messages/spam/<int:user_id>', methods=['GET'])
+def get_spam(user_id):
+    # Fetch messages where user_id is the recipient and that are marked as spam
+    try:
+        spam_messages = Message.query.filter(
+            Message.recipient_id == user_id,
+            Message.is_draft == False,
+            Message.is_spam == True  # Only get spam messages
+        ).order_by(Message.created_at.desc()).all()
+        
+        print(f"🗑️ Loaded {len(spam_messages)} spam messages for user {user_id}")
+
+        results = []
+        for msg in spam_messages:
+            sender = User.query.get(msg.sender_id)
+            results.append({
+                "id": msg.id,
+                "sender_id": msg.sender_id,
+                "sender_email": sender.email if sender else "Unknown",
+                "sender_name": f"{sender.first_name} {sender.last_name}" if sender else "Unknown Sender",
+                "subject": msg.subject,
+                "body": msg.body,
+                "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        
+        return jsonify({"messages": results}), 200
+    except Exception as e:
+        print(f"❌ Error fetching spam messages: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": "Error fetching spam messages", "details": str(e)}), 500
+
+@messages_bp.route('/messages/not-spam/<int:message_id>', methods=['POST'])
+def mark_as_not_spam(message_id):
+    """Endpoint to move a message from spam to inbox"""
+    message = Message.query.get(message_id)
+    if not message:
+        return jsonify({"error": "Message not found"}), 404
+        
+    if message.is_spam:
+        message.is_spam = False  # Mark as not spam
+        db.session.commit()
+        return jsonify({"message": "Message moved to inbox"}), 200
+    else:
+        return jsonify({"error": "Message is not marked as spam"}), 400
