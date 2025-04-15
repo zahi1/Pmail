@@ -64,7 +64,9 @@ body {
 
 /* Style for nav icons */
 .nav-link .material-icons {
-  vertical-align: middle;
+  vertical-align: top; /* Changed from middle to top */
+  position: relative;
+  top: -3px; /* Move up slightly */
   margin-right: 4px;
   font-size: 20px;
 }
@@ -73,7 +75,9 @@ body {
 .nav-icon {
   width: 20px;
   height: 20px;
-  vertical-align: middle;
+  vertical-align: top; /* Changed from middle to top */
+  position: relative;
+  top: -3px; /* Move up slightly */
   margin-right: 6px;
   filter: brightness(0) saturate(100%) invert(67%) sepia(13%) saturate(2067%) hue-rotate(185deg) brightness(98%) contrast(96%);
 }

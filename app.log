@@ -16834,3 +16834,228 @@
 2025-04-15 21:48:11,015 - INFO - 127.0.0.1 - - [15/Apr/2025 21:48:11] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
 2025-04-15 21:48:11,016 - INFO - 127.0.0.1 - - [15/Apr/2025 21:48:11] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
 2025-04-15 21:48:11,020 - INFO - 127.0.0.1 - - [15/Apr/2025 21:48:11] "GET /jobs HTTP/1.1" 200 -
+2025-04-15 21:50:01,137 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,149 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:50:01,150 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,152 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:50:01,153 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:50:01,154 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:50:01,155 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:50:01,156 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,156 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,157 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,158 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:50:01,158 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,159 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:50:01,161 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,162 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:50:01,162 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:01,163 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:01] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,408 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /frontend/jobs.html HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,420 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:50:04,422 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:50:04,423 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,424 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:50:04,425 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:50:04,426 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:50:04,426 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,427 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,427 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,428 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,429 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:50:04,430 - INFO - Serving public file: js/jobs.js
+2025-04-15 21:50:04,430 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:50:04,431 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,431 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/js/jobs.js HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,432 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,433 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:50:04,435 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:50:04,438 - INFO - 127.0.0.1 - - [15/Apr/2025 21:50:04] "GET /jobs HTTP/1.1" 200 -
+2025-04-15 21:52:13,024 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,039 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:52:13,039 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,042 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:52:13,043 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:52:13,044 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:52:13,045 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,045 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,046 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:52:13,046 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,047 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:52:13,048 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:52:13,049 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,050 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:52:13,050 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,050 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:52:13,051 - INFO - 127.0.0.1 - - [15/Apr/2025 21:52:13] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,751 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,765 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:56:45,767 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:56:45,768 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:56:45,770 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,771 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:56:45,771 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:56:45,772 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,773 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:56:45,775 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:56:45,776 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,778 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:56:45,779 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:56:45,780 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,780 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,781 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,782 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:56:45,785 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:56:45,785 - INFO - 127.0.0.1 - - [15/Apr/2025 21:56:45] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,948 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,959 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:58:10,960 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:58:10,961 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,963 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:10,963 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:58:10,964 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,965 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:58:10,966 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:58:10,967 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:58:10,968 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,968 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,969 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,970 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:58:10,971 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:58:10,971 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,972 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:10,975 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:10,976 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:10] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,664 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,675 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:58:24,677 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:58:24,678 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,679 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:24,680 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:58:24,680 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:58:24,685 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:58:24,686 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,686 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,687 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:58:24,688 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:58:24,690 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,691 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,692 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:58:24,693 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,694 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:24,698 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:24,699 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:24] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,479 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,489 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:58:49,490 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:58:49,491 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:49,492 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,492 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:58:49,493 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,493 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:58:49,494 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:58:49,495 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,496 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:58:49,497 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:58:49,498 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,499 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:58:49,500 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,500 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,500 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:58:49,503 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:58:49,504 - INFO - 127.0.0.1 - - [15/Apr/2025 21:58:49] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,213 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,223 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:59:12,224 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,226 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:59:12,227 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:12,228 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:59:12,229 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:59:12,230 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,231 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:59:12,232 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:59:12,233 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:59:12,234 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:59:12,235 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,236 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,237 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,238 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,240 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:12,244 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:12,244 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:12] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:13,982 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:13] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:59:13,991 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:59:13,992 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:13] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:13,994 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:59:13,995 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:13,995 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:59:13,997 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:59:13,997 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:13] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:13,999 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:59:13,999 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:13] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,000 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,000 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/css/inbox.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,001 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:59:14,002 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,002 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:59:14,004 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,005 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:14,009 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:14,009 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:14] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,030 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,041 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:59:29,042 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,044 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:59:29,045 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:59:29,045 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:29,047 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,048 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:59:29,049 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:59:29,049 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:59:29,050 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:59:29,051 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,051 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:59:29,052 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,053 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,054 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,055 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:29,059 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:29,059 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:29] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,156 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,167 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:59:38,168 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:59:38,169 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,169 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:38,170 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:59:38,171 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:59:38,171 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,172 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:59:38,173 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:59:38,174 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,174 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,175 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:59:38,175 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,176 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:59:38,177 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,177 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:38,180 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:38,180 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:38] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,380 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /frontend/employee_home.html HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,392 - INFO - Serving public file: css/jobs.css
+2025-04-15 21:59:46,393 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/css/jobs.css HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,395 - INFO - Serving public file: css/inbox.css
+2025-04-15 21:59:46,397 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:46,398 - INFO - Serving public file: images/home_icon.png
+2025-04-15 21:59:46,400 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "GET /public/css/inbox.css HTTP/1.1" 200 -
+2025-04-15 21:59:46,400 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,401 - INFO - Serving public file: images/findjob_icon.png
+2025-04-15 21:59:46,402 - INFO - Serving public file: images/dashboard_icon.png
+2025-04-15 21:59:46,403 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/home_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,405 - INFO - Serving public file: images/inbox_icon.png
+2025-04-15 21:59:46,406 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/findjob_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,408 - INFO - Serving public file: images/person_icon.png
+2025-04-15 21:59:46,409 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/dashboard_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,409 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/inbox_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,411 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/person_icon.png HTTP/1.1[0m" 304 -
+2025-04-15 21:59:46,413 - INFO - Serving public file: images/Pmail1.png
+2025-04-15 21:59:46,414 - INFO - 127.0.0.1 - - [15/Apr/2025 21:59:46] "[36mGET /public/images/Pmail1.png HTTP/1.1[0m" 304 -
