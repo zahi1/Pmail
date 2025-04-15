@@ -6,6 +6,15 @@
   <title>Pmail - Login</title>
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
   <link rel="stylesheet" href="../public/css/style.css">
+  <style>
+    .error-message {
+      color: #d93025;
+      font-size: 14px;
+      margin-top: 8px;
+      text-align: left;
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
@@ -16,6 +25,7 @@
     <!-- Step 1: Email Input -->
     <div id="step-1" class="login-step">
       <input type="email" id="login-email" placeholder="Email" required>
+      <p id="email-error" class="error-message">Email must end with @pmail.com.</p>
       <button id="next-btn" class="next-btn" onclick="goToPasswordStep()">Next</button>
     </div>
     
@@ -55,11 +65,23 @@
     // Move from email step to password step
     function goToPasswordStep() {
       let email = document.getElementById("login-email").value.trim();
+      let errorElement = document.getElementById("email-error");
+      
       if (!email) {
-        alert("Please enter your email.");
+        errorElement.textContent = "Please enter your email.";
+        errorElement.style.display = "block";
         return;
       }
-      // (Optional: You can add further email validation here.)
+      
+      // Check if email ends with @pmail.com
+      if (!email.endsWith("@pmail.com")) {
+        errorElement.textContent = "Email must end with @pmail.com";
+        errorElement.style.display = "block";
+        return;
+      }
+      
+      // If email is valid, hide error and proceed
+      errorElement.style.display = "none";
       document.getElementById("step-1").style.display = "none";
       document.getElementById("step-2").style.display = "block";
     }
