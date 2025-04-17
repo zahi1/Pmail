@@ -87,6 +87,29 @@
       background-color: #6e9ad0;
     }
 
+    /* Status badge styling */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    
+    .status-badge.open {
+      background-color: #dcf5e7;
+      color: #064e21;
+      border: 1px solid #064e21;
+    }
+    
+    .status-badge.closed {
+      background-color: #fee7e7;
+      color: #9b1c1c;
+      border: 1px solid #9b1c1c;
+    }
+
     /* Edit Modal */
     .modal-backdrop {
       position: fixed;
@@ -211,6 +234,10 @@
         <label for="location">Location:</label>
         <input type="text" id="location" name="location" placeholder="e.g. New York, Remote" required />
 
+        <label for="deadline">Application Deadline:</label>
+        <input type="date" id="deadline" name="deadline" />
+        <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Leave blank for no deadline</small>
+
         <button type="submit">Post Job</button>
       </form>
     </div>
@@ -262,6 +289,10 @@
 
       <label for="edit-location">Location:</label>
       <input type="text" id="edit-location" required />
+      
+      <label for="edit-deadline">Application Deadline:</label>
+      <input type="date" id="edit-deadline" />
+      <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Leave blank for no deadline</small>
 
       <div class="modal-btns">
         <button class="save-edit-btn" onclick="saveJobEdits()">Save</button>

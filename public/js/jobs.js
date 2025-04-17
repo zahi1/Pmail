@@ -17,19 +17,21 @@ document.addEventListener("DOMContentLoaded", () => {
     filterBtn.addEventListener("click", () => {
       const category = document.getElementById("category-select").value;
       const jobType = document.getElementById("jobtype-select").value;
-      fetchJobs(category, jobType);
+      const showClosed = document.getElementById("show-closed-checkbox")?.checked || false;
+      fetchJobs(category, jobType, showClosed);
     });
   
     // Fetch all jobs initially
-    fetchJobs("", "");
+    fetchJobs("", "", false);
   }
   
-  function fetchJobs(category, jobType) {
+  function fetchJobs(category, jobType, showClosed) {
     let url = "/jobs"; // Because we registered jobs_bp at root url_prefix=""
     let params = [];
   
     if (category) params.push(`category=${encodeURIComponent(category)}`);
     if (jobType)   params.push(`job_type=${encodeURIComponent(jobType)}`);
+    params.push(`show_closed=${showClosed}`);
   
     if (params.length > 0) {
       url += "?" + params.join("&");
@@ -55,12 +57,24 @@ document.addEventListener("DOMContentLoaded", () => {
     jobs.forEach(job => {
       const jobDiv = document.createElement("div");
       jobDiv.classList.add("job-item");
+      
+      // Add status badge
+      const statusBadge = job.is_open ? 
+        '<span class="status-badge open">OPEN</span>' : 
+        '<span class="status-badge closed">CLOSED</span>';
+      
+      // Format deadline
+      const deadlineDisplay = job.deadline ? 
+        `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
+        '<p><strong>Application Deadline:</strong> No deadline</p>';
+      
       jobDiv.innerHTML = `
-        <h3>${job.title}</h3>
+        <h3>${job.title} ${statusBadge}</h3>
         <p><strong>Company:</strong> ${job.company_name}</p>
         <p><strong>Location:</strong> ${job.location}</p>
         <p><strong>Category:</strong> ${job.category}</p>
         <p><strong>Job Type:</strong> ${job.job_type}</p>
+        ${deadlineDisplay}
         <button class="view-details-btn" data-id="${job.id}">View Details</button>
       `;
       listingsContainer.appendChild(jobDiv);
@@ -101,14 +115,44 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function renderJobDetail(job) {
     const container = document.getElementById("job-detail-container");
+    
+    // Create status badge
+    const statusBadge = job.is_open ? 
+      '<span class="status-badge open">OPEN</span>' : 
+      '<span class="status-badge closed">CLOSED</span>';
+      
+    // Format deadline
+    const deadlineDisplay = job.deadline ? 
+      `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
+      '<p><strong>Application Deadline:</strong> No deadline</p>';
+      
+    // Apply button - only enabled if job is open
+    const applyButton = job.is_open ?
+      `<button class="apply-btn" onclick="window.location.href='compose_message.html?job_id=${job.id}&employer=${encodeURIComponent(job.company_name)}'">Apply Now</button>` :
+      `<button class="apply-btn" disabled>Applications Closed</button>`;
+    
     container.innerHTML = `
-      <h2>${job.title}</h2>
-      <p><strong>Company:</strong> ${job.company_name}</p>
-      <p><strong>Location:</strong> ${job.location}</p>
-      <p><strong>Category:</strong> ${job.category}</p>
-      <p><strong>Job Type:</strong> ${job.job_type}</p>
-      <p><strong>Description:</strong> ${job.description}</p>
-      <p><em>Posted on: ${job.created_at}</em></p>
+      <div class="job-detail-header">
+        <h2>${job.title} ${statusBadge}</h2>
+        <p><strong>Company:</strong> ${job.company_name}</p>
+      </div>
+      
+      <div class="job-detail-info">
+        <p><strong>Location:</strong> ${job.location}</p>
+        <p><strong>Category:</strong> ${job.category}</p>
+        <p><strong>Job Type:</strong> ${job.job_type}</p>
+        ${deadlineDisplay}
+        <p><em>Posted on: ${job.created_at}</em></p>
+      </div>
+      
+      <div class="job-description">
+        <h3>Description</h3>
+        <p>${job.description}</p>
+      </div>
+      
+      <div class="job-actions">
+        ${applyButton}
+        <button class="back-btn" onclick="window.location.href='jobs.html'">Back to Jobs</button>
+      </div>
     `;
   }
-  

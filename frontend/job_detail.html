@@ -8,6 +8,71 @@
   <!-- Using jobs.css for common styling -->
   <link rel="stylesheet" href="../public/css/jobs.css" />
   <link rel="stylesheet" href="../public/css/inbox.css" />
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    
+    .status-badge.open {
+      background-color: #dcf5e7;
+      color: #064e21;
+      border: 1px solid #064e21;
+    }
+    
+    .status-badge.closed {
+      background-color: #fee7e7;
+      color: #9b1c1c;
+      border: 1px solid #9b1c1c;
+    }
+    
+    .job-detail-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 15px;
+    }
+    
+    .job-detail-info {
+      margin-bottom: 20px;
+    }
+    
+    .job-description {
+      margin-bottom: 30px;
+    }
+    
+    .job-actions {
+      margin-top: 30px;
+    }
+    
+    .apply-btn {
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .apply-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .back-btn {
+      padding: 10px 20px;
+      background-color: #f0f0f0;
+      color: #333;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  </style>
 </head>
 <body>
   <!-- Top Navigation Bar -->

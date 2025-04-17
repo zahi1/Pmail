@@ -3,6 +3,7 @@ from backend.models.database import db
 from backend.models.job import Job
 from backend.models.user import User
 from sqlalchemy import func
+from datetime import datetime
 
 jobs_bp = Blueprint("jobs", __name__)
 
@@ -14,15 +15,24 @@ def get_all_jobs():
     # Optional filters via query parameters
     category = request.args.get("category")
     job_type = request.args.get("job_type")
+    show_closed = request.args.get("show_closed", "false").lower() == "true"
+    
     query = Job.query
     if category:
         query = query.filter(Job.category == category)
     if job_type:
         query = query.filter(Job.job_type == job_type)
+    if not show_closed:
+        query = query.filter((Job.deadline >= datetime.now()) | (Job.deadline.is_(None)))
     
     jobs = query.all()
     results = []
     for job in jobs:
+        # Check if job is open or closed
+        is_open = True
+        if job.deadline and job.deadline < datetime.now():
+            is_open = False
+            
         results.append({
             "id": job.id,
             "title": job.title,
@@ -31,6 +41,8 @@ def get_all_jobs():
             "job_type": job.job_type,
             "location": job.location,
             "company_name": job.company_name,
+            "deadline": job.deadline.strftime("%Y-%m-%d") if job.deadline else None,
+            "is_open": is_open,
             "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S")
         })
     return jsonify(results), 200
@@ -55,6 +67,10 @@ def get_employer_jobs():
 
     results = []
     for job in employer_jobs:
+        is_open = True
+        if job.deadline and job.deadline < datetime.now():
+            is_open = False
+            
         results.append({
             "id": job.id,
             "title": job.title,
@@ -62,7 +78,9 @@ def get_employer_jobs():
             "category": job.category,
             "job_type": job.job_type,
             "location": job.location,
-            "company_name": job.company_name
+            "company_name": job.company_name,
+            "deadline": job.deadline.strftime("%Y-%m-%d") if job.deadline else None,
+            "is_open": is_open
         })
     return jsonify(results), 200
 
@@ -89,6 +107,14 @@ def post_job():
         if not data.get(field):
             return jsonify({"error": f"Missing field: {field}"}), 400
 
+    # Process deadline if provided
+    deadline = None
+    if data.get("deadline"):
+        try:
+            deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid deadline format. Use YYYY-MM-DD"}), 400
+
     # Use employer's company name
     new_job = Job(
         title=data["title"],
@@ -96,7 +122,8 @@ def post_job():
         category=data["category"],
         job_type=data["job_type"],
         location=data["location"],
-        company_name=user.company_name  # Assumes employer has company_name set
+        company_name=user.company_name,  # Assumes employer has company_name set
+        deadline=deadline
     )
     
     try:
@@ -137,6 +164,13 @@ def update_job(job_id):
     job.category = data["category"]
     job.job_type = data["job_type"]
     job.location = data["location"]
+    
+    # Process deadline if provided
+    if data.get("deadline"):
+        try:
+            job.deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid deadline format. Use YYYY-MM-DD"}), 400
 
     try:
         db.session.commit()
@@ -150,6 +184,12 @@ def get_job_detail(job_id):
     job = Job.query.get(job_id)
     if not job:
         return jsonify({"error": "Job not found"}), 404
+        
+    # Check if job is open or closed
+    is_open = True
+    if job.deadline and job.deadline < datetime.now():
+        is_open = False
+        
     return jsonify({
         "id": job.id,
         "title": job.title,
@@ -158,6 +198,8 @@ def get_job_detail(job_id):
         "job_type": job.job_type,
         "location": job.location,
         "company_name": job.company_name,
+        "deadline": job.deadline.strftime("%Y-%m-%d") if job.deadline else None,
+        "is_open": is_open,
         "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S")
     }), 200
 
@@ -167,7 +209,12 @@ def get_job_detail(job_id):
 @jobs_bp.route("/jobs/titles", methods=["GET"])
 def get_job_titles():
     # Get all job titles with their employer company names
-    jobs = Job.query.with_entities(Job.id, Job.title, Job.company_name).all()
+    # Only return open jobs
+    current_date = datetime.now()
+    jobs = Job.query.filter(
+        (Job.deadline >= current_date) | (Job.deadline.is_(None))
+    ).with_entities(Job.id, Job.title, Job.company_name).all()
+    
     results = []
     for job in jobs:
         results.append({
@@ -192,8 +239,12 @@ def get_job_titles_by_employer(email):
         # Use the employer's actual company name if available
         company_name = employer.company_name
     
-    # Get jobs for this company
-    jobs = Job.query.filter(func.lower(Job.company_name).like(f"%{company_name}%")).all()
+    # Get only open jobs for this company
+    current_date = datetime.now()
+    jobs = Job.query.filter(
+        func.lower(Job.company_name).like(f"%{company_name}%"),
+        (Job.deadline >= current_date) | (Job.deadline.is_(None))
+    ).all()
     
     results = []
     for job in jobs:
