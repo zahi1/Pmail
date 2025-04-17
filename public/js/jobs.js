@@ -126,9 +126,13 @@ document.addEventListener("DOMContentLoaded", () => {
       `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
       '<p><strong>Application Deadline:</strong> No deadline</p>';
       
+    // Use the actual employer email from the API response
+    const employerEmail = job.employer_email;
+    
     // Apply button - only enabled if job is open
+    // Pass the actual employer email to the inbox compose
     const applyButton = job.is_open ?
-      `<button class="apply-btn" onclick="window.location.href='compose_message.html?job_id=${job.id}&employer=${encodeURIComponent(job.company_name)}'">Apply Now</button>` :
+      `<button class="apply-btn" onclick="window.location.href='employee_inbox.html?compose=true&employer=${encodeURIComponent(employerEmail)}&job=${encodeURIComponent(job.title)}'">Apply Now</button>` :
       `<button class="apply-btn" disabled>Applications Closed</button>`;
     
     container.innerHTML = `

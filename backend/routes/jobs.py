@@ -189,7 +189,11 @@ def get_job_detail(job_id):
     is_open = True
     if job.deadline and job.deadline < datetime.now():
         is_open = False
-        
+    
+    # Find the employer based on company name
+    employer = User.query.filter_by(company_name=job.company_name, role="employer").first()
+    employer_email = employer.email if employer else f"{job.company_name.lower().replace(' ', '')}@example.com"
+    
     return jsonify({
         "id": job.id,
         "title": job.title,
@@ -198,6 +202,7 @@ def get_job_detail(job_id):
         "job_type": job.job_type,
         "location": job.location,
         "company_name": job.company_name,
+        "employer_email": employer_email,  # Include the actual employer email
         "deadline": job.deadline.strftime("%Y-%m-%d") if job.deadline else None,
         "is_open": is_open,
         "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S")

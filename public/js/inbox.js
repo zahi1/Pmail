@@ -20,9 +20,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Check if we have URL parameters (from job application)
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('compose') === 'true') {
-    const company = urlParams.get('company');
+    const employer = urlParams.get('employer');
     const jobTitle = urlParams.get('job');
-    openComposeWithJobDetails(company, jobTitle);
+    
+    if (employer) {
+      // Pre-fill the compose form with employer email and job title
+      openComposeWithJobDetails(employer, jobTitle);
+    }
   }
 
   // Add event listener to recipient email field
@@ -207,21 +211,50 @@ function loadJobTitlesByEmployer(employerEmail) {
     .catch(error => console.error('Error loading job titles:', error));
 }
 
-function openComposeWithJobDetails(company, jobTitle) {
+function openComposeWithJobDetails(employer, jobTitle) {
   // When opening with job details, we are composing a new email.
   openCompose(true);
+  
+  // Set recipient email field directly with the employer's email
   const emailField = document.getElementById('recipient-email');
-  emailField.value = `${company.toLowerCase().replace(/\s+/g, '')}@example.com`;
-  loadJobTitlesByEmployer(emailField.value);
-  setTimeout(() => {
-    const dropdown = document.getElementById('subject-dropdown');
-    for (let i = 0; i < dropdown.options.length; i++) {
-      if (dropdown.options[i].text === jobTitle) {
-        dropdown.selectedIndex = i;
-        break;
+  if (emailField) {
+    // Use the employer email directly without modification
+    emailField.value = employer;
+    
+    // Load job titles for this employer
+    loadJobTitlesByEmployer(employer);
+    
+    // Wait for job titles to load, then select the matching title
+    setTimeout(() => {
+      const dropdown = document.getElementById('subject-dropdown');
+      if (dropdown && jobTitle) {
+        // Look for exact match first
+        let found = false;
+        for (let i = 0; i < dropdown.options.length; i++) {
+          if (dropdown.options[i].text === jobTitle) {
+            dropdown.selectedIndex = i;
+            found = true;
+            break;
+          }
+        }
+        
+        // If no exact match, add it as a custom option
+        if (!found) {
+          const option = document.createElement('option');
+          option.value = `Application for: ${jobTitle}`;
+          option.text = jobTitle;
+          dropdown.appendChild(option);
+          dropdown.selectedIndex = dropdown.options.length - 1;
+        }
+        
+        // Focus on message body field so user can start typing immediately
+        const messageBody = document.getElementById('message-body');
+        if (messageBody) {
+          messageBody.focus();
+        }
       }
-    }
-  }, 500);
+    }, 500);
+  }
 }
 
 function sendMessage() {
