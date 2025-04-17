@@ -105,3 +105,12 @@ def login():
         "first_name": user.first_name,  # Include first name in response
         "role": user.role
     }), 200
+
+# --------------------- #
+# ✅ User Logout Route  #
+# --------------------- #
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    session.pop("user_id", None)
+    session.pop("role", None)
+    return jsonify({"message": "Logged out successfully"}), 200

@@ -1,0 +1,470 @@
+/* Modern Profile Page Styling */
+
+.profile-container {
+  max-width: 1000px;
+  margin: 90px auto 40px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Profile Layout */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+/* Left sidebar with profile picture and actions */
+.profile-sidebar {
+  background-color: #252525;
+  padding: 40px 30px;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 600px;
+}
+
+/* Right content area */
+.profile-content-area {
+  padding: 0;
+}
+
+/* Profile picture styling */
+.profile-picture-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 25px;
+}
+
+.profile-picture {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #8ab4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  color: #121212;
+  font-weight: bold;
+  background-size: cover;
+  background-position: center;
+  border: 4px solid #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shiny effect for profile picture border */
+.profile-picture::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: rotate(45deg);
+  animation: shine 4s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  20%, 100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Picture upload styling */
+.upload-overlay {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background-color: #8ab4f8;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid #1e1e1e;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.upload-overlay:hover {
+  transform: scale(1.1);
+  background-color: #6e9ad0;
+}
+
+/* Hide the actual file input */
+.upload-overlay input[type="file"] {
+  display: none;
+}
+
+.upload-icon {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0);
+}
+
+/* Profile name and email */
+.profile-identity {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#profile-name {
+  margin: 0 0 5px;
+  font-size: 26px;
+  color: #fff;
+  font-weight: 500;
+}
+
+#profile-email {
+  margin: 0 0 5px;
+  color: #8ab4f8;
+  font-size: 16px;
+  word-break: break-all;
+}
+
+#profile-role {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  color: #aaa;
+  background-color: #333;
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+/* Profile action buttons */
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.profile-btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+/* Fixed icon container with consistent dimensions */
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: 0;
+  object-fit: contain; /* Ensures icon maintains aspect ratio */
+}
+
+.edit-btn {
+  background-color: #8ab4f8;
+  color: #121212;
+}
+
+.edit-btn:hover {
+  background-color: #6e9ad0;
+}
+
+.privacy-btn {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.privacy-btn:hover {
+  background-color: #333;
+}
+
+.logout-btn {
+  background-color: #2a2a2a;
+  color: #ff6b6b;
+  border: 1px solid #444;
+  margin-top: auto;
+}
+
+.logout-btn:hover {
+  background-color: #ff6b6b;
+  color: #fff;
+  border-color: #ff6b6b;
+}
+
+/* Tabs styling */
+.profile-tabs {
+  border-bottom: 1px solid #333;
+}
+
+.tab-nav {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tab-nav li {
+  padding: 20px 30px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #aaa;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-nav li:hover {
+  color: #fff;
+  background-color: rgba(138, 180, 248, 0.05);
+}
+
+.tab-nav li.active {
+  color: #8ab4f8;
+  border-bottom-color: #8ab4f8;
+}
+
+/* Tab content */
+.tab-content {
+  padding: 30px;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* User info styling */
+.info-card {
+  background-color: #252525;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.info-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #8ab4f8;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  width: 20px;
+  height: 20px;
+  filter: invert(67%) sepia(13%) saturate(2067%) hue-rotate(185deg) brightness(98%) contrast(96%);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.info-item {
+  margin-bottom: 20px;
+}
+
+.info-label {
+  display: block;
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.info-value {
+  color: #fff;
+  font-size: 16px;
+  background-color: #2a2a2a;
+  padding: 10px 15px;
+  border-radius: 6px;
+  display: block;
+  border: 1px solid #333;
+}
+
+/* Form styling */
+#profile-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  color: #aaa;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  border-color: #8ab4f8;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.save-btn {
+  padding: 12px 25px;
+  background-color: #8ab4f8;
+  color: #121212;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #6e9ad0;
+}
+
+.cancel-btn {
+  padding: 12px 25px;
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+/* Activity section styling */
+.activity-card {
+  background-color: #252525;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.activity-item {
+  padding: 15px 0;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  background-color: rgba(138, 180, 248, 0.1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-icon img {
+  width: 20px;
+  height: 20px;
+  filter: invert(67%) sepia(13%) saturate(2067%) hue-rotate(185deg) brightness(98%) contrast(96%);
+}
+
+.activity-content {
+  flex-grow: 1;
+}
+
+.activity-title {
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.activity-subtitle {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.activity-time {
+  color: #666;
+  font-size: 12px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: #8ab4f8;
+}
+
+.mt-4 {
+  margin-top: 40px;
+}

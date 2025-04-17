@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pmail - Employer Profile</title>
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
-  <!-- Use the same CSS for consistent top nav; you can use inbox.css or a common CSS -->
   <link rel="stylesheet" href="../public/css/jobs.css" />
   <link rel="stylesheet" href="../public/css/inbox.css" />
+  <link rel="stylesheet" href="../public/css/profile.css" />
   <script src="../public/js/profile.js" defer></script>
 </head>
 <body>
@@ -26,29 +26,168 @@
   </div>
 
   <!-- Profile Container -->
-  <div class="profile-container" style="margin-top: 80px;">
-    <h1>My Profile</h1>
-    <form id="profile-form">
-      <label for="company_name">Company Name:</label>
-      <input type="text" id="company_name" name="company_name" placeholder="Your Company Name" />
-
-      <label for="contact_name">Contact Name:</label>
-      <input type="text" id="contact_name" name="contact_name" placeholder="John Doe" />
-
-      <label for="birthdate">Birthdate:</label>
-      <input type="date" id="birthdate" name="birthdate" />
-
-      <label for="phone">Phone:</label>
-      <input type="text" id="phone" name="phone" placeholder="(555) 123-4567" />
-
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" placeholder="employer@pmail.com" disabled />
-
-      <label for="address">Address:</label>
-      <input type="text" id="address" name="address" placeholder="123 Main St, City, Country" />
-
-      <button type="submit">Update Profile</button>
-    </form>
+  <div class="profile-container">
+    <div class="profile-layout">
+      <!-- Left Sidebar -->
+      <div class="profile-sidebar">
+        <div class="profile-picture-container">
+          <div class="profile-picture" id="profile-picture">
+            <span class="initials" id="profile-initials"></span>
+          </div>
+          <div class="upload-overlay">
+            <input type="file" id="profile-upload" accept="image/*" />
+            <label for="profile-upload">
+              <img src="../public/images/camera_icon.png" alt="Upload" class="upload-icon" />
+            </label>
+          </div>
+        </div>
+        
+        <div class="profile-identity">
+          <h2 id="profile-name">Loading...</h2>
+          <p id="profile-email">loading@example.com</p>
+          <span id="profile-role">Employer</span>
+        </div>
+        
+        <div class="profile-actions">
+          <button id="edit-profile-btn" class="profile-btn edit-btn">
+            <img src="../public/images/pen_icon.png" alt="Edit" class="btn-icon">
+            Edit Profile
+          </button>
+          <button id="privacy-btn" class="profile-btn privacy-btn">
+            <img src="../public/images/privacy_icon.png" alt="Privacy" class="btn-icon">
+            Privacy Policy
+          </button>
+          <button id="logout-btn" class="profile-btn logout-btn">
+            <img src="../public/images/logout_icon.png" alt="Logout" class="btn-icon">
+            Logout
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Content Area -->
+      <div class="profile-content-area">
+        <!-- Tabs -->
+        <div class="profile-tabs">
+          <ul class="tab-nav">
+            <li class="active" data-tab="info-tab">Company Information</li>
+            <li data-tab="jobs-tab">Posted Jobs</li>
+            <li data-tab="applications-tab">Received Applications</li>
+          </ul>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Company Information Tab -->
+          <div id="info-tab" class="tab-pane active">
+            <!-- Info View Mode -->
+            <div id="profile-info" class="profile-info">
+              <div class="info-card">
+                <h3>
+                  <img src="../public/images/company_icon.png" alt="Company" class="section-icon">
+                  Company Details
+                </h3>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">Company Name</span>
+                    <span id="info-company-name" class="info-value">Loading...</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Contact Name</span>
+                    <span id="info-contact-name" class="info-value">Loading...</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span id="info-phone" class="info-value">Loading...</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Address</span>
+                    <span id="info-address" class="info-value">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Edit Form (Hidden by default) -->
+            <div id="profile-form-container" class="hidden">
+              <div class="info-card">
+                <h3>
+                  <img src="../public/images/pen_icon.png" alt="Edit" class="section-icon">
+                  Edit Company Information
+                </h3>
+                <form id="profile-form">
+                  <div class="form-group">
+                    <label class="form-label" for="company_name">Company Name</label>
+                    <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Your Company Name" />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="contact_name">Contact Name</label>
+                    <input type="text" id="contact_name" name="contact_name" class="form-control" placeholder="John Doe" />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="birthdate">Birthdate</label>
+                    <input type="date" id="birthdate" name="birthdate" class="form-control" />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" class="form-control" placeholder="(555) 123-4567" />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="email">Email (Cannot be changed)</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="employer@pmail.com" disabled />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="address">Address</label>
+                    <input type="text" id="address" name="address" class="form-control" placeholder="123 Main St, City, Country" />
+                  </div>
+                  
+                  <div class="form-actions">
+                    <button type="submit" class="save-btn">Save Changes</button>
+                    <button type="button" id="cancel-edit-btn" class="cancel-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Jobs Tab -->
+          <div id="jobs-tab" class="tab-pane">
+            <div class="activity-card">
+              <h3>
+                <img src="../public/images/postjob_icon.png" alt="Jobs" class="section-icon">
+                Posted Jobs
+              </h3>
+              <div id="employer-jobs">
+                <!-- Jobs will be loaded dynamically -->
+                <div class="text-center mt-4">
+                  <p>Loading your posted jobs...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Applications Tab -->
+          <div id="applications-tab" class="tab-pane">
+            <div class="activity-card">
+              <h3>
+                <img src="../public/images/draft_icon.png" alt="Applications" class="section-icon">
+                Received Applications
+              </h3>
+              <div id="received-applications">
+                <!-- Applications will be loaded dynamically -->
+                <div class="text-center mt-4">
+                  <p>Loading received applications...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
