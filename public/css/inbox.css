@@ -713,3 +713,24 @@ body {
   border: 1px solid #444;
   border-radius: 4px;
 }
+
+/* Delete draft button styling */
+.delete-draft-btn {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-right: auto; /* Push to left side */
+  border-radius: 4px;
+  display: none; /* Hidden by default */
+}
+
+.delete-draft-btn:hover {
+  background-color: #2a2a2a;
+}
+
+.delete-icon {
+  width: 20px;
+  height: 20px;
+  filter: invert(32%) sepia(14%) saturate(2741%) hue-rotate(335deg) brightness(87%) contrast(96%);
+}

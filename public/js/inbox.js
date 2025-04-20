@@ -138,6 +138,13 @@ function openCompose(isNew = true) {
   if (modal) {
     modal.classList.remove("hidden");
   }
+  
+  // Always show the delete button for both new compositions and drafts
+  const deleteBtn = document.getElementById("delete-draft-btn");
+  if (deleteBtn) {
+    deleteBtn.style.display = "block"; // Always show delete button
+  }
+  
   if (isNew) {
     // When composing a new email, clear any existing draft id and clear fields.
     currentDraftId = null;
@@ -904,6 +911,54 @@ function viewDraft(draft) {
   }
   
   document.getElementById("message-body").value = draft.body || "";
+  
+  // Show delete button when editing an existing draft
+  const deleteBtn = document.getElementById("delete-draft-btn");
+  if (deleteBtn) {
+    deleteBtn.style.display = "block";
+  }
+}
+
+function deleteDraft() {
+  if (currentDraftId) {
+    // For existing drafts: Delete from the server
+    if (!confirm("Are you sure you want to delete this draft?")) {
+      return;  // User canceled the deletion
+    }
+    
+    fetch(`/messages/draft/${currentDraftId}`, {
+      method: 'DELETE'
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      showToast("Draft deleted");
+      
+      // Reset the draft ID and close the compose modal
+      currentDraftId = null;
+      const modal = document.getElementById("compose-modal");
+      if (modal) modal.classList.add("hidden");
+      
+      // If we're currently viewing drafts, refresh the drafts list
+      if (currentView === 'drafts') {
+        loadDraftMessages();
+      }
+    })
+    .catch(err => {
+      console.error("Error deleting draft:", err);
+      showToast(`An error occurred while deleting the draft: ${err.message}`);
+    });
+  } else {
+    // For new compositions: Just discard the message without saving to drafts
+    if (confirm("Discard this message?")) {
+      const modal = document.getElementById("compose-modal");
+      if (modal) modal.classList.add("hidden");
+    }
+  }
 }
 
 function updateMessageStatus(event) {

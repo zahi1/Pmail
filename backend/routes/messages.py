@@ -308,3 +308,22 @@ def get_replies(message_id):
     except Exception as e:
         print(f"❌ Error fetching replies: {e}")
         return jsonify({"error": "Error fetching replies"}), 500
+
+@messages_bp.route('/messages/draft/<int:draft_id>', methods=['DELETE'])
+def delete_draft(draft_id):
+    """Delete a draft message"""
+    draft = Message.query.get(draft_id)
+    if not draft:
+        return jsonify({"error": "Draft not found"}), 404
+        
+    if not draft.is_draft:
+        return jsonify({"error": "Message is not a draft"}), 400
+        
+    try:
+        db.session.delete(draft)
+        db.session.commit()
+        return jsonify({"message": "Draft deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error deleting draft: {e}")
+        return jsonify({"error": "Database error while deleting draft"}), 500

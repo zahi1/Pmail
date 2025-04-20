@@ -80,6 +80,9 @@
         <textarea id="message-body" rows="8" placeholder="Write your message..."></textarea>
       </div>
       <div class="compose-footer">
+        <button id="delete-draft-btn" class="delete-draft-btn" onclick="deleteDraft()" title="Delete Draft">
+          <img src="../public/images/trash_icon.png" alt="Delete" class="delete-icon">
+        </button>
         <button class="send-btn" onclick="sendMessage()">Send</button>
       </div>
     </div>
