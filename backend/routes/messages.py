@@ -132,7 +132,8 @@ def save_draft():
         draft.body = body
         draft.recipient_id = recipient.id if recipient else sender_id
         draft.is_draft = True
-        draft.status = "Draft"
+        ####draft.status = "Draft"  # For windows compatibility
+        draft.status = "Pending"  # Changed from "Draft" to "Pending" for Mac compatibility
         db.session.commit()
         return jsonify({"message": "Draft updated successfully", "draft_id": draft.id}), 200
     else:
@@ -141,7 +142,8 @@ def save_draft():
             recipient_id=recipient.id if recipient else sender_id,
             subject=subject,
             body=body,
-            status="Draft",
+            ####status ="Draft",  # For windows compatibility
+            status="Pending",  # Changed from "Draft" to "Pending" for Mac compatibility
             is_draft=True
         )
         db.session.add(new_draft)
