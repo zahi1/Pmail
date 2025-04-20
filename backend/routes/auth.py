@@ -4,6 +4,7 @@ from backend.models.user import User
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from sqlalchemy import func
+from backend.models.login_history import LoginHistory
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -92,6 +93,17 @@ def login():
     session["role"] = user.role
 
     print(f"✅ Login successful for: {email}")
+
+    # Record login history
+    user_agent = request.headers.get('User-Agent', '')
+    ip_address = request.remote_addr
+    login_record = LoginHistory(
+        user_id=user.id,
+        ip_address=ip_address,
+        device_info=user_agent
+    )
+    db.session.add(login_record)
+    db.session.commit()
 
     if user.role == "employee":
         redirect_url = "/frontend/employee_inbox.html"

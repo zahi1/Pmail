@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify, session
 from backend.models.database import db
 from backend.models.user import User
+from backend.models.login_history import LoginHistory
 
 profile_bp = Blueprint("profile", __name__)
 
@@ -64,3 +65,53 @@ def update_profile():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Database error", "details": str(e)}), 500
+
+@profile_bp.route("/profile/activity", methods=["GET"])
+def get_user_activity():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    # Get login history for the user
+    login_history = LoginHistory.query.filter_by(user_id=user_id)\
+                    .order_by(LoginHistory.login_time.desc())\
+                    .limit(10)\
+                    .all()
+                    
+    activities = []
+    for login in login_history:
+        # Extract browser and OS info from device_info (user agent string)
+        device_info = login.device_info or "Unknown device"
+        device_summary = "Unknown device"
+        if login.device_info:
+            # Check for Edge first since Edge user agent contains Chrome too
+            if "Edge" in login.device_info or "Edg/" in login.device_info:
+                device_summary = "Microsoft Edge"
+            elif "Chrome" in login.device_info:
+                device_summary = "Google Chrome"
+            elif "Firefox" in login.device_info:
+                device_summary = "Mozilla Firefox"
+            elif "Safari" in login.device_info:
+                device_summary = "Safari"
+            
+            if "Windows" in login.device_info:
+                device_summary += " on Windows"
+            elif "Mac" in login.device_info:
+                device_summary += " on Mac"
+            elif "iPhone" in login.device_info:
+                device_summary += " on iPhone"
+            elif "Android" in login.device_info:
+                device_summary += " on Android"
+        
+        activities.append({
+            "type": "login",
+            "title": "Account Login",
+            "description": f"Logged in from {device_summary}",
+            "timestamp": login.login_time.isoformat(),
+            "ip_address": login.ip_address
+        })
+    
+    return jsonify({
+        "success": True,
+        "activities": activities
+    }), 200

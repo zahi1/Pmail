@@ -190,23 +190,21 @@ function formatDate(dateString) {
 }
 
 function formatRelativeTime(dateString) {
+    // Parse the dateString into a Date object
     const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) {
-        return "Today";
-    } else if (diffDays === 1) {
-        return "Yesterday";
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-        const weeks = Math.floor(diffDays / 7);
-        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    } else {
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    }
+    // Manually add 3 hours to account for Helsinki timezone (UTC+3)
+    const helsinkiDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    // Use English locale for formatting
+    return helsinkiDate.toLocaleString('en-GB', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // Use 24-hour format
+    });
 }
 
 function toggleEditProfile() {
@@ -399,6 +397,9 @@ function renderActivities(activities) {
                 break;
             case 'profile_update':
                 iconName = 'edit_icon.png';
+                break;
+            case 'login':
+                iconName = 'activity_icon.png'; // New icon for login activity
                 break;
             default:
                 iconName = 'activity_icon.png';
