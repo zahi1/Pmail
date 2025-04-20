@@ -193,17 +193,16 @@ function formatRelativeTime(dateString) {
     // Parse the dateString into a Date object
     const date = new Date(dateString);
     
-    // Manually add 3 hours to account for Helsinki timezone (UTC+3)
-    const helsinkiDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
-    
-    // Use English locale for formatting
-    return helsinkiDate.toLocaleString('en-GB', { 
+    // Use the browser's local timezone instead of manual offset
+    // This will automatically handle DST and timezone differences
+    return date.toLocaleString('en-GB', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false // Use 24-hour format
+        hour12: false, // Use 24-hour format
+        timeZone: 'Europe/Helsinki' // Explicitly set timezone to Helsinki
     });
 }
 
@@ -512,11 +511,24 @@ function loadUserApplications() {
     const applicationsContainer = document.getElementById('applications-container');
     if (!applicationsContainer) return;
     
-    fetch('/employee/applications')
+    // Get current user ID
+    const currentUserId = localStorage.getItem("user_id") || "0";
+    if (currentUserId === "0") {
+        applicationsContainer.innerHTML = `
+            <div class="text-center mt-4">
+                <p>Please log in to view your applications.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Use the dashboard endpoint to get comprehensive application data
+    fetch(`/dashboard/employee/${currentUserId}`)
         .then(response => response.json())
         .then(data => {
             if (data.applications && data.applications.length > 0) {
-                renderApplications(data.applications, 'employee');
+                // Pass the applications array to the render function
+                renderEnhancedApplications(data.applications);
             } else {
                 applicationsContainer.innerHTML = `
                     <div class="text-center mt-4">
@@ -529,13 +541,59 @@ function loadUserApplications() {
             }
         })
         .catch(error => {
-            console.error('Error fetching applications:', error);
+            console.error('Error fetching applications data:', error);
             applicationsContainer.innerHTML = `
                 <div class="text-center mt-4">
                     <p>Failed to load applications data.</p>
                 </div>
             `;
         });
+}
+
+// New function to render enhanced application data
+function renderEnhancedApplications(applications) {
+    const container = document.getElementById('applications-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    applications.forEach(app => {
+        const appItem = document.createElement('div');
+        appItem.className = 'activity-item';
+        
+        let statusClass = '';
+        switch ((app.status || '').toLowerCase()) {
+            case 'pending': statusClass = 'status-pending'; break;
+            case 'under review': statusClass = 'status-under-review'; break;
+            case 'accepted': statusClass = 'status-accepted'; break;
+            case 'rejected': statusClass = 'status-rejected'; break;
+        }
+        
+        // Format the date nicely
+        const applicationDate = app.created_at ? formatRelativeTime(app.created_at) : 'Unknown date';
+        
+        // Create HTML content for each application - removed the View button
+        appItem.innerHTML = `
+            <div class="activity-icon">
+                <img src="../public/images/apply_icon.png" alt="Application">
+            </div>
+            <div class="activity-content">
+                <div class="activity-title">
+                    ${app.subject || 'Application'} 
+                    <span class="status-badge-small ${statusClass}">${app.status || 'Unknown'}</span>
+                </div>
+                <div class="activity-subtitle">
+                    ${app.job_company || 'Company'} • 
+                    ${app.job_category || 'Category'} • 
+                    ${app.job_type || 'Job Type'} • 
+                    ${app.job_location || 'Location'} • 
+                    ${applicationDate}
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(appItem);
+    });
 }
 
 function renderApplications(applications, viewType) {
