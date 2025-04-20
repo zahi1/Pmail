@@ -484,17 +484,41 @@ function loadReceivedApplications() {
     const applicationsContainer = document.getElementById('received-applications');
     if (!applicationsContainer) return;
     
-    fetch('/employer/applications')
+    // Get current user ID
+    const currentUserId = localStorage.getItem("user_id") || "0";
+    if (currentUserId === "0") {
+        applicationsContainer.innerHTML = `
+            <div class="text-center mt-4">
+                <p>Please log in to view received applications.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Use a dashboard-style endpoint for employers to get comprehensive application data
+    fetch(`/dashboard/employer/${currentUserId}`)
         .then(response => response.json())
         .then(data => {
             if (data.applications && data.applications.length > 0) {
-                renderApplications(data.applications, 'employer');
+                // Store applications in a global variable for filtering
+                window.employerApplications = data.applications;
+                
+                // Update the applications count
+                updateApplicationsCount(data.applications.length);
+                
+                // Populate the job filter dropdown
+                populateJobFilter(data.applications);
+                
+                // Pass the applications array to the render function
+                renderEmployerApplications(data.applications);
             } else {
                 applicationsContainer.innerHTML = `
                     <div class="text-center mt-4">
                         <p>No applications received yet.</p>
+                        <p class="small-text">When candidates apply to your jobs, they will appear here.</p>
                     </div>
                 `;
+                updateApplicationsCount(0);
             }
         })
         .catch(error => {
@@ -505,6 +529,120 @@ function loadReceivedApplications() {
                 </div>
             `;
         });
+}
+
+function updateApplicationsCount(count) {
+    const countElement = document.getElementById('applications-count');
+    if (countElement) {
+        countElement.textContent = `(${count})`;
+    }
+}
+
+function populateJobFilter(applications) {
+    const filterDropdown = document.getElementById('job-filter');
+    if (!filterDropdown) return;
+    
+    // Clear existing options except "All"
+    while (filterDropdown.options.length > 1) {
+        filterDropdown.remove(1);
+    }
+    
+    // Get unique job subjects/titles
+    const uniqueJobs = [...new Set(applications.map(app => {
+        // Extract the job title from "Application for: Job Title"
+        let subject = app.subject || '';
+        if (subject.startsWith('Application for:')) {
+            return subject.substring('Application for:'.length).trim();
+        }
+        return subject;
+    }))];
+    
+    // Add job options to dropdown
+    uniqueJobs.forEach(job => {
+        if (job) {  // Only add non-empty job titles
+            const option = document.createElement('option');
+            option.value = job;
+            option.textContent = job;
+            filterDropdown.appendChild(option);
+        }
+    });
+    
+    // Add event listener to filter applications
+    filterDropdown.addEventListener('change', function() {
+        const selectedJob = this.value;
+        filterApplications(selectedJob);
+    });
+}
+
+function filterApplications(jobTitle) {
+    if (!window.employerApplications) return;
+    
+    let filteredApplications;
+    
+    if (jobTitle === 'all') {
+        filteredApplications = window.employerApplications;
+    } else {
+        filteredApplications = window.employerApplications.filter(app => {
+            const subject = app.subject || '';
+            return subject.includes(jobTitle);
+        });
+    }
+    
+    // Update the applications count with filtered count
+    updateApplicationsCount(filteredApplications.length);
+    
+    // Render the filtered applications
+    renderEmployerApplications(filteredApplications);
+}
+
+// New function to render employer applications in a format similar to employee applications
+function renderEmployerApplications(applications) {
+    const container = document.getElementById('received-applications');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    applications.forEach(app => {
+        const appItem = document.createElement('div');
+        appItem.className = 'activity-item';
+        
+        let statusClass = '';
+        switch ((app.status || '').toLowerCase()) {
+            case 'pending': statusClass = 'status-pending'; break;
+            case 'under review': statusClass = 'status-under-review'; break;
+            case 'accepted': statusClass = 'status-accepted'; break;
+            case 'rejected': statusClass = 'status-rejected'; break;
+        }
+        
+        // Format the date nicely
+        const applicationDate = app.created_at ? formatRelativeTime(app.created_at) : 'Unknown date';
+        
+        // Extract job title from subject
+        let jobTitle = app.subject || 'Job Position';
+        if (jobTitle.startsWith('Application for:')) {
+            jobTitle = jobTitle.substring('Application for:'.length).trim();
+        }
+        
+        appItem.innerHTML = `
+            <div class="activity-icon">
+                <img src="../public/images/apply_icon.png" alt="Application">
+            </div>
+            <div class="activity-content">
+                <div class="activity-title">
+                    Application for: ${jobTitle}
+                    <span class="status-badge-small ${statusClass}">${app.status || 'Pending'}</span>
+                </div>
+                <div class="activity-subtitle">
+                    ${app.sender_name || app.sender_email || 'Applicant'} • 
+                    ${app.job_category || 'Category'} • 
+                    ${app.job_type || 'Job Type'} • 
+                    ${app.created_at ? formatRelativeTime(app.created_at) : 'Unknown date'}
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(appItem);
+    });
 }
 
 function loadUserApplications() {
