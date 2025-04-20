@@ -141,11 +141,23 @@ function openCompose(isNew = true) {
     // When composing a new email, clear any existing draft id and clear fields.
     currentDraftId = null;
     document.getElementById('recipient-email').value = '';
-    document.getElementById('subject-dropdown').selectedIndex = 0;
+    
+    // Handle different subject fields based on user type
+    if (localStorage.getItem('isEmployer') === 'true') {
+      if (document.getElementById('subject-input'))
+        document.getElementById('subject-input').value = '';
+    } else {
+      if (document.getElementById('subject-dropdown'))
+        document.getElementById('subject-dropdown').selectedIndex = 0;
+    }
+    
     document.getElementById('message-body').value = '';
   }
-  // Clear job titles; they will be reloaded if needed
-  clearJobTitles();
+  
+  // Clear job titles for employee; they will be reloaded if needed
+  if (localStorage.getItem('isEmployer') !== 'true') {
+    clearJobTitles();
+  }
 }
 
 function closeCompose() {
@@ -154,7 +166,19 @@ function closeCompose() {
   
   // Grab the current compose field values
   const recipientEmail = document.getElementById('recipient-email').value.trim();
-  const subject = document.getElementById('subject-dropdown').value.trim();
+  
+  // Check if we're in employer or employee mode
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  let subject = '';
+  
+  if (isEmployer) {
+    const subjectInput = document.getElementById('subject-input');
+    subject = subjectInput ? subjectInput.value.trim() : '';
+  } else {
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    subject = subjectDropdown ? subjectDropdown.value.trim() : '';
+  }
+  
   const body = document.getElementById('message-body').value.trim();
   
   // If there is any content, save (or update) the draft before hiding the modal.
@@ -264,8 +288,20 @@ function sendMessage() {
   }
 
   const recipientEmail = document.getElementById("recipient-email").value.trim();
-  const subjectDropdown = document.getElementById('subject-dropdown');
-  const subject = subjectDropdown.value.trim();
+  let subject = "";
+  
+  // Check if this is an employer (free-text subject) or employee (dropdown subject)
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  if (isEmployer) {
+    // For employer: get text input subject
+    const subjectInput = document.getElementById('subject-input');
+    subject = subjectInput ? subjectInput.value.trim() : "";
+  } else {
+    // For employee: get dropdown subject
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    subject = subjectDropdown ? subjectDropdown.value.trim() : "";
+  }
+  
   const body = document.getElementById("message-body").value.trim();
 
   if (!recipientEmail || !subject || !body) {
@@ -275,10 +311,15 @@ function sendMessage() {
 
   let jobId = null;
   let companyName = null;
-  if (subjectDropdown.selectedIndex > 0) {
-    const selectedOption = subjectDropdown.options[subjectDropdown.selectedIndex];
-    jobId = selectedOption.dataset.jobId;
-    companyName = selectedOption.dataset.companyName;
+  
+  // Only try to get job data from dropdown for employees
+  if (!isEmployer && document.getElementById('subject-dropdown')) {
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    if (subjectDropdown.selectedIndex > 0) {
+      const selectedOption = subjectDropdown.options[subjectDropdown.selectedIndex];
+      jobId = selectedOption.dataset.jobId;
+      companyName = selectedOption.dataset.companyName;
+    }
   }
 
   const payload = {
@@ -296,41 +337,67 @@ function sendMessage() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .then(data => {
       if (data.message && (data.message === "Message sent successfully" || data.message === "Draft sent successfully")) {
         showToast("Message sent!");
+        
         // Clear the compose form and reset currentDraftId
         currentDraftId = null;
         document.getElementById("recipient-email").value = "";
-        document.getElementById('subject-dropdown').selectedIndex = 0;
+        
+        // Handle different subject fields based on user type
+        if (isEmployer) {
+          const subjectInput = document.getElementById('subject-input');
+          if (subjectInput) subjectInput.value = "";
+        } else {
+          const subjectDropdown = document.getElementById('subject-dropdown');
+          if (subjectDropdown) subjectDropdown.selectedIndex = 0;
+        }
+        
         document.getElementById("message-body").value = "";
         const modal = document.getElementById("compose-modal");
         if (modal) modal.classList.add("hidden");
         loadInbox();
       } else {
-        showToast("Error: " + data.error);
+        showToast("Error: " + (data.error || "Unknown error"));
       }
     })
     .catch(err => {
-      console.error("Error:", err);
-      showToast("An error occurred while sending the message.");
+      console.error("Error sending message:", err);
+      showToast(`An error occurred while sending the message: ${err.message}`);
     });
 }
 
 function saveDraft() {
   const recipientEmail = document.getElementById("recipient-email").value.trim();
-  const subjectDropdown = document.getElementById('subject-dropdown');
-  const subject = subjectDropdown.value.trim();
-  const body = document.getElementById("message-body").value.trim();
-  
+  let subject = "";
   let jobId = null;
   let companyName = null;
-  if (subjectDropdown.selectedIndex > 0) {
-    const selectedOption = subjectDropdown.options[subjectDropdown.selectedIndex];
-    jobId = selectedOption.dataset.jobId;
-    companyName = selectedOption.dataset.companyName;
+  
+  // Handle different subject fields based on user type
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  if (isEmployer) {
+    const subjectInput = document.getElementById('subject-input');
+    subject = subjectInput ? subjectInput.value.trim() : "";
+  } else {
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    subject = subjectDropdown ? subjectDropdown.value.trim() : "";
+    
+    // Get job data from dropdown for employees
+    if (subjectDropdown && subjectDropdown.selectedIndex > 0) {
+      const selectedOption = subjectDropdown.options[subjectDropdown.selectedIndex];
+      jobId = selectedOption.dataset.jobId;
+      companyName = selectedOption.dataset.companyName;
+    }
   }
+  
+  const body = document.getElementById("message-body").value.trim();
   
   const payload = {
     sender_id: currentUserId,
@@ -695,23 +762,39 @@ function viewDraft(draft) {
   currentDraftId = draft.id;
   openCompose(false); // false indicates we're editing an existing draft
   document.getElementById("recipient-email").value = draft.recipient_email || "";
-  const subjectDropdown = document.getElementById('subject-dropdown');
-  let found = false;
-  for (let i = 0; i < subjectDropdown.options.length; i++) {
-    if (subjectDropdown.options[i].text === draft.subject) {
-      subjectDropdown.selectedIndex = i;
-      found = true;
-      break;
+  
+  // Handle different subject fields based on user type
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  
+  if (isEmployer) {
+    // For employer: set the subject in text input
+    const subjectInput = document.getElementById('subject-input');
+    if (subjectInput) {
+      subjectInput.value = draft.subject || "";
+    }
+  } else {
+    // For employee: handle the dropdown
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    if (subjectDropdown) {
+      let found = false;
+      for (let i = 0; i < subjectDropdown.options.length; i++) {
+        if (subjectDropdown.options[i].text === draft.subject) {
+          subjectDropdown.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const option = document.createElement('option');
+        option.value = draft.subject;
+        option.text = draft.subject;
+        subjectDropdown.appendChild(option);
+        subjectDropdown.selectedIndex = subjectDropdown.options.length - 1;
+      }
     }
   }
-  if (!found) {
-    const option = document.createElement('option');
-    option.value = draft.subject;
-    option.text = draft.subject;
-    subjectDropdown.appendChild(option);
-    subjectDropdown.selectedIndex = subjectDropdown.options.length - 1;
-  }
-  document.getElementById("message-body").value = draft.body;
+  
+  document.getElementById("message-body").value = draft.body || "";
 }
 
 function updateMessageStatus(event) {
