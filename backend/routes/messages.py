@@ -53,6 +53,7 @@ def send_message():
     draft_id = data.get('draft_id')  # Optional: if coming from an existing draft
     job_id = data.get('job_id')
     company_name = data.get('company_name')
+    parent_id = data.get('parent_message_id')
 
     if not sender_id or not recipient_email or not subject or not body:
         return jsonify({"error": "Missing required fields"}), 400
@@ -80,6 +81,8 @@ def send_message():
             message.status = "Pending"
             message.is_draft = False
             message.is_spam = spam_detected  # Set is_spam flag
+            if parent_id:
+                message.parent_id = parent_id
             db.session.commit()
             
             print(f"📤 Draft sent with ID {message.id}, is_spam: {message.is_spam}")
@@ -92,7 +95,8 @@ def send_message():
                 body=body,
                 status="Pending",
                 is_draft=False,
-                is_spam=spam_detected  # Set is_spam flag
+                is_spam=spam_detected,  # Set is_spam flag
+                parent_id=parent_id
             )
             db.session.add(new_message)
             db.session.commit()
@@ -322,3 +326,43 @@ def get_message(message_id):
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
+@messages_bp.route('/messages/replies/<int:message_id>', methods=['GET'])
+def get_replies(message_id):
+    """Fetch replies for a given message to display threaded view"""
+    try:
+        replies = Message.query.filter_by(parent_id=message_id) \
+                               .order_by(Message.created_at).all()
+        results = []
+        for msg in replies:
+            user = User.query.get(msg.sender_id)
+            results.append({
+                "id": msg.id,
+                "sender_email": user.email if user else "",
+                "subject": msg.subject,
+                "body": msg.body,
+                "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        return jsonify(results), 200
+    except Exception as e:
+        print(f"❌ Error fetching replies: {e}")
+        return jsonify({"error": "Error fetching replies"}), 500
+
+@messages_bp.route('/messages/draft/<int:draft_id>', methods=['DELETE'])
+def delete_draft(draft_id):
+    """Delete a draft message"""
+    draft = Message.query.get(draft_id)
+    if not draft:
+        return jsonify({"error": "Draft not found"}), 404
+        
+    if not draft.is_draft:
+        return jsonify({"error": "Message is not a draft"}), 400
+        
+    try:
+        db.session.delete(draft)
+        db.session.commit()
+        return jsonify({"message": "Draft deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error deleting draft: {e}")
+        return jsonify({"error": "Database error while deleting draft"}), 500

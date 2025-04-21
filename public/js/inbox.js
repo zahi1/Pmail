@@ -4,6 +4,7 @@
 let currentUserId = localStorage.getItem("user_id") || "0";
 let currentView = 'inbox'; // Track current view: 'inbox', 'sent', 'drafts', or 'message'
 let currentMessage = null; // Store the currently viewed message
+let currentReplyToId = null;  // track which message we're replying to
 let currentDraftId = null; // Store the draft ID (if editing a draft)
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -141,6 +142,13 @@ function openCompose(isNew = true) {
   if (modal) {
     modal.classList.remove("hidden");
   }
+  
+  // Always show the delete button for both new compositions and drafts
+  const deleteBtn = document.getElementById("delete-draft-btn");
+  if (deleteBtn) {
+    deleteBtn.style.display = "block"; // Always show delete button
+  }
+  
   if (isNew) {
     // When composing a new email, clear any existing draft id and clear fields.
     currentDraftId = null;
@@ -333,7 +341,8 @@ function sendMessage() {
     body: body,
     job_id: jobId,
     company_name: companyName,
-    draft_id: currentDraftId // If editing an existing draft, include its ID
+    draft_id: currentDraftId,     // existing
+    parent_message_id: currentReplyToId
   };
 
   fetch("/messages/send", {
@@ -368,6 +377,7 @@ function sendMessage() {
         const modal = document.getElementById("compose-modal");
         if (modal) modal.classList.add("hidden");
         loadInbox();
+        currentReplyToId = null;  // reset after send
       } else {
         showToast("Error: " + (data.error || "Unknown error"));
       }
@@ -745,10 +755,30 @@ function viewMessage(message, source = 'inbox') {
       ${message.body}
     </div>
   `;
+
+  const replyBtn = document.createElement('button');
+  replyBtn.id = 'reply-btn';
+  replyBtn.classList.add('reply-btn');
   
+  // Add the reply icon and text to the button
+  replyBtn.innerHTML = `
+    <img src="../public/images/reply_icon.png" alt="Reply" class="reply-icon">
+    Reply
+  `;
+  
+  document.querySelector('.message-header').appendChild(replyBtn);
+  replyBtn.addEventListener('click', () => replyToMessage(message));
+
+  fetchReplies(message.id);
+
   const backButton = document.getElementById("back-to-inbox");
   if (backButton) {
     backButton.addEventListener("click", () => {
+      // Clear message_id from URL by resetting to base URL
+      const baseUrl = window.location.pathname;
+      window.history.pushState({}, '', baseUrl);
+      
+      // Return to appropriate view
       if (source === 'inbox') {
         loadInbox();
       } else if (source === 'sent') {
@@ -821,6 +851,9 @@ function loadMessageById(messageId) {
         inboxMessages.innerHTML = `<p style="padding:20px; color:#f44336; text-align:center;">
           Failed to load message. The message may not exist or you may not have permission to view it.
         </p>`;
+        
+        // Also clear URL parameters on error
+        window.history.pushState({}, '', window.location.pathname);
       }
     });
 }
@@ -881,6 +914,12 @@ function viewDraft(draft) {
   }
   
   document.getElementById("message-body").value = draft.body || "";
+  
+  // Show delete button when editing an existing draft
+  const deleteBtn = document.getElementById("delete-draft-btn");
+  if (deleteBtn) {
+    deleteBtn.style.display = "block";
+  }
 }
 
 function updateMessageStatus(event) {
@@ -920,5 +959,138 @@ function hideMessageDetail() {
   const messageDetail = document.getElementById("message-detail");
   if (messageDetail) {
     messageDetail.classList.add("hidden");
+  }
+}
+
+function replyToMessage(message) {
+  currentReplyToId = message.id;
+  openCompose(true);
+  
+  // prefill
+  const recipientEmailField = document.getElementById('recipient-email');
+  recipientEmailField.value = message.sender_email;
+  
+  // Check if user is employer or employee
+  const isEmployer = localStorage.getItem('isEmployer') === 'true';
+  
+  // Disable recipient field for both employee and employer
+  recipientEmailField.disabled = true;
+  recipientEmailField.style.opacity = "0.7";
+  recipientEmailField.style.cursor = "not-allowed";
+  
+  if (!isEmployer) {
+    // Employee replying to employer
+    // Handle subject field for employee
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    if (subjectDropdown) {
+      subjectDropdown.disabled = true;
+      subjectDropdown.style.opacity = "0.7";
+      subjectDropdown.style.cursor = "not-allowed";
+      
+      // If it's a reply, select or create the "Re:" option
+      const reSubject = `Re: ${message.subject}`;
+      
+      // Try to find an existing option with the Re: prefix
+      let found = false;
+      for (let i = 0; i < subjectDropdown.options.length; i++) {
+        if (subjectDropdown.options[i].text === reSubject) {
+          subjectDropdown.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+      
+      // If not found, add a new option
+      if (!found) {
+        const option = document.createElement('option');
+        option.value = reSubject;
+        option.text = reSubject;
+        subjectDropdown.appendChild(option);
+        subjectDropdown.selectedIndex = subjectDropdown.options.length - 1;
+      }
+    }
+  } else {
+    // Employer replying to employee
+    // Handle subject field for employer
+    const subjectInput = document.getElementById('subject-input');
+    if (subjectInput) {
+      subjectInput.value = `Re: ${message.subject}`;
+      subjectInput.disabled = true;
+      subjectInput.style.opacity = "0.7";
+      subjectInput.style.cursor = "not-allowed";
+    }
+  }
+  
+  // Prefill message body with quoted text
+  const bodyField = document.getElementById('message-body');
+  if (bodyField) {
+    bodyField.value = `\n\nOn ${message.created_at}, ${message.sender_email} wrote:\n${message.body}\n`;
+    // Focus on the message body after everything is set up
+    bodyField.focus();
+  }
+}
+
+function fetchReplies(messageId) {
+  const messageBody = document.querySelector('#message-detail .message-body');
+  const threadContainer = document.createElement('div');
+  threadContainer.classList.add('thread');
+  // insert thread container immediately under the original message
+  messageBody.insertAdjacentElement('afterend', threadContainer);
+
+  fetch(`/messages/replies/${messageId}`)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(reply => {
+        const item = document.createElement('div');
+        item.classList.add('reply-item');
+        item.innerHTML = `
+          <div class="reply-header">${reply.sender_email} - ${reply.created_at}</div>
+          <div class="reply-body">${reply.body}</div>
+        `;
+        threadContainer.appendChild(item);
+      });
+    })
+    .catch(err => console.error('Error loading replies:', err));
+}
+
+function deleteDraft() {
+  if (currentDraftId) {
+    // For existing drafts: Delete from the server
+    if (!confirm("Are you sure you want to delete this draft?")) {
+      return;  // User canceled the deletion
+    }
+    
+    fetch(`/messages/draft/${currentDraftId}`, {
+      method: 'DELETE'
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      showToast("Draft deleted");
+      
+      // Reset the draft ID and close the compose modal
+      currentDraftId = null;
+      const modal = document.getElementById("compose-modal");
+      if (modal) modal.classList.add("hidden");
+      
+      // If we're currently viewing drafts, refresh the drafts list
+      if (currentView === 'drafts') {
+        loadDraftMessages();
+      }
+    })
+    .catch(err => {
+      console.error("Error deleting draft:", err);
+      showToast(`An error occurred while deleting the draft: ${err.message}`);
+    });
+  } else {
+    // For new compositions: Just discard the message without saving to drafts
+    if (confirm("Discard this message?")) {
+      const modal = document.getElementById("compose-modal");
+      if (modal) modal.classList.add("hidden");
+    }
   }
 }
