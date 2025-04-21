@@ -33,7 +33,7 @@ def is_spam(subject, body):
         
         # Get probability of being spam (index 1 is spam probability)
         spam_prob = spam_model.predict_proba([combined_text])[0][1]
-        is_spam_result = spam_prob > 0.5  # Threshold for classifying as spam
+        is_spam_result = spam_prob >= 0.5  # Threshold for classifying as spam
         
         print(f"📊 Spam probability: {spam_prob:.4f} - {'SPAM' if is_spam_result else 'NOT SPAM'}")
         return is_spam_result
