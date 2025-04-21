@@ -46,25 +46,32 @@
       </div>
     </div>
 
-    <div class="table-container">
+    <div class="applications-container">
       <h2>All Received Applications</h2>
-      <table id="applicationsTable">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Status</th>
-            <th>Sent Date</th>
-            <th>Applicant</th>
-            <th>Category</th>
-            <th>Job Type</th>
-            <th>Location</th>
-            <th>Company</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filled by employer_dashboard.js -->
-        </tbody>
-      </table>
+      
+      <!-- Application filter controls -->
+      <div class="applications-filters">
+        <div class="filter-controls">
+          <label for="statusFilter">Status:</label>
+          <select id="statusFilter" onchange="filterApplications()">
+            <option value="all">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <label for="categoryFilter">Category:</label>
+          <select id="categoryFilter" onchange="filterApplications()">
+            <option value="all">All Categories</option>
+            <!-- Will be populated dynamically -->
+          </select>
+        </div>
+      </div>
+      
+      <!-- Applications cards container -->
+      <div id="applicationsGrid" class="applications-grid">
+        <!-- Application cards will be added here dynamically -->
+      </div>
     </div>
   </div>
 

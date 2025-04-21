@@ -471,38 +471,6 @@ body {
   border-bottom: 1px solid #444;
 }
 
-/* Reply button in message header */
-.reply-btn {
-  background-color: #8ab4f8;    /* changed to blue to match UI */
-  color: #000;                   /* black text for better contrast */
-  border: none;
-  padding: 8px 16px;             /* larger padding */
-  border-radius: 4px;
-  font-size: 14px;               /* slightly larger text */
-  cursor: pointer;
-  margin-left: 10px;             /* space after back button */
-  margin-right: auto;            /* push to left instead of right */
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-}
-
-.reply-btn:hover {
-  background-color: #6e9ad0;     /* darker blue on hover */
-}
-
-/* Reply icon styling */
-.reply-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-}
-
-/* add one empty line (vertical space) between header and body of each reply */
-.reply-body {
-  margin-top: 1em;
-}
-
 /* -------------------------------------- */
 /* 🔹 MESSAGE STATUS STYLING              */
 /* -------------------------------------- */
@@ -697,40 +665,4 @@ body {
 
 .not-spam-btn:hover {
   background-color: #333;
-}
-
-.thread {
-  margin-top: 20px;
-  margin-left: 20px;
-  border-left: 2px solid #444;
-  padding-left: 15px;
-}
-
-.reply-item {
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #2b2b2b;
-  border: 1px solid #444;
-  border-radius: 4px;
-}
-
-/* Delete draft button styling */
-.delete-draft-btn {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  margin-right: auto; /* Push to left side */
-  border-radius: 4px;
-  display: none; /* Hidden by default */
-}
-
-.delete-draft-btn:hover {
-  background-color: #2a2a2a;
-}
-
-.delete-icon {
-  width: 20px;
-  height: 20px;
-  filter: invert(32%) sepia(14%) saturate(2741%) hue-rotate(335deg) brightness(87%) contrast(96%);
 }

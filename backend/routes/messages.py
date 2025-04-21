@@ -33,7 +33,7 @@ def is_spam(subject, body):
         
         # Get probability of being spam (index 1 is spam probability)
         spam_prob = spam_model.predict_proba([combined_text])[0][1]
-        is_spam_result = spam_prob >= 0.5  # Threshold for classifying as spam
+        is_spam_result = spam_prob > 0.5  # Threshold for classifying as spam
         
         print(f"📊 Spam probability: {spam_prob:.4f} - {'SPAM' if is_spam_result else 'NOT SPAM'}")
         return is_spam_result
@@ -53,7 +53,6 @@ def send_message():
     draft_id = data.get('draft_id')  # Optional: if coming from an existing draft
     job_id = data.get('job_id')
     company_name = data.get('company_name')
-    parent_id = data.get('parent_message_id')
 
     if not sender_id or not recipient_email or not subject or not body:
         return jsonify({"error": "Missing required fields"}), 400
@@ -81,8 +80,6 @@ def send_message():
             message.status = "Pending"
             message.is_draft = False
             message.is_spam = spam_detected  # Set is_spam flag
-            if parent_id:
-                message.parent_id = parent_id
             db.session.commit()
             
             print(f"📤 Draft sent with ID {message.id}, is_spam: {message.is_spam}")
@@ -95,8 +92,7 @@ def send_message():
                 body=body,
                 status="Pending",
                 is_draft=False,
-                is_spam=spam_detected,  # Set is_spam flag
-                parent_id=parent_id
+                is_spam=spam_detected  # Set is_spam flag
             )
             db.session.add(new_message)
             db.session.commit()
@@ -288,42 +284,41 @@ def mark_as_not_spam(message_id):
     else:
         return jsonify({"error": "Message is not marked as spam"}), 400
 
-@messages_bp.route('/messages/replies/<int:message_id>', methods=['GET'])
-def get_replies(message_id):
-    """Fetch replies for a given message to display threaded view"""
+@messages_bp.route('/messages/<int:message_id>', methods=['GET'])
+def get_message(message_id):
+    """Get a specific message by ID"""
     try:
-        replies = Message.query.filter_by(parent_id=message_id) \
-                               .order_by(Message.created_at).all()
-        results = []
-        for msg in replies:
-            user = User.query.get(msg.sender_id)
-            results.append({
-                "id": msg.id,
-                "sender_email": user.email if user else "",
-                "subject": msg.subject,
-                "body": msg.body,
-                "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
-            })
-        return jsonify(results), 200
-    except Exception as e:
-        print(f"❌ Error fetching replies: {e}")
-        return jsonify({"error": "Error fetching replies"}), 500
-
-@messages_bp.route('/messages/draft/<int:draft_id>', methods=['DELETE'])
-def delete_draft(draft_id):
-    """Delete a draft message"""
-    draft = Message.query.get(draft_id)
-    if not draft:
-        return jsonify({"error": "Draft not found"}), 404
+        message = Message.query.get(message_id)
+        if not message:
+            return jsonify({"error": "Message not found"}), 404
         
-    if not draft.is_draft:
-        return jsonify({"error": "Message is not a draft"}), 400
+        # Check if the current user has permission to view this message
+        current_user_id = request.args.get('user_id')
+        if current_user_id:
+            current_user_id = int(current_user_id)
+            if message.sender_id != current_user_id and message.recipient_id != current_user_id:
+                return jsonify({"error": "Permission denied"}), 403
         
-    try:
-        db.session.delete(draft)
-        db.session.commit()
-        return jsonify({"message": "Draft deleted successfully"}), 200
+        sender = User.query.get(message.sender_id)
+        recipient = User.query.get(message.recipient_id)
+        
+        result = {
+            "id": message.id,
+            "sender_id": message.sender_id,
+            "sender_email": sender.email if sender else "Unknown",
+            "recipient_id": message.recipient_id,
+            "recipient_email": recipient.email if recipient else "Unknown",
+            "subject": message.subject,
+            "body": message.body,
+            "status": message.status,
+            "is_draft": message.is_draft,
+            "is_spam": message.is_spam,
+            "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        return jsonify(result), 200
     except Exception as e:
-        db.session.rollback()
-        print(f"❌ Error deleting draft: {e}")
-        return jsonify({"error": "Database error while deleting draft"}), 500
+        print(f"❌ Error fetching message: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500

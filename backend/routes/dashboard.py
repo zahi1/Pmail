@@ -137,6 +137,7 @@ def employer_dashboard(employer_id):
         sender_email = sender_user.email if sender_user else "unknown"
 
         applications.append({
+            "id": msg.id,  # Add the message ID for status updates
             "subject": msg.subject,
             "status": msg.status,
             "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),

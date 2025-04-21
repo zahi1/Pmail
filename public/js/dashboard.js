@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // 4) Day of week distribution (bar)
       renderDayOfWeekChart(data.day_of_week_counts);
 
-      // Fill the table
-      populateApplicationsTable(data.applications);
+      // Display applications using cards instead of a table
+      displayApplicationCards(data.applications);
     })
     .catch(err => {
       console.error("Error fetching dashboard data:", err);
@@ -201,22 +201,107 @@ function renderDayOfWeekChart(dayOfWeekData) {
   });
 }
 
-function populateApplicationsTable(applications) {
-  const tbody = document.getElementById("applicationsTable").querySelector("tbody");
-  tbody.innerHTML = "";
-
-  applications.forEach(app => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${app.subject}</td>
-      <td>${app.status}</td>
-      <td>${app.created_at}</td>
-      <td>${app.recipient_email}</td>
-      <td>${app.job_category}</td>
-      <td>${app.job_type}</td>
-      <td>${app.job_location}</td>
-      <td>${app.job_company}</td>
+function displayApplicationCards(applications) {
+  // First, find or create a container for the applications
+  let applicationsContainer = document.querySelector('.applications-container');
+  if (!applicationsContainer) {
+    // If the container doesn't exist yet, create it
+    applicationsContainer = document.createElement('div');
+    applicationsContainer.className = 'applications-container';
+    applicationsContainer.innerHTML = '<h2>My Applications</h2>';
+    
+    // Add it to the page after the charts
+    const chartsGrid = document.querySelector('.charts-grid');
+    if (chartsGrid) {
+      chartsGrid.parentNode.insertBefore(applicationsContainer, chartsGrid.nextSibling);
+    } else {
+      document.querySelector('.dashboard-container').appendChild(applicationsContainer);
+    }
+  }
+  
+  // Create grid container for cards
+  const applicationsGrid = document.createElement('div');
+  applicationsGrid.className = 'applications-grid';
+  applicationsContainer.appendChild(applicationsGrid);
+  
+  // Remove the old table if it exists
+  const oldTable = document.getElementById('applicationsTable');
+  if (oldTable) {
+    oldTable.parentNode.removeChild(oldTable);
+  }
+  
+  // Handle empty state
+  if (!applications || applications.length === 0) {
+    applicationsGrid.innerHTML = `
+      <div class="no-applications">
+        <img src="../public/images/inbox_icon.png" alt="No Applications">
+        <p>You haven't submitted any job applications yet.</p>
+        <p>Once you apply for jobs, they will appear here.</p>
+      </div>
     `;
-    tbody.appendChild(row);
+    return;
+  }
+  
+  // Create cards for each application
+  applications.forEach((app, index) => {
+    const card = document.createElement('div');
+    card.className = 'application-card';
+    card.style.setProperty('--card-index', index);
+    
+    const status = app.status || 'Pending';
+    
+    // Format the date to be more readable
+    const date = new Date(app.created_at);
+    const formattedDate = date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    
+    card.innerHTML = `
+      <div class="card-header">
+        <h3 class="job-title">${app.subject || 'No Subject'}</h3>
+        <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+      </div>
+      <div class="card-body">
+        <div class="applicant-info">
+          <div class="applicant-avatar">
+            ${app.recipient_email ? app.recipient_email.charAt(0).toUpperCase() : 'C'}
+          </div>
+          <div class="applicant-details">
+            <p class="applicant-name">Employer</p>
+            <p class="applicant-email">${app.recipient_email || 'Unknown'}</p>
+          </div>
+        </div>
+        <div class="application-details">
+          <div class="detail-row">
+            <span class="detail-label">Category:</span>
+            <span class="detail-value">${app.job_category || 'N/A'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Job Type:</span>
+            <span class="detail-value">${app.job_type || 'N/A'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Location:</span>
+            <span class="detail-value">${app.job_location || 'N/A'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Company:</span>
+            <span class="detail-value">${app.job_company || 'N/A'}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">${formattedDate}</span>
+        <div class="card-actions">
+          <button class="action-btn" onclick="window.location.href='employee_inbox.html?view_message=${app.id}'">
+            View Application
+          </button>
+        </div>
+      </div>
+    `;
+    
+    applicationsGrid.appendChild(card);
   });
 }
