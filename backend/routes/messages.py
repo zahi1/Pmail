@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 from backend.models.database import db
 from backend.models.message import Message
 from backend.models.user import User
+from backend.models.status_message import StatusMessage
 from sqlalchemy import func
 import pickle
 import os
@@ -233,7 +234,38 @@ def update_message_status(message_id):
     if not message:
         return jsonify({"error": "Message not found"}), 404
     
+    old_status = message.status
     message.status = new_status
+    
+    # Only create notification if status has changed
+    if old_status != new_status:
+        try:
+            # Create an automated reply message based on the new status
+            employer = User.query.get(message.recipient_id)  # The employer is the recipient of the original message
+            employee = User.query.get(message.sender_id)      # The employee is the sender of the original message
+            
+            if employer and employee:
+                # Generate status-specific message content, passing employer ID for custom messages
+                reply_subject = f"Re: {message.subject}"
+                reply_body = generate_status_message(new_status, message.subject, employer.id)
+                
+                # Create the automated reply message
+                auto_reply = Message(
+                    sender_id=employer.id,            # From employer
+                    recipient_id=employee.id,         # To employee
+                    subject=reply_subject,
+                    body=reply_body,
+                    status=new_status,
+                    is_draft=False,
+                    is_spam=False,
+                    parent_id=message_id              # Link to original message
+                )
+                db.session.add(auto_reply)
+                print(f"📧 Created automated status update message with status: {new_status}")
+        except Exception as e:
+            print(f"⚠️ Failed to create status update message: {e}")
+            # Continue even if automated message fails, don't block the status update
+    
     db.session.commit()
     
     return jsonify({
@@ -241,6 +273,40 @@ def update_message_status(message_id):
         "message_id": message_id,
         "status": new_status
     }), 200
+
+def generate_status_message(status, job_subject, employer_id=None):
+    """Generate appropriate message text based on application status"""
+    # Extract job title from subject if it contains "Application for: "
+    job_title = job_subject
+    if "Application for:" in job_subject:
+        job_title = job_subject.split("Application for:")[1].strip()
+    
+    # Try to find custom message from the employer
+    if employer_id:
+        custom_message = StatusMessage.query.filter_by(
+            user_id=employer_id,
+            status=status.lower().replace(' ', '_')
+        ).first()
+        
+        if custom_message:
+            # Replace {job_title} placeholder with actual job title
+            return custom_message.message.replace('{job_title}', job_title)
+    
+    # If no custom message found or no employer_id provided, use default messages
+    if status == "Pending":
+        return f"Thank you for your application for {job_title}. Your application is currently in our pending queue and will be reviewed soon."
+    
+    elif status == "Under Review":
+        return f"Good news! Your application for {job_title} is now being reviewed by our team. We'll be in touch with updates as we evaluate your candidacy."
+    
+    elif status == "Accepted":
+        return f"Congratulations! We are pleased to inform you that your application for {job_title} has been accepted. We'll contact you shortly with next steps regarding the interview process."
+    
+    elif status == "Rejected":
+        return f"Thank you for your interest in {job_title}. After careful consideration, we regret to inform you that we've decided to move forward with other candidates at this time.\n\nWe appreciate your interest in our organization and wish you success in your job search."
+    
+    else:
+        return f"Your application status has been updated to: {status}"
 
 @messages_bp.route('/messages/spam/<int:user_id>', methods=['GET'])
 def get_spam(user_id):
@@ -366,3 +432,63 @@ def delete_draft(draft_id):
         db.session.rollback()
         print(f"❌ Error deleting draft: {e}")
         return jsonify({"error": "Database error while deleting draft"}), 500
+
+# New endpoints for status messages
+@messages_bp.route('/status-messages/<int:user_id>', methods=['GET'])
+def get_status_messages(user_id):
+    """Get custom status messages for a user"""
+    try:
+        messages = {}
+        status_messages = StatusMessage.query.filter_by(user_id=user_id).all()
+        
+        # Define default messages to return if no custom ones exist
+        default_messages = {
+            "pending": "Thank you for your application for {job_title}. Your application is currently in our pending queue and will be reviewed soon.",
+            "under_review": "Good news! Your application for {job_title} is now being reviewed by our team. We'll be in touch with updates as we evaluate your candidacy.",
+            "accepted": "Congratulations! We are pleased to inform you that your application for {job_title} has been accepted. We'll contact you shortly with next steps regarding the interview process.",
+            "rejected": "Thank you for your interest in {job_title}. After careful consideration, we regret to inform you that we've decided to move forward with other candidates at this time.\n\nWe appreciate your interest in our organization and wish you success in your job search."
+        }
+        
+        # If we have custom messages, use them; otherwise use defaults
+        for msg in status_messages:
+            messages[msg.status] = msg.message
+            
+        # Fill in any missing messages with defaults
+        for status, default_msg in default_messages.items():
+            if status not in messages:
+                messages[status] = default_msg
+        
+        return jsonify({"success": True, "messages": messages}), 200
+    except Exception as e:
+        print(f"❌ Error fetching status messages: {e}")
+        return jsonify({"error": "Error fetching status messages"}), 500
+
+@messages_bp.route('/status-messages', methods=['POST'])
+def save_status_messages():
+    """Save custom status messages for a user"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        messages = data.get('messages', {})
+        
+        if not user_id:
+            return jsonify({"error": "Missing user_id"}), 400
+        
+        # Delete existing messages for this user
+        StatusMessage.query.filter_by(user_id=user_id).delete()
+        
+        # Insert new messages
+        for status, message in messages.items():
+            if message:  # Only save non-empty messages
+                db.session.add(StatusMessage(
+                    user_id=user_id,
+                    status=status,
+                    message=message
+                ))
+        
+        db.session.commit()
+        return jsonify({"success": True, "message": "Status messages saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error saving status messages: {e}")
+        return jsonify({"error": "Error saving status messages", "details": str(e)}), 500

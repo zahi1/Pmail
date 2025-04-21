@@ -65,7 +65,7 @@ def employee_dashboard(employee_id):
         recipient_email = recipient_user.email if recipient_user else "unknown"
 
         applications.append({
-            # No ID column
+            "id": msg.id,  # Add the message ID for viewing applications
             "subject": msg.subject,
             "status": msg.status,
             "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),

@@ -72,6 +72,7 @@
             <li class="active" data-tab="info-tab">Company Information</li>
             <li data-tab="jobs-tab">Posted Jobs</li>
             <li data-tab="applications-tab">Received Applications</li>
+            <li data-tab="status-messages-tab">Status Messages</li>
           </ul>
         </div>
         
@@ -192,6 +193,58 @@
                 <div class="text-center mt-4">
                   <p>Loading received applications...</p>
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Status Messages Tab -->
+          <div id="status-messages-tab" class="tab-pane">
+            <div class="activity-card">
+              <h3>
+                <img src="../public/images/status_icon.png" alt="Status Messages" class="section-icon">
+                Customize Automated Status Messages
+                <span class="status-subtitle">These messages are automatically sent when you change an application status</span>
+              </h3>
+              
+              <div class="status-messages-container">
+                <form id="status-messages-form">
+                  <div class="status-message-group">
+                    <div class="status-header">
+                      <span class="status-badge status-pending">Pending</span>
+                      <span class="status-description">Initial status for new applications</span>
+                    </div>
+                    <textarea id="pending-message" class="status-message-textarea" rows="4" placeholder="Enter message for pending status..."></textarea>
+                  </div>
+
+                  <div class="status-message-group">
+                    <div class="status-header">
+                      <span class="status-badge status-under-review">Under Review</span>
+                      <span class="status-description">Application is being reviewed</span>
+                    </div>
+                    <textarea id="under-review-message" class="status-message-textarea" rows="4" placeholder="Enter message for under review status..."></textarea>
+                  </div>
+
+                  <div class="status-message-group">
+                    <div class="status-header">
+                      <span class="status-badge status-accepted">Accepted</span>
+                      <span class="status-description">Application has been accepted</span>
+                    </div>
+                    <textarea id="accepted-message" class="status-message-textarea" rows="4" placeholder="Enter message for accepted status..."></textarea>
+                  </div>
+
+                  <div class="status-message-group">
+                    <div class="status-header">
+                      <span class="status-badge status-rejected">Rejected</span>
+                      <span class="status-description">Application has been rejected</span>
+                    </div>
+                    <textarea id="rejected-message" class="status-message-textarea" rows="4" placeholder="Enter message for rejected status..."></textarea>
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="button" id="reset-default-messages" class="profile-btn">Reset to Default</button>
+                    <button type="submit" class="save-btn">Save Messages</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

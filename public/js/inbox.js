@@ -23,7 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (urlParams.get('message_id')) {
     // Direct link to a specific message
     const messageId = urlParams.get('message_id');
-    loadMessageById(messageId);
+    const shouldReply = urlParams.get('reply') === 'true';
+    
+    // Load the message and then reply if needed
+    loadMessageById(messageId, shouldReply);
   } else if (urlParams.get('compose') === 'true') {
     const employer = urlParams.get('employer');
     const jobTitle = urlParams.get('job');
@@ -818,8 +821,8 @@ function viewMessage(message, source = 'inbox') {
   // }
 }
 
-// New function to load a specific message by ID
-function loadMessageById(messageId) {
+// Modified function to handle auto-reply parameter
+function loadMessageById(messageId, shouldReply = false) {
   if (!currentUserId || currentUserId === "0") {
     console.error("User not logged in: cannot load message.");
     return;
@@ -844,6 +847,17 @@ function loadMessageById(messageId) {
       // Determine if this is from inbox or sent based on sender_id
       const source = (message.sender_id == currentUserId) ? 'sent' : 'inbox';
       viewMessage(message, source);
+      
+      // If shouldReply is true, automatically open reply compose window
+      if (shouldReply) {
+        // Small delay to ensure viewMessage has completed rendering
+        setTimeout(() => {
+          const replyBtn = document.getElementById('reply-btn');
+          if (replyBtn) {
+            replyBtn.click();
+          }
+        }, 300);
+      }
     })
     .catch(err => {
       console.error("Error loading message:", err);

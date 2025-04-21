@@ -50,13 +50,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load activity data
     loadActivityData();
     
-    // Load jobs or applications based on user role
+    // Load status messages if on employer profile
     const userRole = localStorage.getItem('isEmployer') === 'true' ? 'employer' : 'employee';
     if (userRole === 'employer') {
         loadEmployerJobs();
         loadReceivedApplications();
+        loadStatusMessages(); // Load the status messages
     } else {
         loadUserApplications();
+    }
+    
+    // Set up status messages form submission
+    const statusMessagesForm = document.getElementById('status-messages-form');
+    if (statusMessagesForm) {
+        statusMessagesForm.addEventListener('submit', saveStatusMessages);
+    }
+    
+    // Reset status messages to default
+    const resetDefaultBtn = document.getElementById('reset-default-messages');
+    if (resetDefaultBtn) {
+        resetDefaultBtn.addEventListener('click', resetStatusMessages);
     }
 });
 
@@ -826,4 +839,81 @@ function showNotification(message, type = 'info') {
             document.body.removeChild(toast);
         }, 500);
     }, 3000);
+}
+
+// Function to load status messages
+function loadStatusMessages() {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) return;
+    
+    fetch(`/status-messages/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update text areas with custom or default messages
+                document.getElementById('pending-message').value = data.messages.pending || '';
+                document.getElementById('under-review-message').value = data.messages.under_review || '';
+                document.getElementById('accepted-message').value = data.messages.accepted || '';
+                document.getElementById('rejected-message').value = data.messages.rejected || '';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading status messages:', error);
+            showNotification('Failed to load status messages', 'error');
+        });
+}
+
+// Function to save custom status messages
+function saveStatusMessages(event) {
+    event.preventDefault();
+    
+    const userId = localStorage.getItem("user_id");
+    if (!userId) return;
+    
+    const messages = {
+        pending: document.getElementById('pending-message').value.trim(),
+        under_review: document.getElementById('under-review-message').value.trim(),
+        accepted: document.getElementById('accepted-message').value.trim(),
+        rejected: document.getElementById('rejected-message').value.trim()
+    };
+    
+    fetch('/status-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: userId,
+            messages: messages
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Status messages saved successfully', 'success');
+        } else {
+            showNotification('Error: ' + (data.error || 'Failed to save status messages'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving status messages:', error);
+        showNotification('Failed to save status messages', 'error');
+    });
+}
+
+// Function to reset status messages to default
+function resetStatusMessages() {
+    // Default messages with placeholder for job title
+    const defaultMessages = {
+        pending: "Thank you for your application for {job_title}. Your application is currently in our pending queue and will be reviewed soon.",
+        under_review: "Good news! Your application for {job_title} is now being reviewed by our team. We'll be in touch with updates as we evaluate your candidacy.",
+        accepted: "Congratulations! We are pleased to inform you that your application for {job_title} has been accepted. We'll contact you shortly with next steps regarding the interview process.",
+        rejected: "Thank you for your interest in {job_title}. After careful consideration, we regret to inform you that we've decided to move forward with other candidates at this time.\n\nWe appreciate your interest in our organization and wish you success in your job search."
+    };
+    
+    // Update form fields with default messages
+    document.getElementById('pending-message').value = defaultMessages.pending;
+    document.getElementById('under-review-message').value = defaultMessages.under_review;
+    document.getElementById('accepted-message').value = defaultMessages.accepted;
+    document.getElementById('rejected-message').value = defaultMessages.rejected;
+    
+    showNotification('Status messages reset to default values', 'info');
 }

@@ -134,7 +134,6 @@ function displayApplicationCards(applications) {
             <option value="Rejected" ${(app.status || '') === 'Rejected' ? 'selected' : ''}>Rejected</option>
           </select>
           <button class="action-btn view-btn" onclick="viewApplication(${app.id})">View</button>
-          <button class="action-btn reply-btn" onclick="replyToApplicant('${app.sender_email}', '${(app.subject || '').replace(/'/g, "\\'")}')">Reply</button>
         </div>
       </div>
     `;

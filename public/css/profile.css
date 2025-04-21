@@ -7,12 +7,22 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 100%;
+  padding: 30px;
+  margin-top: 70px;
 }
 
 /* Profile Layout */
 .profile-layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
+  display: flex;
+  max-width: 1400px; /* Increased from default width */
+  margin: 0 auto;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  gap: 30px;
 }
 
 /* Left sidebar with profile picture and actions */
@@ -24,11 +34,19 @@
   flex-direction: column;
   align-items: center;
   min-height: 600px;
+  width: 280px;
+  min-width: 280px; /* Ensure sidebar doesn't shrink */
+  flex-shrink: 0;
 }
 
 /* Right content area */
 .profile-content-area {
+  flex: 1;
+  min-width: 0;
+  max-width: 1100px; /* Wider content area */
+  margin-left: 30px;
   padding: 0;
+  width: calc(100% - 310px);
 }
 
 /* Profile picture styling */
@@ -217,6 +235,8 @@
 /* Tabs styling */
 .profile-tabs {
   border-bottom: 1px solid #333;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .tab-nav {
@@ -224,15 +244,17 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  border-bottom: 1px solid #333;
 }
 
 .tab-nav li {
-  padding: 20px 30px;
+  padding: 12px 25px; /* Increase horizontal padding */
   cursor: pointer;
   font-weight: 500;
   color: #aaa;
   transition: all 0.2s;
   border-bottom: 3px solid transparent;
+  white-space: nowrap; /* Prevent wrapping */
 }
 
 .tab-nav li:hover {
@@ -248,10 +270,12 @@
 /* Tab content */
 .tab-content {
   padding: 30px;
+  width: 100%;
 }
 
 .tab-pane {
   display: none;
+  width: 100%;
 }
 
 .tab-pane.active {
@@ -393,6 +417,7 @@
   border-radius: 10px;
   padding: 25px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .activity-list {
@@ -467,4 +492,95 @@
 
 .mt-4 {
   margin-top: 40px;
+}
+
+/* Status Messages Tab Styles */
+.status-subtitle {
+  font-size: 13px;
+  color: #999;
+  font-weight: normal;
+  margin-left: 10px;
+}
+
+.status-messages-container {
+  margin-top: 20px;
+  width: 100%; /* Ensure full width */
+}
+
+.status-message-group {
+  margin-bottom: 25px; 
+  padding: 20px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  border: 1px solid #444;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-description {
+  margin-left: 12px;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.status-message-textarea {
+  width: 100%;
+  background-color: #333;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px; /* Ensure reasonable height for messages */
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.status-message-textarea:focus {
+  border-color: #8ab4f8;
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .profile-layout {
+    max-width: 100%;
+    padding: 20px 15px;
+  }
+  
+  .profile-content-area {
+    max-width: calc(100% - 300px);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    flex-direction: column;
+  }
+  
+  .profile-sidebar {
+    width: 100%;
+    margin-bottom: 30px;
+  }
+  
+  .profile-content-area {
+    margin-left: 0;
+    max-width: 100%;
+  }
 }

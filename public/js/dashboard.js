@@ -208,7 +208,7 @@ function displayApplicationCards(applications) {
     // If the container doesn't exist yet, create it
     applicationsContainer = document.createElement('div');
     applicationsContainer.className = 'applications-container';
-    applicationsContainer.innerHTML = '<h2>My Applications</h2>';
+    applicationsContainer.innerHTML = '<h2>My Applications</h2>'; // Changed from uppercase to proper case
     
     // Add it to the page after the charts
     const chartsGrid = document.querySelector('.charts-grid');
@@ -295,7 +295,7 @@ function displayApplicationCards(applications) {
       <div class="card-footer">
         <span class="card-date">${formattedDate}</span>
         <div class="card-actions">
-          <button class="action-btn" onclick="window.location.href='employee_inbox.html?view_message=${app.id}'">
+          <button class="action-btn" onclick="window.location.href='employee_inbox.html?message_id=${app.id}'">
             View Application
           </button>
         </div>
