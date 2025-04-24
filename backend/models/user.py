@@ -12,7 +12,7 @@ class User(db.Model):
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
     phone = Column(String(20), nullable=False)
-    role = Column(Enum('employee', 'employer'), nullable=False)
+    role = Column(Enum('employee', 'employer', 'admin'), nullable=False)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     company_name = db.Column(db.String(100))

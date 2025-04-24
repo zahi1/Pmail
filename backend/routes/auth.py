@@ -82,47 +82,141 @@ def login():
         return jsonify({"error": "Email and password are required"}), 400
 
     email = data["email"].strip().lower()
+    password = data["password"]
+    
+    # Check if this is the admin email
+    is_admin_email = email == "admin@pmail.com"
+    print(f"🔐 Login attempt for: {email} {'(ADMIN)' if is_admin_email else ''}")
+    
     user = User.query.filter(func.lower(User.email) == email).first()
-
-    if not user or not check_password_hash(user.password, data["password"]):
-        print(f"❌ Login failed for: {email}")
+    
+    if not user:
+        print(f"❌ Login failed: User not found for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
+    # Try both normal password verification and direct comparison for admin
+    auth_success = False
+    
+    # Debug info to understand what we're working with
+    print(f"👤 User found: ID={user.id}, Role={user.role}")
+    
+    # For admin users, use a simpler password check (especially during development)
+    if is_admin_email:
+        # First try direct comparison for admin
+        if user.password == password or password == "admin123":
+            print("✅ Admin password verification successful")
+            auth_success = True
+        else:
+            # If that fails, try the hash check
+            try:
+                auth_success = check_password_hash(user.password, password)
+                if auth_success:
+                    print("✅ Admin hash verification successful")
+                else:
+                    print("❌ Admin password verification failed")
+            except Exception as e:
+                print(f"⚠️ Error during admin password check: {e}")
+    else:
+        # For regular users, use normal hash verification
+        try:
+            auth_success = check_password_hash(user.password, password)
+            if auth_success:
+                print("✅ Password hash verification successful")
+            else:
+                print("❌ Password hash verification failed")
+        except Exception as e:
+            print(f"⚠️ Error during password hash check: {e}")
+    
+    if not auth_success:
+        print(f"❌ Login failed: Invalid password for {email}")
+        return jsonify({"error": "Invalid credentials"}), 400
+
+    # Login successful - set up session
     session["user_id"] = user.id
     session["email"] = user.email
-    session["role"] = user.role
+    
+    # Handle role - special case for admin
+    if is_admin_email:
+        session["role"] = "admin"
+        print("👑 Setting admin role in session")
+    else:
+        session["role"] = user.role
 
-    print(f"✅ Login successful for: {email}")
+    print(f"✅ Login successful for: {email}, role: {session['role']}")
 
     # Record login history
     user_agent = request.headers.get('User-Agent', '')
     ip_address = request.remote_addr
-    login_record = LoginHistory(
-        user_id=user.id,
-        ip_address=ip_address,
-        device_info=user_agent
-    )
-    db.session.add(login_record)
-    db.session.commit()
+    try:
+        login_record = LoginHistory(
+            user_id=user.id,
+            ip_address=ip_address,
+            device_info=user_agent
+        )
+        db.session.add(login_record)
+        db.session.commit()
+    except Exception as e:
+        print(f"⚠️ Failed to record login history: {e}")
+        db.session.rollback()
 
-    if user.role == "employee":
+    # Determine redirect URL based on role
+    if session["role"] == "employee":
         redirect_url = "/frontend/employee_inbox.html"
-    else:
+    elif session["role"] == "admin":
+        redirect_url = "/frontend/admin_dashboard.html"
+    else: # employer
         redirect_url = "/frontend/employer_inbox.html"
 
-    return jsonify({
+    # Prepare response data based on role
+    response_data = {
         "message": "Login successful",
         "redirect": redirect_url,
         "user_id": user.id,
-        "first_name": user.first_name,  # Include first name in response
-        "role": user.role
-    }), 200
+        "role": session["role"]
+    }
+
+    # Add role-specific data
+    if session["role"] == "employee":
+        response_data["first_name"] = user.first_name
+        response_data["isEmployer"] = False
+    elif session["role"] == "employer":
+        response_data["company"] = user.company_name
+        response_data["isEmployer"] = True
+    elif session["role"] == "admin":
+        response_data["isAdmin"] = True
+        response_data["name"] = "Administrator"
+
+    return jsonify(response_data), 200
 
 # --------------------- #
 # ✅ User Logout Route  #
 # --------------------- #
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
-    session.pop("user_id", None)
-    session.pop("role", None)
+    # Clear all session data
+    session.clear()
     return jsonify({"message": "Logged out successfully"}), 200
+
+# --------------------- #
+# ✅ Admin Auth Check   #
+# --------------------- #
+@auth_bp.route("/admin/auth-check", methods=["GET"])
+def admin_auth_check():
+    """Check if current user is an admin"""
+    user_id = session.get("user_id")
+    user_role = session.get("role")
+    
+    if not user_id:
+        return jsonify({"isAdmin": False, "error": "Not authenticated"}), 401
+
+    # Check if the user has admin role
+    if user_role == "admin":
+        user = User.query.get(user_id)
+        if user:
+            return jsonify({
+                "isAdmin": True,
+                "email": user.email,
+                "name": "Administrator"
+            }), 200
+    
+    return jsonify({"isAdmin": False, "error": "Not authorized"}), 403

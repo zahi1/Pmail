@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pmail - Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <link rel="stylesheet" href="../public/css/jobs.css" />
+  <link rel="stylesheet" href="../public/css/inbox.css" />
+  <link rel="stylesheet" href="../public/css/profile.css" />
+  <link rel="stylesheet" href="../public/css/admin.css" />
+  <script src="../public/js/admin.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <div class="nav-right">
+      <a href="admin_dashboard.html" class="nav-link active"><img src="../public/images/dashboard_icon.png" alt="Dashboard" class="nav-icon"> Dashboard</a>
+      <a href="#" id="logout-btn" class="nav-link"><img src="../public/images/logout_icon.png" alt="Logout" class="nav-icon"> Logout</a>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Container -->
+  <div class="profile-container">
+    <div class="profile-layout admin-layout">
+      <!-- Left Sidebar -->
+      <div class="profile-sidebar admin-sidebar">
+        <div class="profile-picture-container">
+          <div class="profile-picture admin-picture">
+            <img src="../public/images/admin_icon.png" alt="Admin" class="admin-profile-icon">
+          </div>
+        </div>
+        
+        <div class="profile-identity">
+          <h2 id="admin-name">Admin Panel</h2>
+          <p id="admin-email">admin@pmail.com</p>
+          <span id="admin-role">System Administrator</span>
+        </div>
+        
+        <div class="admin-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="total-users">0</span>
+            <span class="stat-label">Users</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="total-jobs">0</span>
+            <span class="stat-label">Active Jobs</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="total-applications">0</span>
+            <span class="stat-label">Applications</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Content Area -->
+      <div class="profile-content-area">
+        <!-- Tabs -->
+        <div class="profile-tabs">
+          <ul class="tab-nav">
+            <li class="active" data-tab="users-tab">User Management</li>
+            <li data-tab="jobs-tab">Job Listings</li>
+            <li data-tab="reports-tab">Reports & Analytics</li>
+          </ul>
+        </div>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Users Management Tab -->
+          <div id="users-tab" class="tab-pane active">
+            <div class="admin-card">
+              <div class="card-header">
+                <h3>
+                  <img src="../public/images/person_icon.png" alt="Users" class="section-icon">
+                  User Management
+                </h3>
+                <div class="search-filter-container">
+                  <div class="filter-group">
+                    <select id="user-role-filter" class="admin-filter" title="Filter users by role">
+                      <option value="all">All Roles</option>
+                      <option value="employee">Employees</option>
+                      <option value="employer">Employers</option>
+                    </select>
+                  </div>
+                  <div class="search-group">
+                    <input type="text" id="user-search" placeholder="Search by name, company or email..." class="admin-search">
+                    <button id="search-users-btn" class="search-btn">
+                      <img src="../public/images/findjob_icon.png" alt="Search" class="search-icon">
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="admin-table-container">
+                <table class="admin-table" id="users-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name/Company</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Date Joined</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-table-body">
+                    <!-- User data will be loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="pagination">
+                <button id="prev-page-users" class="pagination-btn" disabled>&laquo; Previous</button>
+                <span id="page-info-users">Page 1</span>
+                <button id="next-page-users" class="pagination-btn">Next &raquo;</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Jobs Listings Tab -->
+          <div id="jobs-tab" class="tab-pane">
+            <div class="admin-card">
+              <div class="card-header">
+                <h3>
+                  <img src="../public/images/job_icon.png" alt="Jobs" class="section-icon">
+                  Job Listings Management
+                </h3>
+                <div class="search-filter-container">
+                  <div class="filter-group">
+                    <select id="job-status-filter" class="admin-filter" title="Filter jobs by status">
+                      <option value="all">All Status</option>
+                      <option value="open">Open</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                    <select id="job-category-filter" class="admin-filter" title="Filter jobs by category">
+                      <option value="all">All Categories</option>
+                      <!-- Categories will be loaded dynamically -->
+                    </select>
+                  </div>
+                  <div class="search-group">
+                    <input type="text" id="job-search" placeholder="Search jobs..." class="admin-search">
+                    <button id="search-jobs-btn" class="search-btn">
+                      <img src="../public/images/findjob_icon.png" alt="Search" class="search-icon">
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="admin-table-container">
+                <table class="admin-table" id="jobs-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Title</th>
+                      <th>Company</th>
+                      <th>Category</th>
+                      <th>Location</th>
+                      <th>Status</th>
+                      <th>Posted Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="jobs-table-body">
+                    <!-- Job data will be loaded dynamically -->
+                    <tr>
+                      <td colspan="8" class="text-center">Loading jobs...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="pagination">
+                <button id="prev-page-jobs" class="pagination-btn" disabled>&laquo; Previous</button>
+                <span id="page-info-jobs">Page 1</span>
+                <button id="next-page-jobs" class="pagination-btn">Next &raquo;</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Reports & Analytics Tab -->
+          <div id="reports-tab" class="tab-pane">
+            <div class="admin-card">
+              <div class="card-header">
+                <h3>
+                  <img src="../public/images/chart_icon.png" alt="Reports" class="section-icon">
+                  Reports & Analytics
+                </h3>
+                <div class="report-actions">
+                  <select id="report-type" class="admin-filter" title="Select report type">
+                    <option value="user-growth">User Growth</option>
+                    <option value="job-postings">Job Postings</option>
+                    <option value="application-stats">Application Statistics</option>
+                    <option value="user-activity">User Activity</option>
+                  </select>
+                  <button id="generate-report-btn" class="admin-btn">Generate Report</button>
+                  <button id="export-report-btn" class="admin-btn">Export as PDF</button>
+                </div>
+              </div>
+              
+              <div class="charts-container">
+                <div class="chart-wrapper">
+                  <h4 id="chart-title">User Growth Over Time</h4>
+                  <canvas id="main-chart"></canvas>
+                </div>
+                
+                <div class="metrics-grid">
+                  <div class="metric-card">
+                    <h5>Total Users</h5>
+                    <div class="metric-value" id="metric-total-users">0</div>
+                    <div class="metric-change positive">+0% from last month</div>
+                  </div>
+                  <div class="metric-card">
+                    <h5>New Jobs</h5>
+                    <div class="metric-value" id="metric-new-jobs">0</div>
+                    <div class="metric-change positive">+0% from last month</div>
+                  </div>
+                  <div class="metric-card">
+                    <h5>Applications</h5>
+                    <div class="metric-value" id="metric-applications">0</div>
+                    <div class="metric-change negative">-0% from last month</div>
+                  </div>
+                  <div class="metric-card">
+                    <h5>Active Users</h5>
+                    <div class="metric-value" id="metric-active-users">0</div>
+                    <div class="metric-change positive">+0% from last month</div>
+                  </div>
+                </div>
+                
+                <div class="secondary-charts">
+                  <div class="chart-wrapper half-width">
+                    <h4>User Distribution</h4>
+                    <canvas id="user-distribution-chart"></canvas>
+                  </div>
+                  <div class="chart-wrapper half-width">
+                    <h4>Job Categories</h4>
+                    <canvas id="job-categories-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- User Detail Report Section -->
+            <div class="admin-card mt-20">
+              <div class="card-header">
+                <h3>
+                  <img src="../public/images/person_icon.png" alt="User Detail" class="section-icon">
+                  User Detail Report
+                </h3>
+                <div class="search-filter-container">
+                  <div class="search-group full-width">
+                    <input type="text" id="user-report-search" placeholder="Search user by email or ID..." class="admin-search">
+                    <button id="search-user-report-btn" class="search-btn">
+                      <img src="../public/images/search_icon.png" alt="Search" class="search-icon">
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="user-report-container" class="user-report-container hidden">
+                <!-- User report will be generated here -->
+                <div class="user-report-header">
+                  <div class="user-report-identity">
+                    <h4 id="report-user-name">User Name</h4>
+                    <p id="report-user-email">user@example.com</p>
+                    <span id="report-user-role" class="status-badge">Role</span>
+                  </div>
+                  <div class="user-report-actions">
+                    <button id="export-user-report" class="admin-btn">Export Report</button>
+                  </div>
+                </div>
+                
+                <div class="user-report-stats">
+                  <div class="user-stat-card">
+                    <h5>Account Age</h5>
+                    <div class="stat-value" id="user-account-age">0 days</div>
+                  </div>
+                  <div class="user-stat-card">
+                    <h5>Last Active</h5>
+                    <div class="stat-value" id="user-last-active">Never</div>
+                  </div>
+                  <div class="user-stat-card">
+                    <h5>Total Logins</h5>
+                    <div class="stat-value" id="user-total-logins">0</div>
+                  </div>
+                  <div class="user-stat-card">
+                    <h5>Total Applications</h5>
+                    <div class="stat-value" id="user-total-applications">0</div>
+                  </div>
+                </div>
+                
+                <div class="user-activity-chart">
+                  <h4>User Activity Timeline</h4>
+                  <canvas id="user-activity-chart"></canvas>
+                </div>
+                
+                <!-- Specific sections based on user role -->
+                <div id="employee-specific-section" class="role-specific-section hidden">
+                  <h4>Application History</h4>
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Job Title</th>
+                        <th>Company</th>
+                        <th>Applied Date</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="employee-applications-table">
+                      <!-- Will be populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div id="employer-specific-section" class="role-specific-section hidden">
+                  <h4>Posted Jobs</h4>
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Job Title</th>
+                        <th>Posted Date</th>
+                        <th>Applications</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="employer-jobs-table">
+                      <!-- Will be populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <div id="user-report-placeholder" class="text-center p-20">
+                <p>Search for a user to view detailed reports and analytics</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modals -->
+  <!-- Edit User Modal -->
+  <div id="edit-user-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit User</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="edit-user-form">
+          <input type="hidden" id="edit-user-id">
+          
+          <!-- Employee specific fields -->
+          <div id="employee-fields" class="role-fields">
+            <div class="form-group">
+              <label for="edit-first-name">First Name</label>
+              <input type="text" id="edit-first-name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="edit-last-name">Last Name</label>
+              <input type="text" id="edit-last-name" class="form-control">
+            </div>
+          </div>
+          
+          <!-- Employer specific fields -->
+          <div id="employer-fields" class="role-fields">
+            <div class="form-group">
+              <label for="edit-company-name">Company Name</label>
+              <input type="text" id="edit-company-name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="edit-contact-name">Contact Name</label>
+              <input type="text" id="edit-contact-name" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="edit-address">Address</label>
+              <input type="text" id="edit-address" class="form-control">
+            </div>
+          </div>
+          
+          <!-- Common fields -->
+          <div class="form-group">
+            <label for="edit-email">Email</label>
+            <input type="email" id="edit-email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="edit-phone">Phone</label>
+            <input type="text" id="edit-phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="edit-status">Status</label>
+            <select id="edit-status" class="form-control">
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" id="cancel-edit-user" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Job Modal -->
+  <div id="edit-job-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Job Listing</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="edit-job-form">
+          <input type="hidden" id="edit-job-id">
+          
+          <div class="form-group">
+            <label for="edit-job-title">Job Title</label>
+            <input type="text" id="edit-job-title" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="edit-job-category">Category</label>
+            <select id="edit-job-category" class="form-control">
+              <!-- Will be populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-type">Job Type</label>
+            <select id="edit-job-type" class="form-control">
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Temporary">Temporary</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-location">Location</label>
+            <input type="text" id="edit-job-location" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="edit-job-status">Status</label>
+            <select id="edit-job-status" class="form-control">
+              <option value="1">Open</option>
+              <option value="0">Closed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-description">Description</label>
+            <textarea id="edit-job-description" class="form-control" rows="5"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" id="cancel-edit-job" class="cancel-btn">Cancel</button>
+            <button type="submit" class="save-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal">
+    <div class="modal-content confirm-modal-content">
+      <div class="modal-header">
+        <h3 id="confirm-title">Confirmation</h3>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message">Are you sure you want to perform this action?</p>
+        <div class="form-actions">
+          <button type="button" id="cancel-confirm" class="cancel-btn">Cancel</button>
+          <button type="button" id="confirm-action" class="delete-btn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Job Detail Modal -->
+  <div id="job-detail-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="job-detail-title">Job Title</h3>
+        <span class="close-modal" onclick="closeAdminJobModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p><strong>Company:</strong> <span id="job-detail-company"></span></p>
+        <p><strong>Category:</strong> <span id="job-detail-category"></span></p>
+        <p><strong>Location:</strong> <span id="job-detail-location"></span></p>
+        <p><strong>Deadline:</strong> <span id="job-detail-deadline"></span></p>
+        <p><strong>Posted:</strong> <span id="job-detail-created"></span></p>
+        <h4>Description</h4>
+        <p id="job-detail-description"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="delete-btn" id="job-detail-delete">Delete</button>
+        <button class="cancel-btn" onclick="closeAdminJobModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

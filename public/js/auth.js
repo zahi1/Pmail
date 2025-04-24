@@ -28,13 +28,20 @@ function login() {
       if (data.message === "Login successful") {
         // Store the user_id and role from the backend response
         localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("role", data.role);
+        
+        // Store additional role flags for different UIs
+        if (data.isAdmin) {
+          localStorage.setItem("isAdmin", "true");
+        } else if (data.isEmployer) {
+          localStorage.setItem("isEmployer", "true");
+        }
         
         // Get first name from response or email, then capitalize first letter
-        let displayName = data.first_name || email.split('@')[0];
+        let displayName = data.name || data.first_name || email.split('@')[0];
         displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
         localStorage.setItem("displayName", displayName);
         
-        localStorage.setItem("role", data.role);
         // Redirect to the splash screen
         window.location.href = "splash.html";
       } else {

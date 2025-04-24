@@ -6,6 +6,7 @@ from backend.routes.messages import messages_bp
 from backend.models.database import db
 from backend.routes.profile import profile_bp
 from backend.routes.dashboard import dashboard_bp
+from backend.routes.admin import admin_bp  
 
 import os
 import logging
@@ -30,6 +31,8 @@ app.register_blueprint(jobs_bp, url_prefix='')  # Jobs endpoints will be availab
 app.register_blueprint(messages_bp, url_prefix='')
 app.register_blueprint(profile_bp, url_prefix="/")
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+app.register_blueprint(admin_bp)  # Register the admin blueprint
+
 
 
 @app.route('/')
