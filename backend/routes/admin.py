@@ -293,6 +293,8 @@ def admin_get_jobs():
             "company_name": j.company_name,
             "category": j.category,
             "location": j.location,
+            "job_type": j.job_type,
+            "deadline": j.deadline.strftime("%Y-%m-%d") if j.deadline else None,
             "is_open": is_open,
             "created_at": j.created_at.strftime("%Y-%m-%d %H:%M:%S")
         })
@@ -312,6 +314,7 @@ def admin_job_actions(job_id):
             "title": job.title,
             "description": job.description,
             "category": job.category,
+            "job_type": job.job_type,
             "location": job.location,
             "company_name": job.company_name,
             "deadline": job.deadline.strftime("%Y-%m-%d") if job.deadline else None,
@@ -327,3 +330,12 @@ def admin_job_actions(job_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@admin_bp.route('/admin/job-categories', methods=['GET'])
+@admin_required
+def get_job_categories_admin():
+    """Return distinct job categories for admin filter"""
+    cats = db.session.query(Job.category).distinct().all()
+    return jsonify({
+        "categories": [{"id": cat[0], "name": cat[0]} for cat in cats]
+    }), 200

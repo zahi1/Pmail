@@ -19,9 +19,9 @@ def get_all_jobs():
     
     query = Job.query
     if category:
-        query = query.filter(Job.category == category)
+        query = query.filter(func.lower(Job.category) == category.lower())
     if job_type:
-        query = query.filter(Job.job_type == job_type)
+        query = query.filter(func.lower(Job.job_type) == job_type.lower())
     if not show_closed:
         query = query.filter((Job.deadline >= datetime.now()) | (Job.deadline.is_(None)))
     

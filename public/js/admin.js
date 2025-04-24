@@ -3,11 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     initAdminDashboard();
     
-    // Immediately load all users so the table is populated on page load
-    loadUsers().catch(err => {
-        console.error("Error loading users on init:", err);
-    });
-});
+    // Load users and jobs immediately on load
+    loadUsers().catch(err => console.error("Error loading users on init:", err));
+    loadJobs().catch(err => console.error("Error loading jobs on init:", err));
+});    
 
 // Main initialization function with proper sequencing
 function initAdminDashboard() {
@@ -753,8 +752,9 @@ function renderJobs(jobs) {
     jobs.forEach(job => {
         const row = document.createElement('tr');
         
-        // Format date
+        // Format dates
         const postedDate = new Date(job.created_at).toLocaleDateString();
+        const deadline = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'No deadline';
         
         // Create status badge
         const statusClass = job.is_open ? 'status-open' : 'status-closed';
@@ -766,13 +766,11 @@ function renderJobs(jobs) {
             <td>${job.company_name || '-'}</td>
             <td>${job.category || '-'}</td>
             <td>${job.location || '-'}</td>
+            <td>${deadline}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
             <td>${postedDate || '-'}</td>
             <td>
                 <div class="action-buttons">
-                    <button class="action-btn edit-action" onclick="openEditJobModal(${job.id})">
-                        <img src="../public/images/pen_icon.png" alt="Edit"> Edit
-                    </button>
                     <button class="action-btn preview-action" onclick="openAdminJobModal(${job.id})">
                         <img src="../public/images/eye_icon.png" alt="Preview"> View
                     </button>
@@ -792,9 +790,11 @@ function openAdminJobModal(jobId) {
     fetch(`/admin/jobs/${jobId}`)
       .then(res => res.json())
       .then(job => {
+        document.getElementById('job-detail-id').textContent = job.id;
         document.getElementById('job-detail-title').textContent = job.title;
         document.getElementById('job-detail-company').textContent = job.company_name;
         document.getElementById('job-detail-category').textContent = job.category;
+        document.getElementById('job-detail-type').textContent = job.job_type || 'Not specified';
         document.getElementById('job-detail-location').textContent = job.location;
         document.getElementById('job-detail-deadline').textContent = job.deadline || 'None';
         document.getElementById('job-detail-created').textContent = job.created_at;
@@ -1449,13 +1449,6 @@ function getStatusClass(status) {
     if (statusLower.includes('reject')) return 'status-rejected';
     
     return '';
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function showNotification(message, type = 'info') {

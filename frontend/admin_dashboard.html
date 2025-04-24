@@ -139,7 +139,17 @@
                     </select>
                     <select id="job-category-filter" class="admin-filter" title="Filter jobs by category">
                       <option value="all">All Categories</option>
-                      <!-- Categories will be loaded dynamically -->
+                      <option value="Arts">Arts</option>
+                      <option value="Business">Business</option>
+                      <option value="Communications">Communications</option>
+                      <option value="Education">Education</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Hospitality">Hospitality</option>
+                      <option value="Information technology">Information technology</option>
+                      <option value="Law enforcement">Law enforcement</option>
+                      <option value="Sales and Marketing">Sales and Marketing</option>
+                      <option value="Science">Science</option>
+                      <option value="Transportation">Transportation</option>
                     </select>
                   </div>
                   <div class="search-group">
@@ -160,6 +170,7 @@
                       <th>Company</th>
                       <th>Category</th>
                       <th>Location</th>
+                      <th>Deadline</th>
                       <th>Status</th>
                       <th>Posted Date</th>
                       <th>Actions</th>
@@ -168,7 +179,7 @@
                   <tbody id="jobs-table-body">
                     <!-- Job data will be loaded dynamically -->
                     <tr>
-                      <td colspan="8" class="text-center">Loading jobs...</td>
+                      <td colspan="9" class="text-center">Loading jobs...</td>
                     </tr>
                   </tbody>
                 </table>
@@ -187,7 +198,7 @@
             <div class="admin-card">
               <div class="card-header">
                 <h3>
-                  <img src="../public/images/chart_icon.png" alt="Reports" class="section-icon">
+                  <img src="../public/images/dashboard_icon.png" alt="Reports" class="section-icon">
                   Reports & Analytics
                 </h3>
                 <div class="report-actions">
@@ -491,8 +502,10 @@
         <span class="close-modal" onclick="closeAdminJobModal()">&times;</span>
       </div>
       <div class="modal-body">
+        <p><strong>Job ID:</strong> <span id="job-detail-id"></span></p>
         <p><strong>Company:</strong> <span id="job-detail-company"></span></p>
         <p><strong>Category:</strong> <span id="job-detail-category"></span></p>
+        <p><strong>Job Type:</strong> <span id="job-detail-type"></span></p>
         <p><strong>Location:</strong> <span id="job-detail-location"></span></p>
         <p><strong>Deadline:</strong> <span id="job-detail-deadline"></span></p>
         <p><strong>Posted:</strong> <span id="job-detail-created"></span></p>
