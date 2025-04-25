@@ -9,8 +9,10 @@
   <link rel="stylesheet" href="../public/css/inbox.css" />
   <link rel="stylesheet" href="../public/css/profile.css" />
   <link rel="stylesheet" href="../public/css/admin.css" />
-  <script src="../public/js/admin.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.1"></script>
+<script src="../public/js/admin.js" defer></script>
+
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -241,6 +243,12 @@
                     <div class="metric-change positive">+0% from last month</div>
                   </div>
                 </div>
+
+                <div class="chart-wrapper full-width">
+                  <h4>Peak Usage Heatmap</h4>
+                  <canvas id="usage-heatmap" style="height:200px;"></canvas>
+                </div>
+                
                 
                 <div class="secondary-charts">
                   <div class="chart-wrapper half-width">

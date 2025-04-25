@@ -391,32 +391,27 @@ function deleteUser(userId) {
 
 function setupTabNavigation() {
     const tabLinks = document.querySelectorAll('.tab-nav li');
-    
     tabLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Remove active class from all tabs and panes
-            tabLinks.forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            this.classList.add('active');
-            
-            // Show the corresponding pane
-            const tabId = this.getAttribute('data-tab');
-            document.getElementById(tabId).classList.add('active');
-            
-            // If switching to reports tab, refresh all charts
-            if (tabId === 'reports-tab') {
-                setTimeout(() => {
-                    if (charts.mainChart) {
-                        charts.mainChart.resize();
-                        updateReportView();
-                    }
-                }, 100);
-            }
-        });
+      link.addEventListener('click', function() {
+        // remove .active from all
+        tabLinks.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  
+        // activate this one
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+  
+        if (tabId === 'reports-tab') {
+          // ① set the dropdown‐driven main chart
+          updateReportView();
+          // ② always load & render the heatmap
+          loadUserActivityData();
+        }
+      });
     });
-}
+  }
+  
 
 function setupEventListeners() {
     // Logout button
@@ -967,7 +962,8 @@ let charts = {
     mainChart: null,
     userDistributionChart: null,
     jobCategoriesChart: null,
-    userActivityChart: null
+    userActivityChart: null,
+    heatmapChart: null,
 };
 
 function initializeCharts() {
@@ -1718,20 +1714,45 @@ function loadApplicationStatsData() {
   }
   
   function loadUserActivityData() {
-    fetch('/admin/reports/user-activity', { credentials: 'include' })
-      .then(res => res.json())
+    console.log('→ loadUserActivityData() called');
+    fetch('/admin/reports/user-activity', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(res => {
+        console.log(`← response status: ${res.status}`);
+        return res.json().then(body => {
+          console.log('← response JSON:', body);
+          if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+          return body;
+        });
+      })
       .then(data => {
-        // 1. Main timeseries
+        // main line chart
         updateMainChart(data.labels, data.datasets, 'Logins');
   
-        // 2. Only update the metric cards
+        // metrics
         updateMetrics(data.metrics);
+  
+        // heatmap
+        if (data.heatmapData && data.heatmapData.length) {
+          try {
+            renderUsageHeatmap(data.heatmapData);
+          } catch (e) {
+            console.error('Heatmap render error:', e);
+            showNotification('Failed rendering heatmap: ' + e.message, 'error');
+          }
+        } else {
+          console.warn('No heatmapData returned');
+        }
       })
       .catch(err => {
         console.error('Error loading user activity:', err);
-        showNotification('Failed to load user activity', 'error');
+        showNotification(`Failed to load user activity: ${err.message}`, 'error');
       });
   }
+  
+  
   
   
 //   // Then in your existing updateReportView():
@@ -1749,3 +1770,94 @@ function loadApplicationStatsData() {
 //     }
 // }
   
+
+// map v → color (simple blue→red scale)
+function getColorForValue(v, maxV=50) {
+    const pct = Math.min(v/maxV, 1);
+    const r = Math.floor(255 * pct);
+    const g = 100;
+    const b = Math.floor(255 * (1-pct));
+    return `rgb(${r},${g},${b})`;
+  }
+  
+  function renderUsageHeatmap(data) {
+    const canvas = document.getElementById('usage-heatmap');
+    const ctx    = canvas.getContext('2d');
+  
+    // Destroy any existing instance
+    if (charts.heatmapChart) {
+      charts.heatmapChart.destroy();
+      charts.heatmapChart = null;
+    }
+  
+    const days  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const hours = Array.from({length:24}, (_,i) => String(i));
+    const maxV  = Math.max(...data.map(d => d.v), 1);
+  
+    charts.heatmapChart = new Chart(ctx, {
+      type: 'matrix',
+      data: {
+        datasets: [{
+          label: 'Logins',
+          data,
+          // fancier HSL scale: blue (low) → red (high)
+          backgroundColor: ctx => {
+            const v   = ctx.raw.v;
+            const pct = v / maxV;           // 0..1
+            const hue = (1 - pct) * 240;    // 240° (blue) → 0° (red)
+            return `hsl(${hue}, 70%, ${50 + pct*10}%)`;
+          },
+          borderWidth: 1,
+          borderColor: '#222',
+          width:  ctx => Math.floor(ctx.chart.width  / days.length)  - 2,
+          height: ctx => Math.floor(ctx.chart.height / hours.length) - 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: 'category',
+            labels: days,
+            offset: true,
+            title: { 
+              display: true, 
+              text: 'Day of Week',
+              color: '#fff' 
+            },
+            ticks: {
+              color: '#fff' 
+            },
+            grid: { display: false }
+          },
+          y: {
+            type: 'category',
+            labels: hours,
+            offset: true,
+            title: { 
+              display: true, 
+              text: 'Hour of Day',
+              color: '#fff' 
+            },
+            ticks: {
+              color: '#fff' 
+            },
+            grid: { display: false }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: () => '',
+              label: ctx => {
+                const { x, y, v } = ctx.raw;
+                return `${x} @ ${y}:00 → ${v} logins`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }

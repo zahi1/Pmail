@@ -304,6 +304,13 @@
   width: 100% !important;
 }
 
+/* Heatmap */
+<div class="chart-wrapper full-width">
+  <h4>Peak Usage Heatmap</h4>
+  <canvas id="usage-heatmap" style="height:200px;"></canvas>
+</div>
+
+
 /* Force equal styling for both chart wrappers */
 .charts-container .chart-wrapper.half-width {
   padding-bottom: 20px; /* Add extra padding at the bottom for legends */
