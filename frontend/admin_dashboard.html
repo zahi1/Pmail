@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="../public/css/inbox.css" />
   <link rel="stylesheet" href="../public/css/profile.css" />
   <link rel="stylesheet" href="../public/css/admin.css" />
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.1"></script>
 <script src="../public/js/admin.js" defer></script>
@@ -68,6 +72,8 @@
             <li class="active" data-tab="users-tab">User Management</li>
             <li data-tab="jobs-tab">Job Listings</li>
             <li data-tab="reports-tab">Reports & Analytics</li>
+            <li data-tab="export-tab">Export as PDF</li>
+
           </ul>
         </div>
         
@@ -358,10 +364,38 @@
               </div>
             </div>
           </div>
+
+          <div id="export-tab" class="tab-pane">
+            <div class="admin-card">
+              <div class="card-header">
+                <h3><img src="../public/images/pdf_icon.png" alt="PDF" class="section-icon"> Export as PDF</h3>
+                <div class="search-filter-container">
+                  <div class="filter-group">
+                    <label>Date Range:</label>
+                    <input type="date" id="export-start-date" title="Start date"> –
+                    <input type="date" id="export-end-date" title="End date">
+                  </div>
+                  <div class="filter-group">
+                    <label>Include:</label>
+                    <label><input type="checkbox" class="export-module" value="user-growth" checked> User Growth</label>
+                    <label><input type="checkbox" class="export-module" value="job-postings" checked> Job Postings</label>
+                    <label><input type="checkbox" class="export-module" value="application-stats" checked> Application Stats</label>
+                    <label><input type="checkbox" class="export-module" value="user-activity" checked> User Activity</label>
+                  </div>
+                  <button id="export-generate-btn" class="admin-btn">Generate PDF Preview</button>
+                  <button id="export-download-btn" class="admin-btn" disabled>Download PDF</button>
+                </div>
+              </div>
+              <div id="export-preview" class="export-preview">
+                <!-- dynamically injected: summary cards + chart canvases -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
   
   <!-- Modals -->
   <!-- Edit User Modal -->
@@ -428,6 +462,8 @@
       </div>
     </div>
   </div>
+
+ 
   
   <!-- Edit Job Modal -->
   <div id="edit-job-modal" class="modal">

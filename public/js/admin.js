@@ -462,6 +462,92 @@ function setupEventListeners() {
     document.getElementById('edit-job-form').addEventListener('submit', handleEditJobSubmit);
 }
 
+//import { jsPDF } from "jspdf";
+
+function setupExportTab() {
+  document.getElementById('export-generate-btn').addEventListener('click', generateExportPreview);
+  document.getElementById('export-download-btn').addEventListener('click', downloadPDF);
+}
+
+async function generateExportPreview() {
+  const start = document.getElementById('export-start-date').value;
+  const end   = document.getElementById('export-end-date').value;
+  const modules = Array.from(document.querySelectorAll('.export-module:checked')).map(cb => cb.value);
+  const preview = document.getElementById('export-preview');
+  preview.innerHTML = `<p>Loading preview…</p>`;
+  document.getElementById('export-download-btn').disabled = true;
+
+  // 1) Fetch metrics for each selected module
+  const promises = modules.map(mod => 
+    fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, { credentials:'include' })
+      .then(r=>r.json())
+  );
+  const results = await Promise.all(promises);
+
+  // 2) Build summary cards
+  let html = '<div class="summary-cards">';
+  results.forEach((data, i) => {
+    html += `
+      <div class="summary-card">
+        <h4>${modules[i].replace('-', ' ').toUpperCase()}</h4>
+        <p>Total: <strong>${data.metrics?.totalUsers ?? data.metrics?.totalJobs ?? data.metrics?.applications ?? 0}</strong></p>
+      </div>`;
+  });
+  html += '</div>';
+
+  // 3) Build chart containers
+  modules.forEach(mod => {
+    html += `<div class="chart-container">
+      <h5>${mod.replace('-', ' ').toUpperCase()}</h5>
+      <canvas id="export-chart-${mod}"></canvas>
+    </div>`;
+  });
+
+  preview.innerHTML = html;
+
+  // 4) Render each chart
+  modules.forEach((mod, i) => {
+    const ctx = document.getElementById(`export-chart-${mod}`).getContext('2d');
+    let labels, data;
+    switch(mod) {
+      case 'user-growth':
+      case 'job-postings':
+      case 'application-stats':
+        labels = results[i].labels; data = results[i].datasets;
+        new Chart(ctx, { type:'line', data:{ labels, datasets:[{ data, label:mod }] } });
+        break;
+      case 'user-activity':
+        labels = results[i].labels; data = results[i].datasets;
+        new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ data, label:'Logins' }] } });
+        break;
+    }
+  });
+
+  document.getElementById('export-download-btn').disabled = false;
+}
+
+async function downloadPDF() {
+    const preview = document.getElementById('export-preview');
+    // ① html2canvas is global
+    const canvas = await html2canvas(preview, { scale: 2 });
+    const img    = canvas.toDataURL('image/png');
+  
+    // ② jsPDF is under window.jspdf.jsPDF
+    const { jsPDF } = window.jspdf;
+    const pdf       = new jsPDF('p', 'pt', 'a4');
+  
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = (canvas.height * pageW) / canvas.width;
+  
+    pdf.addImage(img, 'PNG', 0, 0, pageW, pageH);
+    pdf.save(`Admin_Report_${Date.now()}.pdf`);
+  }
+  
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupExportTab();
+});
+
 function setupModalListeners() {
     // Close buttons for all modals
     document.querySelectorAll('.close-modal').forEach(btn => {
