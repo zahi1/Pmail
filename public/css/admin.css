@@ -752,9 +752,47 @@
   height: 300px !important;
 }
 
+/* remove any brightness/invert on your logo */
+.pmail-logo {
+  filter: none !important;
+  width: 40px;  /* or whatever size fits */
+  height: auto;
+}
 
-  .export-preview { padding: 20px; background: #fff; }
+.export-preview {
+  background: #f0f2f5; /* a very light grey page background */
+  padding: 2rem;
+}
+
+.export-preview .summary-cards {
+  display: flex;
+  gap: 1rem;
+}
+
+.export-preview .summary-card {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: #252525;      /* dark card bg */
+  color: #ffffff;                 /* white text */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.export-preview .summary-card h4 {
+  margin-bottom: 0.5rem;
+  color: #8ab4f8;                 /* matching your dashboard accent color */
+}
+
+.export-preview .summary-card p {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+
+
+  /* .export-preview { padding: 20px; background: #fff; }
 .export-preview .summary-cards { display: flex; gap: 1rem; margin-bottom: 1rem; }
-.export-preview .summary-card { flex:1; padding:1rem; background:#f5f5f5; border-radius:8px; text-align:center; }
+.export-preview .summary-card { flex:1; padding:1rem; background:#f5f5f5; border-radius:8px; text-align:center; } */
 .export-preview .chart-container { margin-top:2rem; }
 .chart-container canvas { width:100%; height:250px; margin-bottom:2rem; }

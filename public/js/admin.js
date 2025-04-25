@@ -470,61 +470,168 @@ function setupExportTab() {
 }
 
 async function generateExportPreview() {
-  const start = document.getElementById('export-start-date').value;
-  const end   = document.getElementById('export-end-date').value;
-  const modules = Array.from(document.querySelectorAll('.export-module:checked')).map(cb => cb.value);
-  const preview = document.getElementById('export-preview');
-  preview.innerHTML = `<p>Loading preview…</p>`;
-  document.getElementById('export-download-btn').disabled = true;
-
-  // 1) Fetch metrics for each selected module
-  const promises = modules.map(mod => 
-    fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, { credentials:'include' })
-      .then(r=>r.json())
-  );
-  const results = await Promise.all(promises);
-
-  // 2) Build summary cards
-  let html = '<div class="summary-cards">';
-  results.forEach((data, i) => {
-    html += `
-      <div class="summary-card">
-        <h4>${modules[i].replace('-', ' ').toUpperCase()}</h4>
-        <p>Total: <strong>${data.metrics?.totalUsers ?? data.metrics?.totalJobs ?? data.metrics?.applications ?? 0}</strong></p>
-      </div>`;
-  });
-  html += '</div>';
-
-  // 3) Build chart containers
-  modules.forEach(mod => {
-    html += `<div class="chart-container">
-      <h5>${mod.replace('-', ' ').toUpperCase()}</h5>
-      <canvas id="export-chart-${mod}"></canvas>
-    </div>`;
-  });
-
-  preview.innerHTML = html;
-
-  // 4) Render each chart
-  modules.forEach((mod, i) => {
-    const ctx = document.getElementById(`export-chart-${mod}`).getContext('2d');
-    let labels, data;
-    switch(mod) {
-      case 'user-growth':
-      case 'job-postings':
-      case 'application-stats':
-        labels = results[i].labels; data = results[i].datasets;
-        new Chart(ctx, { type:'line', data:{ labels, datasets:[{ data, label:mod }] } });
-        break;
-      case 'user-activity':
-        labels = results[i].labels; data = results[i].datasets;
-        new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ data, label:'Logins' }] } });
-        break;
-    }
-  });
-
-  document.getElementById('export-download-btn').disabled = false;
-}
+    const start   = document.getElementById('export-start-date').value;
+    const end     = document.getElementById('export-end-date').value;
+    const modules = Array.from(document.querySelectorAll('.export-module:checked'))
+                         .map(cb => cb.value);
+    const preview = document.getElementById('export-preview');
+    preview.innerHTML = `<p>Loading preview…</p>`;
+    document.getElementById('export-download-btn').disabled = true;
+  
+    // 1) Fetch all report data in parallel
+    const results = await Promise.all(
+      modules.map(mod =>
+        fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, {
+          credentials: 'include'
+        }).then(r => r.json())
+      )
+    );
+  
+    // 2) Map module keys to human titles
+    const chartTitles = {
+      'user-growth':       'User Growth Over Time',
+      'job-postings':      'Job Postings Over Time',
+      'application-stats': 'Application Statistics Over Time',
+      'user-activity':     'User Activity Over Time'
+    };
+  
+    // 3) Build summary cards with correct totals per module
+    let html = `<div class="summary-cards" style="display:flex;gap:1rem;">`;
+    results.forEach((data, i) => {
+      const mod = modules[i];
+      let total = 0;
+      switch (mod) {
+        case 'user-growth':
+          total = data.metrics.totalUsers;
+          break;
+        case 'job-postings':
+          total = data.metrics.newJobs;
+          break;
+        case 'application-stats':
+          total = data.metrics.applications;
+          break;
+        case 'user-activity':
+          total = data.metrics.activeUsers;
+          break;
+      }
+  
+      html += `
+        <div class="summary-card" style="
+          flex:1;
+          background:#252525;
+          border-radius:8px;
+          padding:1rem;
+          text-align:center;
+        ">
+          <h4 style="margin:0 0 .5rem;color:#8ab4f8;">
+            ${mod.replace('-', ' ').toUpperCase()}
+          </h4>
+          <p style="margin:0;font-size:1.25rem;color:#fff;">
+            Total: <strong>${total}</strong>
+          </p>
+        </div>`;
+    });
+    html += `</div>`;
+  
+    // 4) Build chart containers
+    modules.forEach(mod => {
+      html += `
+        <div class="chart-container" style="
+          margin-top:1.5rem;
+          background:#252525;
+          border-radius:8px;
+          padding:1rem;
+        ">
+          <h5 style="margin:0 0 .75rem;color:#8ab4f8;">
+            ${chartTitles[mod]}
+          </h5>
+          <canvas id="export-chart-${mod}" style="width:100%;"></canvas>
+        </div>`;
+    });
+  
+    preview.innerHTML = html;
+  
+    // 5) Common Chart.js options
+    const commonOptions = {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      plugins: {
+        legend:   { labels: { color: '#fff' } },
+        tooltip:  { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Month', color: '#fff' },
+          ticks: { color: '#fff' },
+          grid:  { color: 'rgba(255,255,255,0.1)' }
+        },
+        y: {
+          title: { display: true, text: 'Count', color: '#fff' },
+          ticks: { color: '#fff' },
+          grid:  { color: 'rgba(255,255,255,0.1)' }
+        }
+      }
+    };
+  
+    // 6) Instantiate each chart
+    modules.forEach((mod, i) => {
+      const ctx    = document
+        .getElementById(`export-chart-${mod}`)
+        .getContext('2d');
+  
+      let config;
+      const labels = results[i].labels;
+      const data   = results[i].datasets;
+  
+      if (mod === 'user-activity') {
+        config = {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Logins',
+              data,
+              backgroundColor: 'rgba(66, 133, 244, 0.7)'
+            }]
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              ...commonOptions.scales,
+              y: {
+                ...commonOptions.scales.y,
+                title: { display: true, text: 'Logins', color: '#fff' }
+              }
+            }
+          }
+        };
+      } else {
+        config = {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: chartTitles[mod],
+              data,
+              borderColor: '#4285f4',
+              backgroundColor: 'rgba(66,133,244,0.1)',
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: commonOptions
+        };
+      }
+  
+      new Chart(ctx, config);
+    });
+  
+    // 7) Enable Download
+    document.getElementById('export-download-btn').disabled = false;
+  }
+  
+  
 
 async function downloadPDF() {
     const preview    = document.getElementById('export-preview');
