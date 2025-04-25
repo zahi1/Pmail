@@ -1195,33 +1195,35 @@ function loadJobCategoriesForChart() {
     });
 }
 
-// Modify updateReportView to handle different report types
+// Then in your existing updateReportView():
 function updateReportView() {
     const reportType = document.getElementById('report-type').value;
-    console.log("Updating report view for:", reportType);
-    
-    // Update chart title based on report type
-    let chartTitle = document.getElementById('chart-title');
-    
+    const titleEl    = document.getElementById('chart-title');
+  
     switch (reportType) {
-        case 'user-growth':
-            chartTitle.textContent = 'User Growth Over Time';
-            loadUserGrowthData();
-            break;
-        case 'job-postings':
-            chartTitle.textContent = 'Job Postings by Month';
-            loadJobPostingsData();
-            break;
-        case 'application-stats':
-            chartTitle.textContent = 'Application Statistics';
-            loadApplicationStatsData();
-            break;
-        case 'user-activity':
-            chartTitle.textContent = 'User Activity';
-            loadUserActivityData();
-            break;
+      case 'user-growth':
+        titleEl.textContent = 'User Growth Over Time';
+        loadUserGrowthData();
+        break;
+  
+      case 'job-postings':
+        titleEl.textContent = 'Job Postings by Month';
+        loadJobPostingsData();
+        break;
+  
+      case 'application-stats':
+        titleEl.textContent = 'Application Statistics';
+        loadApplicationStatsData();
+        break;
+  
+      case 'user-activity':
+        titleEl.textContent = 'User Activity';
+        loadUserActivityData();
+        break;
     }
-}
+  }
+  
+  
 
 // Enhanced loadJobPostingsData function
 function loadJobPostingsData() {
@@ -1698,3 +1700,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function loadApplicationStatsData() {
+    fetch('/admin/reports/application-stats', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        // 1. Main timeseries
+        updateMainChart(data.labels, data.datasets, 'Applications');
+  
+        // 2. Only update the metric cards
+        updateMetrics(data.metrics);
+      })
+      .catch(err => {
+        console.error('Error loading application stats:', err);
+        showNotification('Failed to load application stats', 'error');
+      });
+  }
+  
+  function loadUserActivityData() {
+    fetch('/admin/reports/user-activity', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        // 1. Main timeseries
+        updateMainChart(data.labels, data.datasets, 'Logins');
+  
+        // 2. Only update the metric cards
+        updateMetrics(data.metrics);
+      })
+      .catch(err => {
+        console.error('Error loading user activity:', err);
+        showNotification('Failed to load user activity', 'error');
+      });
+  }
+  
+  
+//   // Then in your existing updateReportView():
+//   function updateReportView() {
+//     const reportType = document.getElementById('report-type').value;
+//     switch (reportType) {
+//       case 'user-growth':
+//         loadUserGrowthData(); break;
+//       case 'job-postings':
+//         loadJobPostingsData(); break;
+//       case 'application-stats':
+//         loadApplicationStatsData(); break;
+//       case 'user-activity':
+//         loadUserActivityData(); break;
+//     }
+// }
+  

@@ -428,64 +428,91 @@ def report_job_postings():
 @admin_bp.route('/admin/reports/application-stats', methods=['GET'])
 @admin_required
 def report_application_stats():
-    # Group applications by month
+    # 1. Group applications by month
     growth = db.session.query(
         func.date_format(Message.created_at, '%Y-%m').label('month'),
         func.count(Message.id).label('count')
     ).filter(
         Message.subject.like('%Application for:%'),
-        Message.is_draft==False,
-        Message.is_spam==False
+        Message.is_draft == False,
+        Message.is_spam == False
     ).group_by('month').order_by('month').all()
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
-    # Stub status distribution
-    status_dist = {
-        'pending': 0,
-        'under review': 0,
-        'accepted': 0,
-        'rejected': 0
-    }
+    # 2. Status distribution
+    status_counts = dict(
+        db.session.query(
+            Message.status,
+            func.count(Message.id)
+        ).filter(
+            Message.subject.like('%Application for:%'),
+            Message.is_draft == False,
+            Message.is_spam == False
+        ).group_by(Message.status).all()
+    )
+    # Ensure all 4 statuses are present
+    for s in ['Pending', 'Under Review', 'Accepted', 'Rejected']:
+        status_counts.setdefault(s, 0)
 
+    # 3. Metrics
     total_users       = User.query.count()
     total_jobs        = Job.query.count()
-    application_count = sum(data)
+    total_applications = sum(data)
     active_users      = total_users
 
     return jsonify({
         'labels': labels,
         'datasets': data,
-        'statusDistribution': status_dist,
+        'statusDistribution': status_counts,
+        'metrics': {
+            'totalUsers':       total_users,
+            'newJobs':          total_jobs,
+            'applications':     total_applications,
+            'activeUsers':      active_users
+        }
+    }), 200
+
+
+@admin_bp.route('/admin/reports/user-activity', methods=['GET'])
+@admin_required
+def report_user_activity():
+    # 1. Login activity by month
+    login_growth = db.session.query(
+        func.date_format(LoginHistory.login_time, '%Y-%m').label('month'),
+        func.count(LoginHistory.id).label('count')
+    ).group_by('month').order_by('month').all()
+    labels = [m for m,_ in login_growth]
+    data   = [c for _,c in login_growth]
+
+    # 2. Activity type breakdown
+    #    we already have applications count; profile updates and 'other' could be
+    #    filled later—stub to zero for now
+    application_count = Message.query.filter(
+        Message.subject.like('%Application for:%'),
+        Message.is_draft==False,
+        Message.is_spam==False
+    ).count()
+    activity_types = {
+        'logins': sum(data),
+        'applications': application_count,
+        'profile updates': 0,
+        'other': 0
+    }
+
+    # 3. Metrics
+    total_users  = User.query.count()
+    total_jobs   = Job.query.count()
+    active_users = total_users
+
+    return jsonify({
+        'labels': labels,
+        'datasets': data,
+        'activityTypes': activity_types,
         'metrics': {
             'totalUsers':   total_users,
             'newJobs':      total_jobs,
             'applications': application_count,
             'activeUsers':  active_users
-        }
-    }), 200
-
-@admin_bp.route('/admin/reports/user-activity', methods=['GET'])
-@admin_required
-def report_user_activity():
-    # Stub user‐activity
-    return jsonify({
-        'labels': [],
-        'datasets': [],
-        'activityTypes': {
-            'logins': 0,
-            'applications': 0,
-            'profile updates': 0,
-            'other': 0
-        },
-        'metrics': {
-            'totalUsers':   User.query.count(),
-            'newJobs':      Job.query.count(),
-            'applications': Message.query.filter(
-                                Message.subject.like('%Application for:%'),
-                                Message.is_draft==False,
-                                Message.is_spam==False
-                             ).count(),
-            'activeUsers':  User.query.count()
         }
     }), 200
