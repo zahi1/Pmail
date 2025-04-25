@@ -475,46 +475,37 @@ async function generateExportPreview() {
     const modules = Array.from(document.querySelectorAll('.export-module:checked'))
                          .map(cb => cb.value);
     const preview = document.getElementById('export-preview');
-    preview.innerHTML = `<p>Loading preview…</p>`;
-    document.getElementById('export-download-btn').disabled = true;
+    const downloadBtn = document.getElementById('export-download-btn');
   
-    // 1) Fetch all report data in parallel
+    preview.innerHTML = `<p>Loading preview…</p>`;
+    downloadBtn.disabled = true;
+  
+    // 1) Fetch data
     const results = await Promise.all(
       modules.map(mod =>
-        fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, {
-          credentials: 'include'
-        }).then(r => r.json())
+        fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, { credentials: 'include' })
+          .then(r => r.json())
       )
     );
   
-    // 2) Map module keys to human titles
-    const chartTitles = {
+    // 2) Titles & totals
+    const titles = {
       'user-growth':       'User Growth Over Time',
       'job-postings':      'Job Postings Over Time',
       'application-stats': 'Application Statistics Over Time',
       'user-activity':     'User Activity Over Time'
     };
+    const totals = {
+      'user-growth':       data => data.metrics.totalUsers,
+      'job-postings':      data => data.metrics.newJobs,
+      'application-stats': data => data.metrics.applications,
+      'user-activity':     data => data.metrics.activeUsers
+    };
   
-    // 3) Build summary cards with correct totals per module
+    // 3) Summary cards
     let html = `<div class="summary-cards" style="display:flex;gap:1rem;">`;
     results.forEach((data, i) => {
       const mod = modules[i];
-      let total = 0;
-      switch (mod) {
-        case 'user-growth':
-          total = data.metrics.totalUsers;
-          break;
-        case 'job-postings':
-          total = data.metrics.newJobs;
-          break;
-        case 'application-stats':
-          total = data.metrics.applications;
-          break;
-        case 'user-activity':
-          total = data.metrics.activeUsers;
-          break;
-      }
-  
       html += `
         <div class="summary-card" style="
           flex:1;
@@ -527,13 +518,14 @@ async function generateExportPreview() {
             ${mod.replace('-', ' ').toUpperCase()}
           </h4>
           <p style="margin:0;font-size:1.25rem;color:#fff;">
-            Total: <strong>${total}</strong>
+            Total: <strong>${totals[mod](data)}</strong>
           </p>
-        </div>`;
+        </div>
+      `;
     });
     html += `</div>`;
   
-    // 4) Build chart containers
+    // 4) Chart containers
     modules.forEach(mod => {
       html += `
         <div class="chart-container" style="
@@ -543,22 +535,64 @@ async function generateExportPreview() {
           padding:1rem;
         ">
           <h5 style="margin:0 0 .75rem;color:#8ab4f8;">
-            ${chartTitles[mod]}
+            ${titles[mod]}
           </h5>
           <canvas id="export-chart-${mod}" style="width:100%;"></canvas>
-        </div>`;
+        </div>
+      `;
+      if (mod === 'user-growth') {
+        html += `
+          <div class="chart-container" style="
+            margin-top:1rem;
+            background:#252525;
+            border-radius:8px;
+            padding:1rem;
+            max-width:300px;
+          ">
+            <h5 style="margin:0 0 .75rem;color:#8ab4f8;">User Distribution</h5>
+            <canvas id="export-distribution" style="width:300px; height:300px;"></canvas>
+          </div>
+        `;
+      }
+      if (mod === 'job-postings') {
+        html += `
+          <div class="chart-container" style="
+            margin-top:1rem;
+            background:#252525;
+            border-radius:8px;
+            padding:1rem;
+            max-width:300px;
+          ">
+            <h5 style="margin:0 0 .75rem;color:#8ab4f8;">Job Categories</h5>
+            <canvas id="export-job-categories" style="width:300px; height:300px;"></canvas>
+          </div>
+        `;
+      }
+      if (mod === 'user-activity') {
+        html += `
+          <div class="chart-container" style="
+            margin-top:1rem;
+            background:#252525;
+            border-radius:8px;
+            padding:1rem;
+          ">
+            <h5 style="margin:0 0 .75rem;color:#8ab4f8;">Peak Usage Heatmap</h5>
+            <canvas id="export-heatmap" style="width:100%;"></canvas>
+          </div>
+        `;
+      }
     });
   
     preview.innerHTML = html;
   
-    // 5) Common Chart.js options
-    const commonOptions = {
+    // 5) Base Chart.js options
+    const baseOpts = {
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: 2,
       plugins: {
-        legend:   { labels: { color: '#fff' } },
-        tooltip:  { mode: 'index', intersect: false }
+        legend:  { labels: { color: '#fff' } },
+        tooltip: { mode: 'index', intersect: false }
       },
       scales: {
         x: {
@@ -574,62 +608,116 @@ async function generateExportPreview() {
       }
     };
   
-    // 6) Instantiate each chart
+    // 6) Render time‐series charts
     modules.forEach((mod, i) => {
-      const ctx    = document
-        .getElementById(`export-chart-${mod}`)
-        .getContext('2d');
-  
-      let config;
+      const ctx = document.getElementById(`export-chart-${mod}`).getContext('2d');
       const labels = results[i].labels;
       const data   = results[i].datasets;
   
       if (mod === 'user-activity') {
-        config = {
+        new Chart(ctx, {
           type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Logins',
-              data,
-              backgroundColor: 'rgba(66, 133, 244, 0.7)'
-            }]
-          },
+          data: { labels, datasets:[{ label:'Logins', data, backgroundColor:'rgba(66,133,244,0.7)' }] },
           options: {
-            ...commonOptions,
+            ...baseOpts,
             scales: {
-              ...commonOptions.scales,
-              y: {
-                ...commonOptions.scales.y,
-                title: { display: true, text: 'Logins', color: '#fff' }
-              }
+              ...baseOpts.scales,
+              y: { ...baseOpts.scales.y, title:{ display:true, text:'Logins', color:'#fff' } }
             }
           }
-        };
+        });
       } else {
-        config = {
+        new Chart(ctx, {
           type: 'line',
-          data: {
-            labels,
-            datasets: [{
-              label: chartTitles[mod],
-              data,
-              borderColor: '#4285f4',
-              backgroundColor: 'rgba(66,133,244,0.1)',
-              fill: true,
-              tension: 0.3
-            }]
-          },
-          options: commonOptions
-        };
+          data: { labels, datasets:[{
+            label: titles[mod],
+            data,
+            borderColor:'#4285f4',
+            backgroundColor:'rgba(66,133,244,0.1)',
+            fill:true,
+            tension:0.3
+          }]},
+          options: baseOpts
+        });
       }
-  
-      new Chart(ctx, config);
     });
   
-    // 7) Enable Download
-    document.getElementById('export-download-btn').disabled = false;
+    // 7) Render secondary doughnuts & heatmap
+    modules.forEach((mod, i) => {
+      const dat = results[i];
+      if (mod === 'user-growth') {
+        new Chart(document.getElementById('export-distribution').getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels:['Employees','Employers'],
+            datasets:[{
+              data:[dat.userDistribution.employees, dat.userDistribution.employers],
+              backgroundColor:['#4285f4','#34a853']
+            }]
+          },
+          options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1,
+            plugins:{ legend:{ labels:{ color:'#fff' } } }
+          }
+        });
+      }
+      if (mod === 'job-postings') {
+        new Chart(document.getElementById('export-job-categories').getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: dat.jobCategories.map(c=>c.name),
+            datasets:[{
+              data: dat.jobCategories.map(c=>c.count),
+              backgroundColor:['#4285f4','#34a853','#fbbc05','#ea4335','#800080']
+            }]
+          },
+          options:{ responsive:true, maintainAspectRatio:true, aspectRatio:1,
+            plugins:{ legend:{ labels:{ color:'#fff' } } }
+          }
+        });
+      }
+      if (mod === 'user-activity') {
+        new Chart(document.getElementById('export-heatmap').getContext('2d'), {
+          type: 'matrix',
+          data:{ datasets:[{
+            label:'Logins',
+            data: dat.heatmapData,
+            backgroundColor: ctx => {
+              const v = ctx.raw.v;
+              const max = Math.max(...dat.heatmapData.map(d=>d.v));
+              const pct = v/max;
+              return `hsl(${(1-pct)*240},70%,${50+pct*10}%)`;
+            },
+            width:  ctx=>Math.floor(ctx.chart.width/7)-2,
+            height: ctx=>Math.floor(ctx.chart.height/24)-2,
+            borderColor:'#222', borderWidth:1
+          }]},
+          options:{
+            responsive:true, maintainAspectRatio:true, aspectRatio:2,
+            scales:{
+              x:{ type:'category', labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+                title:{ display:true, text:'Day', color:'#fff' },
+                ticks:{ color:'#fff' }, grid:{ display:false }
+              },
+              y:{ type:'category', labels:Array.from({length:24},(_,i)=>i.toString()),
+                title:{ display:true, text:'Hour', color:'#fff' },
+                ticks:{ color:'#fff' }, grid:{ display:false }
+              }
+            },
+            plugins:{
+              tooltip:{ callbacks:{
+                title:()=>'', label:ctx=>`${ctx.raw.x}@${ctx.raw.y}:00 → ${ctx.raw.v}`
+              }},
+              legend:{ display:false }
+            }
+          }
+        });
+      }
+    });
+  
+    downloadBtn.disabled = false;
   }
+  
+
   
   
 

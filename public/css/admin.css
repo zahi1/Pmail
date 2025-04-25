@@ -755,9 +755,11 @@
 /* remove any brightness/invert on your logo */
 .pmail-logo {
   filter: none !important;
-  width: 40px;  /* or whatever size fits */
+  width: 60px;
   height: auto;
+  object-fit: contain;
 }
+
 
 .export-preview {
   background: #f0f2f5; /* a very light grey page background */
