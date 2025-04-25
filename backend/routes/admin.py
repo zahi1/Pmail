@@ -339,3 +339,153 @@ def get_job_categories_admin():
     return jsonify({
         "categories": [{"id": cat[0], "name": cat[0]} for cat in cats]
     }), 200
+
+@admin_bp.route('/admin/reports/user-growth', methods=['GET'])
+@admin_required
+def report_user_growth():
+    # use MySQL DATE_FORMAT instead of SQLite strftime
+    growth = db.session.query(
+        func.date_format(User.created_at, '%Y-%m').label('month'),
+        func.count(User.id).label('count')
+    ) \
+    .group_by(func.date_format(User.created_at, '%Y-%m')) \
+    .order_by(func.date_format(User.created_at, '%Y-%m')) \
+    .all()
+
+    labels = [m for m, _ in growth]
+    data   = [c for _, c in growth]
+
+    # Distribution by role
+    employee_count = User.query.filter_by(role='employee').count()
+    employer_count = User.query.filter_by(role='employer').count()
+
+    # Overall metrics
+    total_users       = User.query.count()
+    new_jobs          = Job.query.count()
+    application_count = Message.query.filter(
+        Message.subject.like('%Application for:%'),
+        Message.is_draft == False,
+        Message.is_spam   == False
+    ).count()
+    active_users = total_users
+
+    return jsonify({
+        'labels': labels,
+        'datasets': data,
+        'userDistribution': {
+            'employees': employee_count,
+            'employers': employer_count
+        },
+        'metrics': {
+            'totalUsers':   total_users,
+            'newJobs':      new_jobs,
+            'applications': application_count,
+            'activeUsers':  active_users
+        }
+    }), 200
+
+@admin_bp.route('/admin/reports/job-postings', methods=['GET'])
+@admin_required
+def report_job_postings():
+    # Group jobs by month (YYYY‑MM)
+    growth = db.session.query(
+        func.date_format(Job.created_at, '%Y-%m').label('month'),
+        func.count(Job.id).label('count')
+    ) \
+    .group_by(func.date_format(Job.created_at, '%Y-%m')) \
+    .order_by(func.date_format(Job.created_at, '%Y-%m')) \
+    .all()
+    labels = [m for m,_ in growth]
+    data   = [c for _,c in growth]
+
+    # Job categories distribution
+    cats = db.session.query(Job.category, func.count(Job.id))\
+                     .group_by(Job.category).all()
+    job_categories = [{'name': cat, 'count': cnt} for cat, cnt in cats]
+
+    # Metrics
+    total_users       = User.query.count()
+    total_jobs        = Job.query.count()
+    application_count = Message.query.filter(
+        Message.subject.like('%Application for:%'),
+        Message.is_draft==False,
+        Message.is_spam==False
+    ).count()
+    active_users = total_users
+
+    return jsonify({
+        'labels': labels,
+        'datasets': data,
+        'jobCategories': job_categories,
+        'metrics': {
+            'totalUsers':   total_users,
+            'newJobs':      total_jobs,
+            'applications': application_count,
+            'activeUsers':  active_users
+        }
+    }), 200
+
+@admin_bp.route('/admin/reports/application-stats', methods=['GET'])
+@admin_required
+def report_application_stats():
+    # Group applications by month
+    growth = db.session.query(
+        func.date_format(Message.created_at, '%Y-%m').label('month'),
+        func.count(Message.id).label('count')
+    ).filter(
+        Message.subject.like('%Application for:%'),
+        Message.is_draft==False,
+        Message.is_spam==False
+    ).group_by('month').order_by('month').all()
+    labels = [m for m,_ in growth]
+    data   = [c for _,c in growth]
+
+    # Stub status distribution
+    status_dist = {
+        'pending': 0,
+        'under review': 0,
+        'accepted': 0,
+        'rejected': 0
+    }
+
+    total_users       = User.query.count()
+    total_jobs        = Job.query.count()
+    application_count = sum(data)
+    active_users      = total_users
+
+    return jsonify({
+        'labels': labels,
+        'datasets': data,
+        'statusDistribution': status_dist,
+        'metrics': {
+            'totalUsers':   total_users,
+            'newJobs':      total_jobs,
+            'applications': application_count,
+            'activeUsers':  active_users
+        }
+    }), 200
+
+@admin_bp.route('/admin/reports/user-activity', methods=['GET'])
+@admin_required
+def report_user_activity():
+    # Stub user‐activity
+    return jsonify({
+        'labels': [],
+        'datasets': [],
+        'activityTypes': {
+            'logins': 0,
+            'applications': 0,
+            'profile updates': 0,
+            'other': 0
+        },
+        'metrics': {
+            'totalUsers':   User.query.count(),
+            'newJobs':      Job.query.count(),
+            'applications': Message.query.filter(
+                                Message.subject.like('%Application for:%'),
+                                Message.is_draft==False,
+                                Message.is_spam==False
+                             ).count(),
+            'activeUsers':  User.query.count()
+        }
+    }), 200

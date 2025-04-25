@@ -49,16 +49,24 @@ function initAdminDashboard() {
                 // Don't rethrow - continue with execution
             });
             
+            // Check if reports tab is already active (initial page load to reports tab)
+            const isReportsTabActive = document.getElementById('reports-tab').classList.contains('active');
+            
             // Initialize charts after a short delay to ensure DOM is ready
             setTimeout(() => {
                 try {
                     initializeCharts();
                     console.log("Charts initialized successfully");
+                    
+                    // Always force real data load after charts are initialized
+                    if (isReportsTabActive) {
+                        console.log("Reports tab is active on load, fetching real data");
+                        loadUserGrowthData(true); // Pass true to indicate this is the initial load
+                    }
                 } catch (err) {
                     console.error("Error initializing charts:", err);
-                    // Non-critical error, don't show notification
                 }
-            }, 100);
+            }, 300); // Increased timeout for chart initialization
         })
         .catch(err => {
             console.error("Error during admin dashboard initialization:", err);
@@ -396,6 +404,16 @@ function setupTabNavigation() {
             // Show the corresponding pane
             const tabId = this.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
+            
+            // If switching to reports tab, refresh all charts
+            if (tabId === 'reports-tab') {
+                setTimeout(() => {
+                    if (charts.mainChart) {
+                        charts.mainChart.resize();
+                        updateReportView();
+                    }
+                }, 100);
+            }
         });
     });
 }
@@ -953,257 +971,441 @@ let charts = {
 };
 
 function initializeCharts() {
-    // Initialize main chart
-    const mainChartCtx = document.getElementById('main-chart').getContext('2d');
-    charts.mainChart = new Chart(mainChartCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'User Growth',
-                data: [0, 0, 0, 0, 0, 0],
-                borderColor: '#4285f4',
-                backgroundColor: 'rgba(66, 133, 244, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
+    console.log("Beginning chart initialization...");
+    
+    try {
+        const mainChartCanvas = document.getElementById('main-chart');
+        const userDistCanvas = document.getElementById('user-distribution-chart');
+        const jobCatCanvas = document.getElementById('job-categories-chart');
+        
+        // Check if canvas elements exist in the DOM
+        if (!mainChartCanvas || !userDistCanvas || !jobCatCanvas) {
+            console.error("Chart canvas elements not found in DOM:", {
+                mainChart: !!mainChartCanvas,
+                userDistribution: !!userDistCanvas,
+                jobCategories: !!jobCatCanvas
+            });
+            return;
+        }
+        
+        console.log("All chart canvases found, creating chart instances...");
+        
+        // Guarantee parent container height
+        const chartWrapper = mainChartCanvas.closest('.chart-wrapper');
+        if (chartWrapper && !chartWrapper.style.height) {
+            chartWrapper.style.height = '300px';
+        }
+        
+        // Initialize main chart with empty data
+        const mainChartCtx = mainChartCanvas.getContext('2d');
+        charts.mainChart = new Chart(mainChartCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'User Growth',
+                    data: [],
+                    borderColor: '#4285f4',
+                    backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
             },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: true,
-                        text: 'Month'
+                        position: 'top',
+                        labels: {
+                            color: '#fff' // Make legend text visible on dark background
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
                     }
                 },
-                y: {
-                    display: true,
-                    title: {
+                scales: {
+                    x: {
                         display: true,
-                        text: 'Value'
+                        title: {
+                            display: true,
+                            text: 'Month',
+                            color: '#fff' // Make axis title visible
+                        },
+                        ticks: {
+                            color: '#fff' // Make axis labels visible
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)' // Subtle grid lines
+                        }
                     },
-                    beginAtZero: true
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Value',
+                            color: '#fff' // Make axis title visible
+                        },
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#fff' // Make axis labels visible
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)' // Subtle grid lines
+                        }
+                    }
                 }
             }
-        }
-    });
-    
-    // Initialize user distribution chart
-    const userDistributionCtx = document.getElementById('user-distribution-chart').getContext('2d');
-    charts.userDistributionChart = new Chart(userDistributionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Employees', 'Employers'],
-            datasets: [{
-                data: [0, 0],
-                backgroundColor: ['#4285f4', '#34a853'],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-    
-    // Initialize job categories chart
-    const jobCategoriesCtx = document.getElementById('job-categories-chart').getContext('2d');
-    charts.jobCategoriesChart = new Chart(jobCategoriesCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
-            datasets: [{
-                label: 'Jobs per Category',
-                data: [0, 0, 0, 0, 0],
-                backgroundColor: [
-                    'rgba(66, 133, 244, 0.7)',
-                    'rgba(52, 168, 83, 0.7)',
-                    'rgba(251, 188, 5, 0.7)',
-                    'rgba(234, 67, 53, 0.7)',
-                    'rgba(128, 0, 128, 0.7)'
-                ],
-                borderColor: [
-                    'rgba(66, 133, 244, 1)',
-                    'rgba(52, 168, 83, 1)',
-                    'rgba(251, 188, 5, 1)',
-                    'rgba(234, 67, 53, 1)',
-                    'rgba(128, 0, 128, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        });
+        
+        // Initialize user distribution chart
+        const userDistributionCtx = userDistCanvas.getContext('2d');
+        charts.userDistributionChart = new Chart(userDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Employees', 'Employers'],
+                datasets: [{
+                    data: [0, 0],
+                    backgroundColor: ['#4285f4', '#34a853'],
+                    hoverOffset: 4
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
             }
+        });
+        
+        // Initialize job categories chart with identical settings as user distribution chart
+        const jobCategoriesCtx = document.getElementById('job-categories-chart').getContext('2d');
+        charts.jobCategoriesChart = new Chart(jobCategoriesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Jobs per Category',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(66, 133, 244, 0.7)',
+                        'rgba(52, 168, 83, 0.7)',
+                        'rgba(251, 188, 5, 0.7)',
+                        'rgba(234, 67, 53, 0.7)',
+                        'rgba(128, 0, 128, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(66, 133, 244, 1)',
+                        'rgba(52, 168, 83, 1)',
+                        'rgba(251, 188, 5, 1)',
+                        'rgba(234, 67, 53, 1)',
+                        'rgba(128, 0, 128, 1)'
+                    ],
+                    borderWidth: 1,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 1, // Force 1:1 aspect ratio like a circle
+                cutout: '50%',
+                plugins: {
+                    legend: {
+                        display: true, // Changed from false to true to show the legend
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff', // Make legend text visible on dark background
+                            boxWidth: 15,
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        console.error("Error creating charts:", err);
+    }
+    
+    console.log("Charts initialized - loading real data");
+    
+    // Load job categories data after initialization
+    setTimeout(() => {
+        loadJobCategoriesForChart();
+    }, 500);
+}
+
+// Add a function to load job categories data specifically
+function loadJobCategoriesForChart() {
+    console.log("Fetching job categories data for chart visualization...");
+    
+    fetch('/admin/reports/job-postings', {
+        credentials: 'include',
+        headers: { 
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
         }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Job categories data received:", data);
+        
+        if (data.jobCategories && data.jobCategories.length > 0) {
+            // Update the job categories chart with real data
+            updateJobCategoriesChart(data.jobCategories);
+        } else {
+            console.warn("No job categories data found");
+            // Create dummy data for demonstration if no data available
+            const dummyData = [
+                {name: "Information Technology", count: 5},
+                {name: "Healthcare", count: 3},
+                {name: "Sales", count: 2},
+                {name: "Marketing", count: 4},
+                {name: "Education", count: 1}
+            ];
+            updateJobCategoriesChart(dummyData);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading job categories data:', error);
+        showNotification('Failed to load job categories data', 'error');
     });
 }
 
+// Modify updateReportView to handle different report types
 function updateReportView() {
     const reportType = document.getElementById('report-type').value;
-    document.getElementById('chart-title').textContent = getReportTitle(reportType);
+    console.log("Updating report view for:", reportType);
     
-    // Load appropriate data based on report type
-    switch(reportType) {
+    // Update chart title based on report type
+    let chartTitle = document.getElementById('chart-title');
+    
+    switch (reportType) {
         case 'user-growth':
+            chartTitle.textContent = 'User Growth Over Time';
             loadUserGrowthData();
             break;
         case 'job-postings':
+            chartTitle.textContent = 'Job Postings by Month';
             loadJobPostingsData();
             break;
         case 'application-stats':
+            chartTitle.textContent = 'Application Statistics';
             loadApplicationStatsData();
             break;
         case 'user-activity':
+            chartTitle.textContent = 'User Activity';
             loadUserActivityData();
             break;
     }
 }
 
-function getReportTitle(reportType) {
-    switch(reportType) {
-        case 'user-growth':
-            return 'User Growth Over Time';
-        case 'job-postings':
-            return 'Job Postings Over Time';
-        case 'application-stats':
-            return 'Application Statistics';
-        case 'user-activity':
-            return 'User Activity Metrics';
-        default:
-            return 'Report';
-    }
+// Enhanced loadJobPostingsData function
+function loadJobPostingsData() {
+    fetch('/admin/reports/job-postings', {
+        credentials: 'include',
+        headers: { 'Cache-Control': 'no-cache' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update main chart with job postings over time
+        updateMainChart(data.labels, data.datasets, 'Job Postings');
+        
+        // Update the job categories chart
+        updateJobCategoriesChart(data.jobCategories);
+        
+        // Also update metrics
+        updateMetrics(data.metrics);
+    })
+    .catch(error => {
+        console.error('Error loading job postings data:', error);
+        showNotification('Failed to load job data', 'error');
+    });
 }
 
-function loadUserGrowthData() {
-    fetch('/admin/reports/user-growth')
-        .then(response => response.json())
+// Update the job categories chart function to maintain circular appearance
+function updateJobCategoriesChart(categories) {
+    const chart = charts.jobCategoriesChart;
+    if (!chart) {
+        console.error("Job categories chart not initialized");
+        return;
+    }
+    
+    console.log("Updating job categories chart with:", categories);
+    
+    // Sort categories by count in descending order for better visualization
+    categories.sort((a, b) => b.count - a.count);
+    
+    // Extract category names and counts
+    const categoryNames = categories.map(cat => cat.name);
+    const categoryCounts = categories.map(cat => cat.count);
+    
+    // Generate colors for the chart - limit to 8 colors for readability
+    const colorPalette = generateCategoryColors(Math.min(categories.length, 8));
+    
+    // Update chart configuration
+    chart.data.labels = categoryNames;
+    chart.data.datasets[0].data = categoryCounts;
+    chart.data.datasets[0].backgroundColor = colorPalette.backgrounds;
+    chart.data.datasets[0].borderColor = colorPalette.borders;
+    
+    // Ensure legend is displayed
+    chart.options.plugins.legend.display = true;
+    
+    // Update the chart
+    chart.update();
+}
+
+// Helper function to generate beautiful colors for the categories
+function generateCategoryColors(count) {
+    const backgrounds = [];
+    const borders = [];
+    
+    // Use predefined brand colors for consistency
+    const brandColors = [
+        { bg: 'rgba(66, 133, 244, 0.7)', border: '#4285f4' },   // Google Blue
+        { bg: 'rgba(52, 168, 83, 0.7)', border: '#34a853' },    // Google Green
+        { bg: 'rgba(251, 188, 5, 0.7)', border: '#fbbc05' },    // Google Yellow
+        { bg: 'rgba(234, 67, 53, 0.7)', border: '#ea4335' },    // Google Red
+        { bg: 'rgba(138, 180, 248, 0.7)', border: '#8ab4f8' },  // Light Blue
+        { bg: 'rgba(128, 0, 128, 0.7)', border: '#800080' },    // Purple
+        { bg: 'rgba(0, 128, 128, 0.7)', border: '#008080' },    // Teal
+        { bg: 'rgba(255, 153, 0, 0.7)', border: '#ff9900' }     // Orange
+    ];
+    
+    for (let i = 0; i < count; i++) {
+        const colorIndex = i % brandColors.length;
+        backgrounds.push(brandColors[colorIndex].bg);
+        borders.push(brandColors[colorIndex].border);
+    }
+    
+    return {
+        backgrounds: backgrounds,
+        borders: borders
+    };
+}
+
+function loadUserGrowthData(isInitialLoad = false) {
+    console.log("Fetching user growth data from database...");
+    //document.getElementById('chart-title').textContent = 'User Growth Over Time (Loading...)';
+    
+    fetch('/admin/reports/user-growth', {
+        credentials: 'include',
+        headers: { 
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("User growth data received:", data);
+            document.getElementById('chart-title').textContent = 'User Growth Over Time';
+            
+            if (!data.labels || !data.labels.length) {
+                console.warn("Received empty data from server");
+                showNotification('No user growth data found in database', 'warning');
+                return;
+            }
+            
+            // Use real data
             updateMainChart(data.labels, data.datasets, 'User Growth');
             updateDistributionChart(data.userDistribution);
             updateMetrics(data.metrics);
+            
+            // Only show the success notification
+            // if (!isInitialLoad) {
+            //     showNotification('Data loaded successfully', 'success');
+            // }
+            
+            // Force a resize to ensure the chart renders correctly
+            window.dispatchEvent(new Event('resize'));
         })
         .catch(error => {
             console.error('Error loading user growth data:', error);
-            showNotification('Failed to load report data', 'error');
+            document.getElementById('chart-title').textContent = 'User Growth Over Time (Error)';
+            showNotification('Failed to load growth data from database', 'error');
         });
 }
 
-function loadJobPostingsData() {
-    fetch('/admin/reports/job-postings')
-        .then(response => response.json())
-        .then(data => {
-            updateMainChart(data.labels, data.datasets, 'Job Postings');
-            updateJobCategoriesChart(data.jobCategories);
-            updateMetrics(data.metrics);
-        })
-        .catch(error => {
-            console.error('Error loading job postings data:', error);
-            showNotification('Failed to load report data', 'error');
-        });
-}
+// Ensure window.load also triggers data loading if needed
+window.addEventListener('load', function() {
+    console.log("Window fully loaded, checking if reports tab is active");
+    const reportsTab = document.getElementById('reports-tab');
+    
+    if (reportsTab && reportsTab.classList.contains('active') && charts.mainChart) {
+        console.log("Reports tab active after full page load, ensuring real data is loaded");
+        // Small delay to ensure everything else is initialized
+        setTimeout(() => {
+            loadUserGrowthData(true);
+        }, 500);
+    }
+});
 
-function loadApplicationStatsData() {
-    fetch('/admin/reports/application-stats')
-        .then(response => response.json())
-        .then(data => {
-            updateMainChart(data.labels, data.datasets, 'Applications');
-            updateApplicationStatusChart(data.statusDistribution);
-            updateMetrics(data.metrics);
-        })
-        .catch(error => {
-            console.error('Error loading application stats data:', error);
-            showNotification('Failed to load report data', 'error');
-        });
-}
-
-function loadUserActivityData() {
-    fetch('/admin/reports/user-activity')
-        .then(response => response.json())
-        .then(data => {
-            updateMainChart(data.labels, data.datasets, 'User Activity');
-            updateActivityTypeChart(data.activityTypes);
-            updateMetrics(data.metrics);
-        })
-        .catch(error => {
-            console.error('Error loading user activity data:', error);
-            showNotification('Failed to load report data', 'error');
-        });
-}
-
+// Simpler updateMainChart that trusts the data from the server
 function updateMainChart(labels, datasets, label) {
     const chart = charts.mainChart;
-    chart.data.labels = labels;
+    if (!chart) {
+        console.error("Main chart not initialized");
+        initializeCharts();
+        return;
+    }
+    
+    console.log("Updating main chart with database data:", {labels, datasets});
+    
+    // Format labels if they're YYYY-MM format to be more readable
+    const formattedLabels = labels.map(l => {
+        if (typeof l === 'string' && l.match(/^\d{4}-\d{2}$/)) {
+            const [year, month] = l.split('-');
+            const date = new Date(parseInt(year), parseInt(month)-1);
+            return date.toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
+        }
+        return l;
+    });
+    
+    chart.data.labels = formattedLabels;
     chart.data.datasets[0].label = label;
     chart.data.datasets[0].data = datasets;
+    
     chart.update();
+    
+    // Debug info for verification
+    console.log("Chart updated with real data from database");
+    console.log("Labels:", chart.data.labels);
+    console.log("Data:", chart.data.datasets[0].data);
 }
 
 function updateDistributionChart(distribution) {
     const chart = charts.userDistributionChart;
     chart.data.datasets[0].data = [distribution.employees || 0, distribution.employers || 0];
-    chart.update();
-}
-
-function updateJobCategoriesChart(categories) {
-    const chart = charts.jobCategoriesChart;
-    chart.data.labels = categories.map(cat => cat.name);
-    chart.data.datasets[0].data = categories.map(cat => cat.count);
-    chart.update();
-}
-
-function updateApplicationStatusChart(statusData) {
-    const chart = charts.userDistributionChart;
-    chart.data.labels = Object.keys(statusData);
-    chart.data.datasets[0].data = Object.values(statusData);
-    chart.data.datasets[0].backgroundColor = [
-        '#FBC02D', // Pending
-        '#2196F3', // Under Review
-        '#4CAF50', // Accepted
-        '#F44336'  // Rejected
-    ];
-    chart.update();
-}
-
-function updateActivityTypeChart(activityData) {
-    const chart = charts.userDistributionChart;
-    chart.data.labels = Object.keys(activityData);
-    chart.data.datasets[0].data = Object.values(activityData);
-    chart.data.datasets[0].backgroundColor = [
-        '#4285f4', // Logins
-        '#34a853', // Applications
-        '#fbbc05', // Profile Updates
-        '#ea4335'  // Other
-    ];
     chart.update();
 }
 
@@ -1471,3 +1673,28 @@ function showNotification(message, type = 'info') {
 
 // Add window global for direct HTML access
 window.viewUserReport = generateUserReport;
+
+// Add explicit redirect when clicking reports tab
+document.addEventListener('DOMContentLoaded', function() {
+    // Target the reports tab link
+    const reportsTab = document.querySelector('.tab-nav li[data-tab="reports-tab"]');
+    if (reportsTab) {
+        reportsTab.addEventListener('click', function() {
+            console.log("Reports tab clicked");
+            setTimeout(() => {
+                // First ensure we're on the reports tab
+                document.getElementById('reports-tab').classList.add('active');
+                
+                // Force chart re-render with real data
+                if (charts.mainChart) {
+                    console.log("Force updating charts after tab click");
+                    loadUserGrowthData(); // This will reload all the charts
+                } else {
+                    console.log("Charts not initialized yet, initializing now");
+                    initializeCharts();
+                    setTimeout(() => loadUserGrowthData(), 200);
+                }
+            }, 200);
+        });
+    }
+});

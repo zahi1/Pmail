@@ -241,20 +241,88 @@
   }
   
   /* Charts and Reports */
-  .charts-container {
-    padding: 20px;
-  }
-  
-  .chart-wrapper {
-    background-color: #252525;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    border: 1px solid #333;
-  }
-  
-  .metrics-grid {
+.charts-container {
+  padding: 20px;
+  overflow: hidden; /* Prevent overflow outside charts container */
+}
+
+/* Make the container for the first chart (User Growth) much bigger */
+.charts-container .chart-wrapper:first-child {
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 35px; /* More space below */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+  min-height: 400px; /* Make the container taller */
+  height: 400px; /* Specific height */
+  overflow: hidden; /* Prevent content from spilling out */
+}
+
+/* Standard styling for other chart wrappers */
+.charts-container .chart-wrapper:not(:first-child) {
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+  overflow: hidden; /* Prevent content from spilling out */
+}
+
+/* Fix chart canvas dimensions */
+.chart-wrapper canvas {
+  width: 100% !important; /* Make sure width is 100% of container */
+  height: 300px !important;
+  max-width: 100%; /* Ensure it doesn't exceed container */
+}
+
+/* Specifically for the main chart */
+.charts-container .chart-wrapper:first-child canvas {
+  height: 350px !important;
+}
+
+.half-width {
+  width: 50%;
+  height: 350px !important; /* Increased fixed height to accommodate legend */
+  min-height: 350px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make sure the canvas elements are the same size in both containers */
+.half-width canvas {
+  height: 280px !important; /* Give more room for both charts */
+  min-height: 280px !important;
+  width: 100% !important;
+}
+
+/* Ensure both donut charts have the same dimensions */
+#user-distribution-chart,
+#job-categories-chart {
+  height: 280px !important;
+  width: 100% !important;
+}
+
+/* Force equal styling for both chart wrappers */
+.charts-container .chart-wrapper.half-width {
+  padding-bottom: 20px; /* Add extra padding at the bottom for legends */
+  background-color: #252525;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+}
+
+/* Make the title styling consistent */
+.chart-wrapper h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #8ab4f8;
+  height: 20px; /* Fixed height for titles */
+}
+
+.metrics-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
@@ -296,16 +364,52 @@
   }
   
   .secondary-charts {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .half-width {
-    width: 50%;
-  }
-  
-  /* Report actions */
-  .report-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.half-width {
+  width: 50%;
+  height: 350px !important; /* Increased fixed height to accommodate legend */
+  min-height: 350px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.half-width canvas {
+  height: 280px !important; /* Give more room for both charts */
+  min-height: 280px !important;
+  width: 100% !important;
+}
+
+/* Ensure both donut charts have the same dimensions */
+#user-distribution-chart,
+#job-categories-chart {
+  height: 280px !important;
+  width: 100% !important;
+}
+
+/* Force equal styling for both chart wrappers */
+.charts-container .chart-wrapper.half-width {
+  padding-bottom: 20px; /* Add extra padding at the bottom for legends */
+  background-color: #252525;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+}
+
+/* Make the title styling consistent */
+.chart-wrapper h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #8ab4f8;
+  height: 20px; /* Fixed height for titles */
+}
+
+/* Report actions */
+.report-actions {
     display: flex;
     gap: 10px;
   }
@@ -623,4 +727,3 @@
     color: #eee;
     margin: 20px 0;
   }
-  
