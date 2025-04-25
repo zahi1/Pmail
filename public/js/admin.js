@@ -527,21 +527,51 @@ async function generateExportPreview() {
 }
 
 async function downloadPDF() {
-    const preview = document.getElementById('export-preview');
-    // ① html2canvas is global
-    const canvas = await html2canvas(preview, { scale: 2 });
-    const img    = canvas.toDataURL('image/png');
+    const preview    = document.getElementById('export-preview');
+    const { jsPDF }  = window.jspdf;
+    const pdf        = new jsPDF('p', 'pt', 'a4');
+    const pageW      = pdf.internal.pageSize.getWidth();
+    const pageH      = pdf.internal.pageSize.getHeight();
+    const margin     = 40;
+    let yOffset      = margin + 30; // leave room for logo
   
-    // ② jsPDF is under window.jspdf.jsPDF
-    const { jsPDF } = window.jspdf;
-    const pdf       = new jsPDF('p', 'pt', 'a4');
+    // 1) load your logo once
+    const logoImg = await html2canvas(
+      document.querySelector('.pmail-logo'),
+      { backgroundColor: null, scale: 2 }
+    ).then(c => c.toDataURL('image/png'));
+    
+    // 2) helper to print header on each page
+    function printHeader() {
+      pdf.setFontSize(16);
+      pdf.text('Pmail Official Report', margin + 110, margin);
+      pdf.addImage(logoImg, 'PNG', margin, margin - 10, 80, 30);
+    }
   
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = (canvas.height * pageW) / canvas.width;
+    printHeader();
   
-    pdf.addImage(img, 'PNG', 0, 0, pageW, pageH);
-    pdf.save(`Admin_Report_${Date.now()}.pdf`);
+    // 3) loop each logical section (summary cards + charts)
+    const sections = preview.querySelectorAll(
+      '.summary-cards, .chart-container'
+    );
+    for (const sec of sections) {
+      const canvas = await html2canvas(sec, { scale: 2 });
+      const img    = canvas.toDataURL('image/png');
+      const imgH   = (canvas.height * (pageW - margin*2)) / canvas.width;
+  
+      // new page if we’d overflow
+      if (yOffset + imgH > pageH - margin) {
+        pdf.addPage();
+        yOffset = margin + 30;
+        printHeader();
+      }
+      pdf.addImage(img, 'PNG', margin, yOffset, pageW - margin*2, imgH);
+      yOffset += imgH + 20;
+    }
+  
+    pdf.save(`Pmail_Report_${Date.now()}.pdf`);
   }
+  
   
 
 document.addEventListener('DOMContentLoaded', () => {

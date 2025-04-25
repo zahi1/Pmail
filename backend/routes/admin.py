@@ -255,14 +255,29 @@ def get_job_categories_admin():
         "categories": [{"id": cat[0], "name": cat[0]} for cat in cats]
     }), 200
 
+from datetime import datetime
+
 @admin_bp.route('/admin/reports/user-growth', methods=['GET'])
 @admin_required
 def report_user_growth():
-    growth = db.session.query(
+    # grab filters
+    start = request.args.get('start')
+    end   = request.args.get('end')
+
+    # base query
+    q = db.session.query(
         func.date_format(User.created_at, '%Y-%m').label('month'),
         func.count(User.id).label('count')
-    ).group_by('month').order_by('month').all()
+    )
 
+    # only include rows in [start, end]
+    if start and end:
+        start_dt = datetime.strptime(start, '%Y-%m-%d')
+        end_dt   = datetime.strptime(end,   '%Y-%m-%d')
+        q = q.filter(User.created_at >= start_dt,
+                     User.created_at <= end_dt)
+
+    growth = q.group_by('month').order_by('month').all()
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
@@ -292,23 +307,50 @@ def report_user_growth():
 @admin_bp.route('/admin/reports/job-postings', methods=['GET'])
 @admin_required
 def report_job_postings():
-    growth = db.session.query(
+    # ─── grab date filters ──────────────────────────────────────────────────────
+    start = request.args.get('start')
+    end   = request.args.get('end')
+    if start and end:
+        try:
+            start_dt = datetime.strptime(start, '%Y-%m-%d')
+            end_dt   = datetime.strptime(end,   '%Y-%m-%d')
+        except ValueError:
+            return jsonify({"error":"Invalid date format, use YYYY-MM-DD"}), 400
+    else:
+        start_dt = end_dt = None
+
+    # ─── postings over time ────────────────────────────────────────────────────
+    q = db.session.query(
         func.date_format(Job.created_at, '%Y-%m').label('month'),
         func.count(Job.id).label('count')
-    ).group_by('month').order_by('month').all()
-
+    )
+    if start_dt and end_dt:
+        q = q.filter(Job.created_at >= start_dt,
+                     Job.created_at <= end_dt)
+    growth = q.group_by('month').order_by('month').all()
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
-    cats = db.session.query(Job.category, func.count(Job.id)).group_by(Job.category).all()
+    # ─── breakdown by category (also date-filtered) ───────────────────────────
+    cat_q = db.session.query(Job.category, func.count(Job.id))
+    if start_dt and end_dt:
+        cat_q = cat_q.filter(Job.created_at >= start_dt,
+                             Job.created_at <= end_dt)
+    cats = cat_q.group_by(Job.category).all()
     job_categories = [{'name': cat, 'count': cnt} for cat,cnt in cats]
 
+    # ─── global metrics (you can choose to date-filter these too if you like) ──
     total_users  = User.query.count()
-    total_jobs   = Job.query.count()
+    total_jobs   = Job.query.filter(
+        (Job.created_at >= start_dt) if start_dt else True,
+        (Job.created_at <= end_dt)   if end_dt   else True
+    ).count()
     app_count    = Message.query.filter(
         Message.subject.like('%Application for:%'),
         Message.is_draft == False,
-        Message.is_spam == False
+        Message.is_spam == False,
+        (Message.created_at >= start_dt) if start_dt else True,
+        (Message.created_at <= end_dt)   if end_dt   else True
     ).count()
     active_users = total_users
 
@@ -324,41 +366,63 @@ def report_job_postings():
         }
     }), 200
 
+
 @admin_bp.route('/admin/reports/application-stats', methods=['GET'])
 @admin_required
 def report_application_stats():
-    growth = db.session.query(
+    # ─── date filters ──────────────────────────────────────────────────────────
+    start = request.args.get('start')
+    end   = request.args.get('end')
+    if start and end:
+        try:
+            start_dt = datetime.strptime(start, '%Y-%m-%d')
+            end_dt   = datetime.strptime(end,   '%Y-%m-%d')
+        except ValueError:
+            return jsonify({"error":"Invalid date format, use YYYY-MM-DD"}), 400
+    else:
+        start_dt = end_dt = None
+
+    # ─── time-series of applications ───────────────────────────────────────────
+    app_q = db.session.query(
         func.date_format(Message.created_at, '%Y-%m').label('month'),
         func.count(Message.id).label('count')
     ).filter(
         Message.subject.like('%Application for:%'),
         Message.is_draft == False,
         Message.is_spam == False
-    ).group_by('month').order_by('month').all()
-
+    )
+    if start_dt and end_dt:
+        app_q = app_q.filter(Message.created_at >= start_dt,
+                             Message.created_at <= end_dt)
+    growth = app_q.group_by('month').order_by('month').all()
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
-    status_counts = dict(
-        db.session.query(
-            Message.status, func.count(Message.id)
-        ).filter(
-            Message.subject.like('%Application for:%'),
-            Message.is_draft == False,
-            Message.is_spam == False
-        ).group_by(Message.status).all()
+    # ─── status distribution ───────────────────────────────────────────────────
+    status_q = db.session.query(
+        Message.status, func.count(Message.id)
+    ).filter(
+        Message.subject.like('%Application for:%'),
+        Message.is_draft == False,
+        Message.is_spam == False
     )
+    if start_dt and end_dt:
+        status_q = status_q.filter(Message.created_at >= start_dt,
+                                   Message.created_at <= end_dt)
+    status_counts = dict(status_q.group_by(Message.status).all())
+    # ensure all states present
     for s in ['Pending','Under Review','Accepted','Rejected']:
         status_counts.setdefault(s, 0)
 
+    # ─── metrics ───────────────────────────────────────────────────────────────
     total_users        = User.query.count()
     total_jobs         = Job.query.count()
     total_applications = sum(data)
     active_users       = total_users
 
     return jsonify({
-        'labels':            labels,
-        'datasets':          data,
+        'labels':             labels,
+        'datasets':           data,
         'statusDistribution': status_counts,
         'metrics': {
             'totalUsers':   total_users,
@@ -368,67 +432,92 @@ def report_application_stats():
         }
     }), 200
 
+
 @admin_bp.route('/admin/reports/user-activity', methods=['GET'])
 @admin_required
 def report_user_activity():
     try:
-        # 1️⃣ Monthly login counts
-        monthly_q = db.session.query(
+        # ─── date filters ────────────────────────────────────────────────────────
+        start = request.args.get('start')
+        end   = request.args.get('end')
+        if start and end:
+            try:
+                start_dt = datetime.strptime(start, '%Y-%m-%d')
+                end_dt   = datetime.strptime(end,   '%Y-%m-%d')
+            except ValueError:
+                return jsonify({"error":"Invalid date format, use YYYY-MM-DD"}), 400
+        else:
+            start_dt = end_dt = None
+
+        # ─── monthly logins ─────────────────────────────────────────────────────
+        m_q = db.session.query(
             func.date_format(LoginHistory.login_time, '%Y-%m').label('month'),
             func.count(LoginHistory.id).label('count')
-        ).group_by('month').order_by('month').all()
-        labels = [m for m, _ in monthly_q]
-        data   = [c for _, c in monthly_q]
+        )
+        if start_dt and end_dt:
+            m_q = m_q.filter(LoginHistory.login_time >= start_dt,
+                             LoginHistory.login_time <= end_dt)
+        monthly_q = m_q.group_by('month').order_by('month').all()
+        labels    = [m for m,_ in monthly_q]
+        data      = [c for _,c in monthly_q]
 
-        # 2️⃣ Activity type breakdown
-        app_count = Message.query.filter(
+        # ─── applications count in this window ─────────────────────────────────
+        app_q = Message.query.filter(
             Message.subject.like('%Application for:%'),
             Message.is_draft == False,
-            Message.is_spam  == False
-        ).count()
+            Message.is_spam == False
+        )
+        if start_dt and end_dt:
+            app_q = app_q.filter(Message.created_at >= start_dt,
+                                 Message.created_at <= end_dt)
+        app_count = app_q.count()
+
         activity_types = {
-            'logins':          sum(data),
-            'applications':    app_count,
+            'logins':       sum(data),
+            'applications': app_count,
             'profile updates': 0,
             'other':           0
         }
 
-        # 3️⃣ Peak‐usage heatmap (day‐of‐week × hour)
-        # MySQL: DAYOFWEEK() returns 1=Sunday…7=Saturday
-        heatmap_q = db.session.query(
+        # ─── heatmap data ───────────────────────────────────────────────────────
+        h_q = db.session.query(
             func.dayofweek(LoginHistory.login_time).label('dow'),
             func.hour(LoginHistory.login_time).label('hour'),
             func.count(LoginHistory.id).label('count')
-        ).group_by(
+        )
+        if start_dt and end_dt:
+            h_q = h_q.filter(LoginHistory.login_time >= start_dt,
+                             LoginHistory.login_time <= end_dt)
+        heatmap_q = h_q.group_by(
             func.dayofweek(LoginHistory.login_time),
             func.hour(LoginHistory.login_time)
         ).all()
         days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
         heatmapData = [
-            {
-                'x': days[int(dow) - 1],
-                'y': str(int(hour)),
-                'v': cnt
-            }
+            {'x': days[int(dow)-1], 'y': str(int(hour)), 'v': cnt}
             for dow, hour, cnt in heatmap_q
         ]
 
-        # 4️⃣ Average logins per week by hour
-        # count distinct weeks in data (MySQL YEARWEEK mode=3 ISO week)
-        week_count = db.session.query(
+        # ─── avg logins per week by hour ────────────────────────────────────────
+        week_count_q = db.session.query(
             func.count(func.distinct(func.yearweek(LoginHistory.login_time, 3)))
-        ).scalar() or 1
+        )
+        if start_dt and end_dt:
+            week_count_q = week_count_q.filter(LoginHistory.login_time >= start_dt,
+                                               LoginHistory.login_time <= end_dt)
+        week_count = week_count_q.scalar() or 1
 
-        avg_hour_q = db.session.query(
+        avg_q = db.session.query(
             func.hour(LoginHistory.login_time).label('hour'),
             (func.count(LoginHistory.id) / week_count).label('avg')
-        ).group_by('hour').order_by('hour').all()
-        avgByHour = [
-            {'hour': str(int(hour)), 'avg': float(avg)}
-            for hour, avg in avg_hour_q
-        ]
+        )
+        if start_dt and end_dt:
+            avg_q = avg_q.filter(LoginHistory.login_time >= start_dt,
+                                 LoginHistory.login_time <= end_dt)
+        avg_hour_q = avg_q.group_by('hour').order_by('hour').all()
+        avgByHour = [{'hour': str(int(h)), 'avg': float(a)} for h,a in avg_hour_q]
 
-        # 5️⃣ Metrics
+        # ─── overall metrics ────────────────────────────────────────────────────
         total_users  = User.query.count()
         total_jobs   = Job.query.count()
         active_users = total_users

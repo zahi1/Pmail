@@ -736,6 +736,23 @@
   }
 
 
+  /* wrap each chart in the same dark “card” you use elsewhere */
+.chart-wrapper {
+  background-color: #252525;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  border: 1px solid #333;
+  margin-bottom: 1.5rem;
+}
+/* make the <canvas> itself transparent */
+.chart-wrapper canvas {
+  background-color: transparent !important;
+  width: 100% !important;
+  height: 300px !important;
+}
+
+
   .export-preview { padding: 20px; background: #fff; }
 .export-preview .summary-cards { display: flex; gap: 1rem; margin-bottom: 1rem; }
 .export-preview .summary-card { flex:1; padding:1rem; background:#f5f5f5; border-radius:8px; text-align:center; }
