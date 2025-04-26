@@ -67,6 +67,26 @@
           </select>
         </div>
       </div>
+
+      <!-- Bulk Actions Panel -->
+      <div id="bulkActionsPanel" class="bulk-actions-panel">
+        <div class="bulk-selection">
+          <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+          <label for="selectAll">Select All</label>
+          <span id="selectedCount" class="selected-count">(0 selected)</span>
+        </div>
+        <div class="bulk-controls">
+          <label for="bulkActionSelect">Bulk Actions:</label>
+          <select id="bulkActionSelect" disabled>
+            <option value="">Bulk Actions</option>
+            <option value="Pending">Mark as Pending</option>
+            <option value="Under Review">Mark as Under Review</option>
+            <option value="Accepted">Mark as Accepted</option>
+            <option value="Rejected">Mark as Rejected</option>
+          </select>
+          <button id="applyBulkAction" class="bulk-action-btn" disabled onclick="applyBulkAction()">Apply</button>
+        </div>
+      </div>
       
       <!-- Applications cards container -->
       <div id="applicationsGrid" class="applications-grid">

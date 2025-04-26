@@ -468,3 +468,126 @@ body {
     width: 48%;
   }
 }
+
+/* Bulk Actions Styling */
+.bulk-actions-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #444;
+}
+
+.bulk-selection {
+  display: flex;
+  align-items: center;
+}
+
+.bulk-selection label {
+  margin-left: 8px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.selected-count {
+  margin-left: 8px;
+  color: #8ab4f8;
+  font-size: 14px;
+}
+
+.bulk-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.bulk-controls select {
+  padding: 8px 12px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.bulk-action-btn {
+  padding: 8px 16px;
+  background-color: #8ab4f8;
+  color: #121212;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bulk-action-btn:hover {
+  background-color: #6e9ad0;
+}
+
+.bulk-action-btn:disabled {
+  background-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Application Card Selection */
+.application-card {
+  position: relative;
+}
+
+.card-checkbox {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 18px;
+  height: 18px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.card-checkbox:checked + .card-header {
+  background-color: rgba(138, 180, 248, 0.15);
+}
+
+.application-card.selected {
+  box-shadow: 0 0 0 2px #8ab4f8;
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #555;
+  border-radius: 3px;
+  background-color: #333;
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #8ab4f8;
+  border-color: #8ab4f8;
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Adjust card header to make room for checkbox */
+.application-card .card-header {
+  padding-left: 40px;
+}

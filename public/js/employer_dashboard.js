@@ -60,11 +60,18 @@ function filterApplications() {
   displayApplicationCards(filtered);
 }
 
+// Global variable to track selected application IDs
+window.selectedApplications = [];
+
+// Display application cards with checkboxes for selection
 function displayApplicationCards(applications) {
   const container = document.getElementById("applicationsGrid");
   if (!container) return;
   
   container.innerHTML = "";
+  
+  // Update the bulk actions panel based on initial state
+  updateBulkActionsPanel();
   
   if (applications.length === 0) {
     container.innerHTML = `
@@ -92,6 +99,7 @@ function displayApplicationCards(applications) {
       day: 'numeric' 
     });
     
+    // First build the card HTML structure without the checkbox
     card.innerHTML = `
       <div class="card-header">
         <h3 class="job-title">${app.subject || 'No Subject'}</h3>
@@ -138,7 +146,181 @@ function displayApplicationCards(applications) {
       </div>
     `;
     
+    // Now create and add the checkbox separately
+    const cardCheckbox = document.createElement("input");
+    cardCheckbox.type = "checkbox";
+    cardCheckbox.className = "card-checkbox";
+    cardCheckbox.dataset.id = app.id;
+    cardCheckbox.addEventListener("change", function() {
+      toggleApplicationSelection(app.id, this.checked);
+    });
+    
+    // Insert checkbox at the beginning of the card
+    card.insertBefore(cardCheckbox, card.firstChild);
+    
     container.appendChild(card);
+  });
+}
+
+// Toggle selection for an individual application
+function toggleApplicationSelection(appId, isSelected) {
+  if (isSelected) {
+    // Add to selection if not already there
+    if (!window.selectedApplications.includes(appId)) {
+      window.selectedApplications.push(appId);
+      
+      // Visually mark the card as selected
+      const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
+      if (card) card.classList.add('selected');
+    }
+  } else {
+    // Remove from selection
+    window.selectedApplications = window.selectedApplications.filter(id => id != appId);
+    
+    // Remove selected styling
+    const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
+    if (card) card.classList.remove('selected');
+    
+    // Uncheck "Select All" if it was checked
+    document.getElementById("selectAll").checked = false;
+  }
+  
+  // Update bulk actions panel
+  updateBulkActionsPanel();
+}
+
+// Toggle select all applications
+function toggleSelectAll() {
+  const isChecked = document.getElementById("selectAll").checked;
+  const checkboxes = document.querySelectorAll('.card-checkbox');
+  
+  // Clear the current selection
+  window.selectedApplications = [];
+  
+  // Update checkboxes and selection
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = isChecked;
+    
+    if (isChecked) {
+      const appId = parseInt(checkbox.dataset.id);
+      window.selectedApplications.push(appId);
+      
+      // Add selected class to card
+      const card = checkbox.closest('.application-card');
+      if (card) card.classList.add('selected');
+    } else {
+      // Remove selected class from all cards
+      const cards = document.querySelectorAll('.application-card');
+      cards.forEach(card => card.classList.remove('selected'));
+    }
+  });
+  
+  // Update bulk actions panel
+  updateBulkActionsPanel();
+}
+
+// Update the bulk actions UI based on selection
+function updateBulkActionsPanel() {
+  const selectedCount = window.selectedApplications.length;
+  
+  // Update counter display
+  document.getElementById("selectedCount").textContent = `(${selectedCount} selected)`;
+  
+  // Enable/disable bulk actions
+  const bulkActionSelect = document.getElementById("bulkActionSelect");
+  const applyButton = document.getElementById("applyBulkAction");
+  
+  if (selectedCount > 0) {
+    bulkActionSelect.disabled = false;
+    applyButton.disabled = bulkActionSelect.value === "";
+  } else {
+    bulkActionSelect.disabled = true;
+    applyButton.disabled = true;
+  }
+}
+
+// Enable/disable apply button when bulk action changes
+document.addEventListener('DOMContentLoaded', () => {
+  const bulkActionSelect = document.getElementById("bulkActionSelect");
+  if (bulkActionSelect) {
+    bulkActionSelect.addEventListener('change', function() {
+      const applyButton = document.getElementById("applyBulkAction");
+      applyButton.disabled = this.value === "" || window.selectedApplications.length === 0;
+    });
+  }
+});
+
+// Apply bulk action to selected applications
+function applyBulkAction() {
+  const action = document.getElementById("bulkActionSelect").value;
+  
+  if (!action || window.selectedApplications.length === 0) {
+    return;
+  }
+  
+  // Confirm before applying bulk action
+  const confirmMessage = `Are you sure you want to change ${window.selectedApplications.length} application(s) to status "${action}"?`;
+  if (!confirm(confirmMessage)) {
+    return;
+  }
+  
+  // Call API to update status for all selected applications
+  fetch('/messages/bulk-status-update', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message_ids: window.selectedApplications,
+      status: action
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Update UI for all affected applications
+    window.selectedApplications.forEach(appId => {
+      // Update in the global array
+      const appIndex = window.allApplications.findIndex(app => app.id == appId);
+      if (appIndex !== -1) {
+        window.allApplications[appIndex].status = action;
+      }
+      
+      // Update the card's status badge and dropdown
+      const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
+      if (card) {
+        const statusBadge = card.querySelector('.status-badge');
+        const statusSelect = card.querySelector('.status-select');
+        
+        if (statusBadge) {
+          statusBadge.textContent = action;
+          statusBadge.className = `status-badge status-${action.toLowerCase().replace(' ', '-')}`;
+        }
+        
+        if (statusSelect) {
+          statusSelect.value = action;
+        }
+        
+        // Remove selected styling
+        card.classList.remove('selected');
+        const checkbox = card.querySelector('.card-checkbox');
+        if (checkbox) checkbox.checked = false;
+      }
+    });
+    
+    // Reset selection
+    window.selectedApplications = [];
+    document.getElementById("selectAll").checked = false;
+    updateBulkActionsPanel();
+    
+    // Show success toast
+    showToast(`Successfully updated ${data.updated_count || data.count || 'all'} applications`);
+  })
+  .catch(error => {
+    console.error('Error applying bulk action:', error);
+    showToast('Failed to update applications: ' + error.message);
   });
 }
 
