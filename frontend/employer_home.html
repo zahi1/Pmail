@@ -7,15 +7,18 @@
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
   <!-- Using the same CSS for consistent top nav -->
   <link rel="stylesheet" href="../public/css/inbox.css" />
+  <link rel="stylesheet" href="../public/css/employer_home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <body>
   <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="nav-left">
+      <img src="../public/images/burger_icon.png" alt="Menu" class="menu-toggle" id="menu-toggle" />
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
     <div class="nav-right">
-      <a href="employer_home.html" class="nav-link"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
+      <a href="employer_home.html" class="nav-link active"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
       <a href="employer_post_job.html" class="nav-link"><img src="../public/images/postjob_icon.png" alt="Post a Job" class="nav-icon"> Post a Job</a>
       <a href="employer_dashboard.html" class="nav-link"><img src="../public/images/dashboard_icon.png" alt="Dashboard" class="nav-icon"> Dashboard</a>
       <a href="employer_inbox.html" class="nav-link"><img src="../public/images/inbox_icon.png" alt="Inbox" class="nav-icon"> Inbox</a>
@@ -23,10 +26,282 @@
     </div>
   </div>
 
-  <!-- Main Content: Employer Home -->
-  <div style="margin-top: 80px; padding: 20px;">
-    <h1>Welcome to Your Employer Dashboard</h1>
-    <p>This is your home page. Here you can manage job postings, view candidate analytics, and more. (Content coming soon!)</p>
+  <!-- Main Content Layout -->
+  <div class="home-container">
+    <!-- Left Sidebar: Company Profile and Quick Actions -->
+    <div class="company-sidebar">
+      <div class="company-profile">
+        <div class="profile-header">
+          <img src="../public/images/company_logo.png" alt="Company Logo" class="company-logo-large">
+          <h2>TechCorp Solutions</h2>
+          <p class="company-info">Technology • San Francisco, CA</p>
+        </div>
+        
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-number">5</span>
+            <span class="stat-label">Active Jobs</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">42</span>
+            <span class="stat-label">Applications</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">7</span>
+            <span class="stat-label">Interviews</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons">
+          <a href="employer_post_job.html" class="action-btn">
+            <i class="fas fa-plus-circle"></i>
+            Post New Job
+          </a>
+          <a href="employer_dashboard.html" class="action-btn">
+            <i class="fas fa-chart-line"></i>
+            View Analytics
+          </a>
+          <a href="employer_inbox.html" class="action-btn">
+            <i class="fas fa-envelope"></i>
+            Check Messages
+          </a>
+        </div>
+      </div>
+      
+      
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content-area">
+      <!-- Summary Cards -->
+      <div class="stats-summary">
+        <div class="summary-card">
+          <div class="card-content">
+            <div class="card-value">158</div>
+            <div class="card-label">Total Applications</div>
+          </div>
+          <div class="card-icon blue">
+            <i class="fas fa-file-alt"></i>
+          </div>
+        </div>
+        
+        <div class="summary-card">
+          <div class="card-content">
+            <div class="card-value">24</div>
+            <div class="card-label">New This Week</div>
+          </div>
+          <div class="card-icon green">
+            <i class="fas fa-user-plus"></i>
+          </div>
+        </div>
+        
+        <div class="summary-card">
+          <div class="card-content">
+            <div class="card-value">18</div>
+            <div class="card-label">Interview Stage</div>
+          </div>
+          <div class="card-icon orange">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+        </div>
+        
+        <div class="summary-card">
+          <div class="card-content">
+            <div class="card-value">5</div>
+            <div class="card-label">Pending Offers</div>
+          </div>
+          <div class="card-icon purple">
+            <i class="fas fa-handshake"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Applications Section -->
+      <div class="content-section">
+        <div class="section-header">
+          <h2>Recent Applications</h2>
+          <a href="employer_dashboard.html" class="view-all">View All</a>
+        </div>
+        
+        <div class="applications-table">
+          <div class="table-header">
+            <div class="col-candidate">Candidate</div>
+            <div class="col-position">Position</div>
+            <div class="col-date">Date Applied</div>
+            <div class="col-match">Match</div>
+            <div class="col-status">Status</div>
+            <div class="col-action">Action</div>
+          </div>
+          
+          <div class="table-row">
+            <div class="col-candidate">
+              <img src="../public/images/candidate1.png" alt="Candidate" class="candidate-avatar">
+              <div class="candidate-info">
+                <div class="candidate-name">Michael Johnson</div>
+                <div class="candidate-title">Senior Developer</div>
+              </div>
+            </div>
+            <div class="col-position">Frontend Lead</div>
+            <div class="col-date">2 hours ago</div>
+            <div class="col-match"><span class="match-score high">92%</span></div>
+            <div class="col-status"><span class="status-badge status-under-review">New</span></div>
+            <div class="col-action">
+              <button class="view-btn">View</button>
+            </div>
+          </div>
+          
+          <div class="table-row">
+            <div class="col-candidate">
+              <img src="../public/images/candidate2.png" alt="Candidate" class="candidate-avatar">
+              <div class="candidate-info">
+                <div class="candidate-name">Sarah Williams</div>
+                <div class="candidate-title">UX Designer</div>
+              </div>
+            </div>
+            <div class="col-position">Product Designer</div>
+            <div class="col-date">Yesterday</div>
+            <div class="col-match"><span class="match-score high">87%</span></div>
+            <div class="col-status"><span class="status-badge status-accepted">Interview</span></div>
+            <div class="col-action">
+              <button class="view-btn">View</button>
+            </div>
+          </div>
+          
+          <div class="table-row">
+            <div class="col-candidate">
+              <img src="../public/images/candidate3.png" alt="Candidate" class="candidate-avatar">
+              <div class="candidate-info">
+                <div class="candidate-name">David Chen</div>
+                <div class="candidate-title">Backend Engineer</div>
+              </div>
+            </div>
+            <div class="col-position">DevOps Engineer</div>
+            <div class="col-date">2 days ago</div>
+            <div class="col-match"><span class="match-score medium">76%</span></div>
+            <div class="col-status"><span class="status-badge status-under-review">Under Review</span></div>
+            <div class="col-action">
+              <button class="view-btn">View</button>
+            </div>
+          </div>
+          
+          <div class="table-row">
+            <div class="col-candidate">
+              <img src="../public/images/candidate4.png" alt="Candidate" class="candidate-avatar">
+              <div class="candidate-info">
+                <div class="candidate-name">Emily Rodriguez</div>
+                <div class="candidate-title">Marketing Specialist</div>
+              </div>
+            </div>
+            <div class="col-position">Digital Marketing Manager</div>
+            <div class="col-date">3 days ago</div>
+            <div class="col-match"><span class="match-score low">65%</span></div>
+            <div class="col-status"><span class="status-badge status-rejected">Not Selected</span></div>
+            <div class="col-action">
+              <button class="view-btn">View</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Active Job Postings -->
+      <div class="content-section">
+        <div class="section-header">
+          <h2>Your Active Job Postings</h2>
+          <a href="employer_post_job.html" class="view-all">Post New Job</a>
+        </div>
+        
+        <div class="job-cards">
+          <div class="job-card">
+            <div class="job-card-header">
+              <h3>Senior Frontend Developer</h3>
+              <div class="job-badge hot">Hot</div>
+            </div>
+            <div class="job-stats">
+              <div class="job-stat">
+                <span class="stat-value">36</span>
+                <span class="stat-label">Applications</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">8</span>
+                <span class="stat-label">Interviews</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">3</span>
+                <span class="stat-label">Shortlisted</span>
+              </div>
+            </div>
+            <div class="job-footer">
+              <span class="job-date">Posted 5 days ago</span>
+              <div class="job-actions">
+                <button class="edit-btn" aria-label="Edit job posting"><i class="fas fa-pen"></i></button>
+                <button class="view-candidates-btn">View Candidates</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-card">
+            <div class="job-card-header">
+              <h3>UX/UI Designer</h3>
+              <div class="job-badge">Active</div>
+            </div>
+            <div class="job-stats">
+              <div class="job-stat">
+                <span class="stat-value">24</span>
+                <span class="stat-label">Applications</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">5</span>
+                <span class="stat-label">Interviews</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">2</span>
+                <span class="stat-label">Shortlisted</span>
+              </div>
+            </div>
+            <div class="job-footer">
+              <span class="job-date">Posted 1 week ago</span>
+              <div class="job-actions">
+                <button class="edit-btn" aria-label="Edit job posting"><i class="fas fa-pen"></i></button>
+                <button class="view-candidates-btn">View Candidates</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-card">
+            <div class="job-card-header">
+              <h3>Backend Engineer</h3>
+              <div class="job-badge">Active</div>
+            </div>
+            <div class="job-stats">
+              <div class="job-stat">
+                <span class="stat-value">42</span>
+                <span class="stat-label">Applications</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">10</span>
+                <span class="stat-label">Interviews</span>
+              </div>
+              <div class="job-stat">
+                <span class="stat-value">4</span>
+                <span class="stat-label">Shortlisted</span>
+              </div>
+            </div>
+            <div class="job-footer">
+              <span class="job-date">Posted 2 weeks ago</span>
+              <div class="job-actions">
+                <button class="edit-btn" aria-label="Edit job posting"><i class="fas fa-pen"></i></button>
+                <button class="view-candidates-btn">View Candidates</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script src="../public/js/employer_home.js"></script>
 </body>
 </html>
