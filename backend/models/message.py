@@ -11,10 +11,12 @@ class Message(db.Model):
     body = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default="Pending", nullable=False)
     is_draft = db.Column(db.Boolean, default=False, nullable=False)
-    is_spam = db.Column(db.Boolean, default=False, nullable=False)  # Add is_spam column
+    is_spam = db.Column(db.Boolean, default=False, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('messages.id'), nullable=True)
     # threaded replies
     replies = db.relationship('Message',
                               backref=db.backref('parent', remote_side=[id]),
                               lazy=True)
+    # Add relationship for attachments (already defined in Attachment model with backref)
+    # attachments = db.relationship('Attachment', backref='message', lazy=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())

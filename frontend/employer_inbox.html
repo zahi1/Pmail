@@ -78,6 +78,16 @@
         
         <label>Message:</label>
         <textarea id="message-body" rows="8" placeholder="Write your message..."></textarea>
+        
+        <!-- File upload section -->
+        <label for="attachment-input">Attachment (PDF only):</label>
+        <div class="attachment-container">
+          <input type="file" id="attachment-input" accept=".pdf" title="Upload PDF attachment" />
+          <div id="selected-file" class="selected-file hidden">
+            <span id="file-name"></span>
+            <button type="button" id="remove-file" class="remove-file-btn">✕</button>
+          </div>
+        </div>
       </div>
       <div class="compose-footer">
         <button id="delete-draft-btn" class="delete-draft-btn" onclick="deleteDraft()" title="Delete Draft">

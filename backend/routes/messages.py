@@ -1,12 +1,14 @@
 # backend/routes/messages.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from backend.models.database import db
 from backend.models.message import Message
+from backend.models.attachment import Attachment
 from backend.models.user import User
 from backend.models.status_message import StatusMessage
 from sqlalchemy import func
 import pickle
 import os
+import io
 
 messages_bp = Blueprint('messages', __name__)
 
@@ -46,16 +48,40 @@ def is_spam(subject, body):
 
 @messages_bp.route('/messages/send', methods=['POST'])
 def send_message():
-    data = request.get_json()
-    sender_id = data.get('sender_id')
-    recipient_email = data.get('recipient_email')
-    subject = data.get('subject')
-    body = data.get('body')
-    draft_id = data.get('draft_id')  # Optional: if coming from an existing draft
-    job_id = data.get('job_id')
-    company_name = data.get('company_name')
-    parent_id = data.get('parent_message_id')
+    """Send a message with optional PDF attachment"""
+    print("Received message submission request")
+    
+    # Check if the request has multipart/form-data content type
+    has_attachment = False
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        print("Processing multipart form data (with file)")
+        # Get form data
+        sender_id = request.form.get('sender_id')
+        recipient_email = request.form.get('recipient_email')
+        subject = request.form.get('subject')
+        body = request.form.get('body')
+        draft_id = request.form.get('draft_id')
+        parent_id = request.form.get('parent_message_id')
+        
+        # Check for attachment
+        attachment = request.files.get('attachment')
+        has_attachment = attachment and attachment.filename
+        
+        if has_attachment:
+            print(f"Received attachment: {attachment.filename}, {attachment.content_type}")
+    else:
+        print("Processing JSON data (no file)")
+        # Parse JSON data
+        data = request.get_json()
+        sender_id = data.get('sender_id')
+        recipient_email = data.get('recipient_email')
+        subject = data.get('subject')
+        body = data.get('body')
+        draft_id = data.get('draft_id')
+        parent_id = data.get('parent_message_id')
+        attachment = None
 
+    # Validate required fields
     if not sender_id or not recipient_email or not subject or not body:
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -71,8 +97,9 @@ def send_message():
     spam_detected = is_spam(subject, body)
     
     try:
+        # Create or update the message
         if draft_id:
-            # Update an existing draft and send it
+            # Update existing draft
             message = Message.query.get(draft_id)
             if not message:
                 return jsonify({"error": "Draft not found"}), 404
@@ -81,33 +108,69 @@ def send_message():
             message.body = body
             message.status = "Pending"
             message.is_draft = False
-            message.is_spam = spam_detected  # Set is_spam flag
+            message.is_spam = spam_detected
             if parent_id:
                 message.parent_id = parent_id
-            db.session.commit()
-            
-            print(f"📤 Draft sent with ID {message.id}, is_spam: {message.is_spam}")
-            return jsonify({"message": "Draft sent successfully"}), 200
         else:
-            new_message = Message(
+            # Create new message
+            message = Message(
                 sender_id=sender_id,
                 recipient_id=recipient.id,
                 subject=subject,
                 body=body,
                 status="Pending",
                 is_draft=False,
-                is_spam=spam_detected,  # Set is_spam flag
+                is_spam=spam_detected,
                 parent_id=parent_id
             )
-            db.session.add(new_message)
-            db.session.commit()
-            
-            print(f"📤 New message sent with ID {new_message.id}, is_spam: {new_message.is_spam}")
-            return jsonify({"message": "Message sent successfully"}), 201
+            db.session.add(message)
+        
+        # First commit to get the message ID
+        db.session.commit()
+        print(f"Message saved with ID: {message.id}")
+        
+        # Handle attachment if present
+        if has_attachment:
+            try:
+                # Validate file type
+                if not attachment.filename.lower().endswith('.pdf'):
+                    return jsonify({"error": "Only PDF files are allowed"}), 400
+                
+                # Read the file data
+                file_data = attachment.read()
+                file_size = len(file_data)
+                print(f"Read {file_size} bytes from attachment")
+                
+                # Create and save attachment
+                new_attachment = Attachment(
+                    message_id=message.id,
+                    filename=attachment.filename,
+                    file_type='application/pdf',
+                    file_size=file_size,
+                    file_data=file_data
+                )
+                db.session.add(new_attachment)
+                db.session.commit()
+                
+                print(f"📎 Attachment saved successfully: {attachment.filename}")
+            except Exception as e:
+                print(f"❌ Error saving attachment: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                # Continue even if attachment fails
+        
+        print(f"📤 Message sent with ID {message.id}, is_spam: {message.is_spam}")
+        return jsonify({
+            "success": True,
+            "message": "Message sent successfully", 
+            "message_id": message.id
+        }), 201
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error saving message: {e}")
-        return jsonify({"error": "Database error while saving message"}), 500
+        print(f"❌ Error saving message: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Database error while saving message: {str(e)}"}), 500
 
 @messages_bp.route('/messages/draft', methods=['POST'])
 def save_draft():
@@ -356,13 +419,11 @@ def mark_as_not_spam(message_id):
 
 @messages_bp.route('/messages/<int:message_id>', methods=['GET'])
 def get_message(message_id):
-    """Get a specific message by ID"""
+    """Get a message by ID including attachments"""
     try:
-        message = Message.query.get(message_id)
-        if not message:
-            return jsonify({"error": "Message not found"}), 404
+        message = Message.query.get_or_404(message_id)
         
-        # Check if the current user has permission to view this message
+        # Check user permissions
         current_user_id = request.args.get('user_id')
         if current_user_id:
             current_user_id = int(current_user_id)
@@ -372,6 +433,18 @@ def get_message(message_id):
         sender = User.query.get(message.sender_id)
         recipient = User.query.get(message.recipient_id)
         
+        # Get attachment info
+        attachments = []
+        for attachment in Attachment.query.filter_by(message_id=message_id).all():
+            attachments.append({
+                "id": attachment.id,
+                "filename": attachment.filename,
+                "file_size": attachment.file_size,
+                "file_type": attachment.file_type,
+                "created_at": attachment.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        
+        # Build response
         result = {
             "id": message.id,
             "sender_id": message.sender_id,
@@ -383,12 +456,13 @@ def get_message(message_id):
             "status": message.status,
             "is_draft": message.is_draft,
             "is_spam": message.is_spam,
+            "attachments": attachments,
             "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }
         
         return jsonify(result), 200
     except Exception as e:
-        print(f"❌ Error fetching message: {e}")
+        print(f"❌ Error fetching message: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
@@ -470,13 +544,13 @@ def save_status_messages():
         data = request.get_json()
         user_id = data.get('user_id')
         messages = data.get('messages', {})
-        
+
         if not user_id:
             return jsonify({"error": "Missing user_id"}), 400
-        
+
         # Delete existing messages for this user
         StatusMessage.query.filter_by(user_id=user_id).delete()
-        
+
         # Insert new messages
         for status, message in messages.items():
             if message:  # Only save non-empty messages
@@ -485,10 +559,54 @@ def save_status_messages():
                     status=status,
                     message=message
                 ))
-        
+
         db.session.commit()
         return jsonify({"success": True, "message": "Status messages saved successfully"}), 200
     except Exception as e:
         db.session.rollback()
         print(f"❌ Error saving status messages: {e}")
         return jsonify({"error": "Error saving status messages", "details": str(e)}), 500
+
+# Add a new endpoint to retrieve attachments
+@messages_bp.route('/attachments/<int:attachment_id>', methods=['GET'])
+def get_attachment(attachment_id):
+    """Get an attachment file by ID"""
+    try:
+        print(f"Fetching attachment with ID: {attachment_id}")
+        # Find the attachment
+        attachment = Attachment.query.get_or_404(attachment_id)
+        print(f"Found attachment: {attachment.filename}, size: {attachment.file_size} bytes")
+        
+        # Validate user access
+        user_id = request.args.get('user_id')
+        if user_id:
+            message = Message.query.get(attachment.message_id)
+            if not message:
+                print(f"Message not found for attachment {attachment_id}")
+                return jsonify({"error": "Message not found"}), 404
+                
+            if (int(user_id) != message.sender_id and int(user_id) != message.recipient_id):
+                print(f"Access denied: User {user_id} is not sender or recipient")
+                return jsonify({"error": "Access denied"}), 403
+                
+            print(f"Access granted for user {user_id}")
+        else:
+            print("No user_id provided in request")
+        
+        # Determine if this is a download or preview request
+        download = request.args.get('download') == 'true'
+        
+        print(f"Sending file: {attachment.filename}, type: {attachment.file_type}, download: {download}")
+        
+        # Send the file
+        return send_file(
+            io.BytesIO(attachment.file_data),
+            mimetype=attachment.file_type,
+            as_attachment=download,
+            download_name=attachment.filename
+        )
+    except Exception as e:
+        print(f"❌ Error retrieving attachment: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Error retrieving attachment: {str(e)}"}), 500
