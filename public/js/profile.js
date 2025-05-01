@@ -71,6 +71,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resetDefaultBtn) {
         resetDefaultBtn.addEventListener('click', resetStatusMessages);
     }
+    
+    initCategories();
+    initCategorySelection();
+
+    // init category selection in edit form
+    document.querySelectorAll('#categories-container .category-item')
+        .forEach(item => item.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            updateCategoriesValue();
+        }));
 });
 
 function setupTabNavigation() {
@@ -102,6 +112,7 @@ function fetchProfile() {
         if (data.error) {
             showNotification("Error: " + data.error, "error");
         } else {
+            console.log("Profile data received:", data); // Log the data
             populateProfileForm(data);
             populateProfileInfo(data);
             setProfileHeader(data);
@@ -169,15 +180,63 @@ function populateProfileForm(data) {
         document.getElementById("phone").value = data.phone || "";
     if (document.getElementById("email"))
         document.getElementById("email").value = data.email || "";
+    
+    // Handle categories for employee profiles
+    if (data.role === "employee" && data.user_categories) {
+        console.log("Loading categories:", data.user_categories);
+        const cats = data.user_categories.split(',');
+        
+        // Store categories in hidden input
+        const categoriesInput = document.getElementById('user_categories');
+        if (categoriesInput) {
+            categoriesInput.value = data.user_categories;
+        }
+        
+        // Mark selected categories with "selected" class
+        document.querySelectorAll('#categories-container .category-item').forEach(item => {
+            if (cats.includes(item.dataset.value)) {
+                item.classList.add('selected');
+            }
+        });
+
+        // update hidden input
+        updateCategoriesValue();
+    }
 }
 
 function populateProfileInfo(data) {
+    console.log("Populating profile info with:", data);
+    
     // Update info display section
     if (data.role === "employee") {
         if (document.getElementById("info-first-name"))
             document.getElementById("info-first-name").textContent = data.first_name || "-";
         if (document.getElementById("info-last-name"))
             document.getElementById("info-last-name").textContent = data.last_name || "-";
+            
+        // Display job categories
+        const infoCategories = document.getElementById("info-categories");
+        console.log("Categories element:", infoCategories);
+        console.log("User categories data:", data.user_categories);
+        
+        if (infoCategories) {
+            if (data.user_categories && data.user_categories.trim() !== "") {
+                const categories = data.user_categories.split(',');
+                console.log("Categories array:", categories);
+                
+                const categoryBadges = categories.map(category => 
+                    `<span class="category-badge">${category}</span>`
+                ).join(' ');
+                
+                console.log("Setting HTML to:", categoryBadges);
+                infoCategories.innerHTML = categoryBadges;
+            } else {
+                console.log("No categories found, setting default text");
+                infoCategories.textContent = "No categories selected";
+            }
+        } else {
+            console.error("info-categories element not found in DOM");
+        }
     } else if (data.role === "employer") {
         if (document.getElementById("info-company-name"))
             document.getElementById("info-company-name").textContent = data.company_name || "-";
@@ -246,9 +305,14 @@ function updateProfile(event) {
     // Employee profile fields
     if (document.getElementById("first_name")) {
         payload.first_name = document.getElementById("first_name").value.trim();
-    }
-    if (document.getElementById("last_name")) {
         payload.last_name = document.getElementById("last_name").value.trim();
+        
+        // Get categories from selected items
+        const selectedCategories = [];
+        document.querySelectorAll('#categories-container .category-item.selected').forEach(item => {
+            selectedCategories.push(item.getAttribute('data-value'));
+        });
+        payload.user_categories = selectedCategories.join(',');
     }
     // Employer profile fields
     if (document.getElementById("company_name")) {
@@ -264,6 +328,10 @@ function updateProfile(event) {
     // Common fields
     payload.birthdate = document.getElementById("birthdate").value.trim();
     payload.phone = document.getElementById("phone").value.trim();
+
+    if (document.getElementById('user_categories')){
+        payload.user_categories = document.getElementById('user_categories').value;
+    }
 
     fetch("/profile", {
         method: "PUT",
@@ -916,4 +984,50 @@ function resetStatusMessages() {
     document.getElementById('rejected-message').value = defaultMessages.rejected;
     
     showNotification('Status messages reset to default values', 'info');
+}
+
+function initCategories(){
+  document.querySelectorAll('#categories-container .category-item')
+    .forEach(item => item.addEventListener('click', function(){
+      this.classList.toggle('selected');
+      const sel = [...document.querySelectorAll('.category-item.selected')]
+        .map(i=>i.dataset.value).join(',');
+      document.getElementById('user_categories').value = sel;
+    }));
+}
+
+function initCategorySelection() {
+    const categoryItems = document.querySelectorAll('#categories-container .category-item');
+    if (categoryItems.length > 0) {
+        console.log("Initializing category selection");
+        categoryItems.forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateCategoriesInput();
+            });
+        });
+    }
+}
+
+function updateCategoriesInput() {
+    const selectedCategories = [];
+    document.querySelectorAll('#categories-container .category-item.selected').forEach(item => {
+        selectedCategories.push(item.getAttribute('data-value'));
+    });
+    
+    // Update hidden input
+    const categoriesInput = document.getElementById('user_categories');
+    if (categoriesInput) {
+        categoriesInput.value = selectedCategories.join(',');
+        console.log("Updated categories:", categoriesInput.value);
+    }
+}
+
+// update hidden input with selected categories
+function updateCategoriesValue() {
+    const selected = Array.from(
+        document.querySelectorAll('#categories-container .category-item.selected')
+    ).map(el => el.dataset.value);
+    const input = document.getElementById('user_categories');
+    if (input) input.value = selected.join(',');
 }

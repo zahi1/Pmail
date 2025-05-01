@@ -67,6 +67,26 @@
         <!-- Step 5: Phone Number & Final Sign Up -->
         <div id="step-5" class="form-step" style="display: none;">
             <input type="tel" id="phone" placeholder="Phone Number" required>
+            
+            <!-- Categories field - for employees only -->
+            <div class="form-group employee-field" id="categories-group" style="display:none;">
+              <label>Job Categories of Interest</label>
+              <div class="categories-container" id="registration-categories-container">
+                <div class="category-item" data-value="Arts">Arts</div>
+                <div class="category-item" data-value="Business">Business</div>
+                <div class="category-item" data-value="Communications">Communications</div>
+                <div class="category-item" data-value="Education">Education</div>
+                <div class="category-item" data-value="Healthcare">Healthcare</div>
+                <div class="category-item" data-value="Hospitality">Hospitality</div>
+                <div class="category-item" data-value="Information Technology">Information Technology</div>
+                <div class="category-item" data-value="Law Enforcement">Law Enforcement</div>
+                <div class="category-item" data-value="Sales and Marketing">Sales and Marketing</div>
+                <div class="category-item" data-value="Science">Science</div>
+                <div class="category-item" data-value="Transportation">Transportation</div>
+              </div>
+              <input type="hidden" id="user_categories" name="user_categories" />
+            </div>
+            
             <!-- The external JS (auth.js) will handle the click event for register-btn -->
             <button id="register-btn">Sign Up</button>
         </div>

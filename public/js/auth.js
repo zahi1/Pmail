@@ -1,9 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // If there's a register button on the page, attach the register() function
-  const registerBtn = document.getElementById("register-btn");
-  if (registerBtn) {
-    registerBtn.addEventListener("click", register);
+  const role = new URLSearchParams(window.location.search).get("role");
+  if (role === "employee") {
+    document.querySelectorAll('.employee-field').forEach(el=>el.style.display="block");
   }
+  // attach register()
+  const registerBtn = document.getElementById("register-btn");
+  if (registerBtn) registerBtn.addEventListener("click", register);
+
+  // categories click
+  document.querySelectorAll('#registration-categories-container .category-item')
+    .forEach(item => item.addEventListener('click', function(){
+      this.classList.toggle('selected');
+      const sel = [...document.querySelectorAll('.category-item.selected')]
+        .map(i=>i.dataset.value).join(',');
+      document.getElementById('user_categories').value = sel;
+    }));
 });
 
 // --------------------------------------
@@ -159,6 +170,10 @@ function register() {
     phone: phone,
     role: role
   };
+
+  if (role === "employee") {
+    userData.user_categories = document.getElementById('user_categories').value;
+  }
 
   fetch("http://127.0.0.1:5000/auth/register", {
     method: "POST",

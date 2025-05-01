@@ -557,6 +557,47 @@
   outline: none;
 }
 
+/* Profile categories styling */
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.category-item {
+  padding: 8px 15px;
+  background-color: #2a2a2a;
+  color: #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1px solid #444;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.category-item:hover {
+  background-color: #333;
+  border-color: #555;
+}
+
+.category-item.selected {
+  background-color: #2c5282;
+  color: #fff;
+  border-color: #4299e1;
+}
+
+/* Category badges styling for profile view */
+.category-badge {
+  display: inline-block;
+  background-color: #2c5282;
+  color: white;
+  border-radius: 16px;
+  padding: 4px 12px;
+  margin: 3px;
+  font-size: 13px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .profile-layout {

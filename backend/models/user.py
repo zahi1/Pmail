@@ -18,3 +18,6 @@ class User(db.Model):
     company_name = db.Column(db.String(100))
     contact_name = db.Column(db.String(100))
     address = db.Column(db.String(255))
+    
+    # Employee-specific fields
+    user_categories = db.Column(db.String(500))  # Comma-separated list of categories

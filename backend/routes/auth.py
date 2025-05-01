@@ -56,6 +56,12 @@ def register():
             phone=data["phone"],
             role=role
         )
+        
+        # Save user_categories if provided and role is employee
+        if role == "employee" and "user_categories" in data:
+            new_user.user_categories = data["user_categories"]
+            print(f"✅ Saving categories: {data['user_categories']}")
+        
         db.session.add(new_user)
         db.session.commit()
         print("✅ User Registered:", email)

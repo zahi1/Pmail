@@ -103,6 +103,10 @@
                     <span class="info-label">Phone</span>
                     <span id="info-phone" class="info-value">Loading...</span>
                   </div>
+                  <div class="info-item">
+                    <span class="info-label">Job Categories of Interest</span>
+                    <span id="info-categories" class="info-value">Loading...</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,6 +142,24 @@
                   <div class="form-group">
                     <label class="form-label" for="email">Email (Cannot be changed)</label>
                     <input type="email" id="email" name="email" class="form-control" placeholder="user@pmail.com" disabled />
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>Job Categories of Interest</label>
+                    <div class="categories-container" id="categories-container">
+                      <div class="category-item" data-value="Arts">Arts</div>
+                      <div class="category-item" data-value="Business">Business</div>
+                      <div class="category-item" data-value="Communications">Communications</div>
+                      <div class="category-item" data-value="Education">Education</div>
+                      <div class="category-item" data-value="Healthcare">Healthcare</div>
+                      <div class="category-item" data-value="Hospitality">Hospitality</div>
+                      <div class="category-item" data-value="Information Technology">Information Technology</div>
+                      <div class="category-item" data-value="Law Enforcement">Law Enforcement</div>
+                      <div class="category-item" data-value="Sales and Marketing">Sales and Marketing</div>
+                      <div class="category-item" data-value="Science">Science</div>
+                      <div class="category-item" data-value="Transportation">Transportation</div>
+                    </div>
+                    <input type="hidden" id="user_categories" name="user_categories" />
                   </div>
                   
                   <div class="form-actions">

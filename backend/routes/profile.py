@@ -28,6 +28,7 @@ def get_profile():
         user_data.update({
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "user_categories": user.user_categories or ""
         })
     elif user.role == "employer":
         user_data.update({
@@ -50,7 +51,7 @@ def update_profile():
         return jsonify({"error": "User not found"}), 404
 
     if user.role == "employee":
-        allowed_fields = ["first_name", "last_name", "birthdate", "phone"]
+        allowed_fields = ["first_name", "last_name", "birthdate", "phone", "user_categories"]
     elif user.role == "employer":
         allowed_fields = ["company_name", "contact_name", "address", "birthdate", "phone"]
     else:
