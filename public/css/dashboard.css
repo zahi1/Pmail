@@ -197,11 +197,14 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .filter-controls label {
   color: #bbb;
   font-weight: bold;
+  margin-right: 5px;
 }
 
 .filter-controls select {
@@ -211,6 +214,7 @@ body {
   color: #fff;
   border: 1px solid #555;
   min-width: 150px;
+  min-width: 160px;
 }
 
 .filter-controls select:focus {
@@ -590,4 +594,29 @@ input[type="checkbox"]:checked::after {
 /* Adjust card header to make room for checkbox */
 .application-card .card-header {
   padding-left: 40px;
+}
+
+/* Closed applications section styling */
+.section-header {
+  margin-top: 30px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444;
+}
+
+.closed-applications-grid {
+  opacity: 0.8;
+}
+
+.closed-application {
+  background-color: #252525;
+  border: 1px solid #3a3a3a;
+}
+
+.closed-application .job-title {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.closed-application .status-badge {
+  opacity: 0.8;
 }

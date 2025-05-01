@@ -5,8 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Global variable to store all applications for filtering
+  // Global variables to store all applications for filtering
   window.allApplications = []; 
+  window.openApplications = [];
+  window.closedApplications = [];
+  window.jobTitles = new Set();
 
   // Fetch dashboard data
   fetch(`/dashboard/employer/${currentUserId}`)
@@ -15,11 +18,17 @@ document.addEventListener("DOMContentLoaded", () => {
       // Store applications globally for filtering
       window.allApplications = data.applications;
       
-      // Extract unique categories
+      // Extract unique categories and job titles
       const uniqueCategories = new Set();
       data.applications.forEach(app => {
         if (app.job_category && app.job_category !== "N/A") {
           uniqueCategories.add(app.job_category);
+        }
+        
+        // Extract job title from subject (after "Application for:")
+        if (app.subject && app.subject.toLowerCase().includes("application for:")) {
+          const jobTitle = app.subject.split("Application for:")[1].trim();
+          window.jobTitles.add(jobTitle);
         }
       });
       
@@ -32,46 +41,110 @@ document.addEventListener("DOMContentLoaded", () => {
         categoryFilter.appendChild(option);
       });
       
+      // Populate job title filter
+      const jobTitleFilter = document.getElementById("jobTitleFilter");
+      window.jobTitles.forEach(title => {
+        const option = document.createElement("option");
+        option.value = title;
+        option.textContent = title;
+        jobTitleFilter.appendChild(option);
+      });
+      
       // Render charts with the data
       renderStatusChart(data.status_counts);
       renderTimeSeriesChart(data.time_series);
       renderCategoryChart(data.category_counts);
       renderDayOfWeekChart(data.day_of_week_counts);
       
-      // Display applications
-      displayApplicationCards(window.allApplications);
+      // Separate open and closed applications
+      separateApplications(window.allApplications);
+      
+      // Display applications in their respective sections
+      displayApplicationCards(window.openApplications, "applicationsGrid");
+      displayApplicationCards(window.closedApplications, "closedApplicationsGrid");
     })
     .catch(err => {
       console.error("Error loading dashboard data:", err);
     });
 });
 
-// Filter applications based on selected status and category
+// Separate applications into open and closed based on job deadline
+function separateApplications(applications) {
+  window.openApplications = applications.filter(app => !app.job_closed);
+  window.closedApplications = applications.filter(app => app.job_closed);
+}
+
+// Filter applications based on selected status, category and job title
 function filterApplications() {
   const statusValue = document.getElementById("statusFilter").value;
   const categoryValue = document.getElementById("categoryFilter").value;
+  const jobTitleValue = document.getElementById("jobTitleFilter").value;
   
-  const filtered = window.allApplications.filter(app => {
+  // Filter open applications
+  const filteredOpen = window.openApplications.filter(app => {
     const matchesStatus = statusValue === "all" || app.status === statusValue;
     const matchesCategory = categoryValue === "all" || app.job_category === categoryValue;
-    return matchesStatus && matchesCategory;
+    
+    // Extract job title from subject for comparison
+    let appJobTitle = "";
+    if (app.subject && app.subject.toLowerCase().includes("application for:")) {
+      appJobTitle = app.subject.split("Application for:")[1].trim();
+    }
+    
+    const matchesJobTitle = jobTitleValue === "all" || appJobTitle === jobTitleValue;
+    
+    return matchesStatus && matchesCategory && matchesJobTitle;
   });
   
-  displayApplicationCards(filtered);
+  // Filter closed applications
+  const filteredClosed = window.closedApplications.filter(app => {
+    const matchesStatus = statusValue === "all" || app.status === statusValue;
+    const matchesCategory = categoryValue === "all" || app.job_category === categoryValue;
+    
+    // Extract job title from subject for comparison
+    let appJobTitle = "";
+    if (app.subject && app.subject.toLowerCase().includes("application for:")) {
+      appJobTitle = app.subject.split("Application for:")[1].trim();
+    }
+    
+    const matchesJobTitle = jobTitleValue === "all" || appJobTitle === jobTitleValue;
+    
+    return matchesStatus && matchesCategory && matchesJobTitle;
+  });
+  
+  // Display filtered applications in their respective sections
+  displayApplicationCards(filteredOpen, "applicationsGrid");
+  displayApplicationCards(filteredClosed, "closedApplicationsGrid");
+  
+  // Update UI to show/hide closed applications section based on results
+  const closedHeader = document.querySelector('.closed-applications-header');
+  const closedGrid = document.getElementById("closedApplicationsGrid");
+  
+  if (filteredClosed.length === 0) {
+    // Hide closed applications section if empty after filtering
+    if (closedHeader) closedHeader.style.display = 'none';
+    if (closedGrid) closedGrid.style.display = 'none';
+  } else {
+    // Show closed applications section if it has content
+    if (closedHeader) closedHeader.style.display = 'block';
+    if (closedGrid) closedGrid.style.display = 'grid';
+  }
 }
 
 // Global variable to track selected application IDs
 window.selectedApplications = [];
 
 // Display application cards with checkboxes for selection
-function displayApplicationCards(applications) {
-  const container = document.getElementById("applicationsGrid");
+function displayApplicationCards(applications, containerId) {
+  const container = document.getElementById(containerId);
   if (!container) return;
   
   container.innerHTML = "";
   
   // Update the bulk actions panel based on initial state
-  updateBulkActionsPanel();
+  if (containerId === "applicationsGrid") {
+    updateBulkActionsPanel();
+  }
   
   if (applications.length === 0) {
     container.innerHTML = `
@@ -88,6 +161,11 @@ function displayApplicationCards(applications) {
     card.className = "application-card";
     card.dataset.appId = app.id; // Store application ID in the DOM element
     
+    // Apply closed class for styling if in closed container
+    if (containerId === "closedApplicationsGrid") {
+      card.classList.add("closed-application");
+    }
+    
     // Get applicant initial for avatar
     const initial = app.sender_email ? app.sender_email.charAt(0).toUpperCase() : "?";
     
@@ -99,10 +177,16 @@ function displayApplicationCards(applications) {
       day: 'numeric' 
     });
     
+    // Extract job title for display
+    let jobTitle = app.subject;
+    if (app.subject && app.subject.toLowerCase().includes("application for:")) {
+      jobTitle = app.subject.split("Application for:")[1].trim();
+    }
+    
     // First build the card HTML structure without the checkbox
     card.innerHTML = `
       <div class="card-header">
-        <h3 class="job-title">${app.subject || 'No Subject'}</h3>
+        <h3 class="job-title">${jobTitle || 'No Subject'}</h3>
         <span class="status-badge status-${(app.status || 'pending').toLowerCase().replace(' ', '-')}">${app.status || 'Pending'}</span>
       </div>
       <div class="card-body">
@@ -146,17 +230,19 @@ function displayApplicationCards(applications) {
       </div>
     `;
     
-    // Now create and add the checkbox separately
-    const cardCheckbox = document.createElement("input");
-    cardCheckbox.type = "checkbox";
-    cardCheckbox.className = "card-checkbox";
-    cardCheckbox.dataset.id = app.id;
-    cardCheckbox.addEventListener("change", function() {
-      toggleApplicationSelection(app.id, this.checked);
-    });
-    
-    // Insert checkbox at the beginning of the card
-    card.insertBefore(cardCheckbox, card.firstChild);
+    // Only add checkbox for open applications
+    if (containerId === "applicationsGrid") {
+      const cardCheckbox = document.createElement("input");
+      cardCheckbox.type = "checkbox";
+      cardCheckbox.className = "card-checkbox";
+      cardCheckbox.dataset.id = app.id;
+      cardCheckbox.addEventListener("change", function() {
+        toggleApplicationSelection(app.id, this.checked);
+      });
+      
+      // Insert checkbox at the beginning of the card
+      card.insertBefore(cardCheckbox, card.firstChild);
+    }
     
     container.appendChild(card);
   });

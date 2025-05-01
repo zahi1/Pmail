@@ -8,6 +8,7 @@ from backend.routes.profile import profile_bp
 from backend.routes.dashboard import dashboard_bp
 from backend.routes.admin import admin_bp  
 from backend.routes.bulk_updates import bulk_updates_bp
+from backend.routes.employer import employer_bp
 
 import os
 import logging
@@ -34,7 +35,7 @@ app.register_blueprint(profile_bp, url_prefix="/")
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 app.register_blueprint(admin_bp)  # Register the admin blueprint
 app.register_blueprint(bulk_updates_bp, url_prefix='')
-
+app.register_blueprint(employer_bp) 
 
 @app.route('/')
 def home():

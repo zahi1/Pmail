@@ -6,6 +6,7 @@ from backend.models.job import Job  # your job_listings model
 from backend.models.user import User
 from sqlalchemy import func
 from collections import defaultdict
+from datetime import datetime
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -102,6 +103,21 @@ def employer_dashboard(employer_id):
     # Table data
     applications = []
 
+    # Track all job titles to determine open/closed status
+    job_title_status = {}  # Map of job title -> is_closed status
+
+    # First pass - get all jobs and determine which are closed
+    active_jobs = Job.query.filter(
+        Job.company_name == User.query.get(employer_id).company_name
+    ).all()
+
+    # Create mapping of job titles to closed status
+    for job in active_jobs:
+        is_closed = False
+        if job.deadline and job.deadline < datetime.now():
+            is_closed = True
+        job_title_status[job.title.lower()] = is_closed
+
     for msg in messages:
         # 1) Parse job title from subject
         job_title = None
@@ -111,8 +127,12 @@ def employer_dashboard(employer_id):
 
         # 2) Look up that job title in job_listings
         found_job = None
+        is_closed = False
+        
         if job_title:
-            found_job = Job.query.filter_by(title=job_title).first()
+            found_job = Job.query.filter(func.lower(Job.title) == job_title.lower()).first()
+            # Check if job is closed based on our mapping
+            is_closed = job_title_status.get(job_title.lower(), False)
 
         # 3) Aggregation
         #    a) Status
@@ -137,7 +157,7 @@ def employer_dashboard(employer_id):
         sender_email = sender_user.email if sender_user else "unknown"
 
         applications.append({
-            "id": msg.id,  # Add the message ID for status updates
+            "id": msg.id,
             "subject": msg.subject,
             "status": msg.status,
             "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -145,7 +165,8 @@ def employer_dashboard(employer_id):
             "job_category": found_job.category if found_job else "N/A",
             "job_type": found_job.job_type if found_job else "N/A",
             "job_location": found_job.location if found_job else "N/A",
-            "job_company": found_job.company_name if found_job else "N/A"
+            "job_company": found_job.company_name if found_job else "N/A",
+            "job_closed": is_closed  # New field to indicate if job is closed
         })
 
     return jsonify({

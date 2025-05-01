@@ -47,11 +47,17 @@
     </div>
 
     <div class="applications-container">
-      <h2>All Received Applications</h2>
+      <h2>Active Applications</h2>
       
       <!-- Application filter controls -->
       <div class="applications-filters">
         <div class="filter-controls">
+          <label for="jobTitleFilter">Job Title:</label>
+          <select id="jobTitleFilter" onchange="filterApplications()">
+            <option value="all">All Jobs</option>
+            <!-- Will be populated dynamically -->
+          </select>
+          
           <label for="statusFilter">Status:</label>
           <select id="statusFilter" onchange="filterApplications()">
             <option value="all">All Statuses</option>
@@ -60,6 +66,7 @@
             <option value="Accepted">Accepted</option>
             <option value="Rejected">Rejected</option>
           </select>
+          
           <label for="categoryFilter">Category:</label>
           <select id="categoryFilter" onchange="filterApplications()">
             <option value="all">All Categories</option>
@@ -88,9 +95,17 @@
         </div>
       </div>
       
-      <!-- Applications cards container -->
+      <!-- Active Applications cards container -->
       <div id="applicationsGrid" class="applications-grid">
         <!-- Application cards will be added here dynamically -->
+      </div>
+      
+      <!-- Closed Applications Section -->
+      <h2 class="section-header closed-applications-header">Closed Applications</h2>
+      
+      <!-- Closed Applications cards container -->
+      <div id="closedApplicationsGrid" class="applications-grid closed-applications-grid">
+        <!-- Closed application cards will be added here dynamically -->
       </div>
     </div>
   </div>
