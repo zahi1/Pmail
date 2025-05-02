@@ -138,26 +138,60 @@ function showLoginSuccessScreen(email, redirectUrl) {
 // 🔹 Registration Function
 // --------------------------------------
 function register() {
-  const firstName = document.getElementById("first_name").value.trim();
-  const lastName = document.getElementById("last_name").value.trim();
-  const birthdate = document.getElementById("birthdate").value;
-  const password = document.getElementById("password").value;
-  const phone = document.getElementById("phone").value.trim();
-  const role = new URLSearchParams(window.location.search).get("role");
+  const btn = document.getElementById("register-btn");
+  if (btn.disabled) return;
+  btn.disabled = true;
 
-  // Retrieve email from the radio buttons or custom input
-  const selectedEmailOption = document.querySelector('input[name="email_option"]:checked');
-  let email = "";
-  if (selectedEmailOption) {
-    if (selectedEmailOption.id === "custom_email_option") {
-      email = document.getElementById("email_input").value.trim().toLowerCase();
-    } else {
-      email = selectedEmailOption.value.trim().toLowerCase();
+  // clear previous inline errors
+  document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+  const firstName = document.getElementById("first_name").value.trim();
+  const lastName  = document.getElementById("last_name").value.trim();
+  const birthdate = document.getElementById("birthdate").value;
+  const password  = document.getElementById("password").value;
+  const phone     = document.getElementById("phone").value.trim();
+  const role      = new URLSearchParams(window.location.search).get("role");
+  const emailElem = document.querySelector('input[name="email_option"]:checked');
+  const email     = emailElem
+    ? (emailElem.id === "custom_email_option"
+       ? document.getElementById("email_input").value.trim().toLowerCase()
+       : emailElem.value.trim().toLowerCase())
+    : "";
+
+  // phone validation
+  const phoneError = document.getElementById("phone-error");
+  const phonePattern = /^[0-9()+\-\s]{7,20}$/;
+  if (!phone) {
+    phoneError.textContent = "Please enter your phone number.";
+    phoneError.style.display = "block";
+    btn.disabled = false;
+    return;
+  }
+  if (!phonePattern.test(phone)) {
+    phoneError.textContent = "Phone must be 7–20 digits and may include +, -, (), or spaces.";
+    phoneError.style.display = "block";
+    btn.disabled = false;
+    return;
+  }
+
+  // categories validation
+  if (role === "employee") {
+    const cats = document.getElementById("user_categories").value;
+    const catError = document.getElementById("categories-error");
+    if (!cats) {
+      catError.textContent = "Please select at least one job category.";
+      catError.style.display = "block";
+      btn.disabled = false;
+      return;
     }
   }
 
-  if (!email || !email.includes("@")) {
-    alert("Please enter a valid email.");
+  // email validation
+  const emailError = document.getElementById("email-error");
+  if (!email || !/^[^@]+@pmail\.com$/.test(email)) {
+    emailError.textContent = "Please select or enter a valid Pmail address.";
+    emailError.style.display = "block";
+    btn.disabled = false;
     return;
   }
 
@@ -168,33 +202,61 @@ function register() {
     email: email,
     password: password,
     phone: phone,
-    role: role
+    role: role,
+    user_categories: role === "employee"
+      ? document.getElementById('user_categories').value
+      : undefined
   };
 
-  if (role === "employee") {
-    userData.user_categories = document.getElementById('user_categories').value;
-  }
-
-  fetch("http://127.0.0.1:5000/auth/register", {
+  fetch("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData)
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.message === "User registered successfully") {
-        alert("Registration successful!");
-
-        // Decide redirect here based on the returned role
-        // Make sure this matches the pages you created
-        if (data.role === "employee") {
-          window.location.href = "/frontend/employee_inbox.html";
-        } else {
-          window.location.href = "/frontend/employer_inbox.html";
-        }
-      } else {
-        alert("Error: " + data.error);
+  .then(res => res.json())
+  .then(data => {
+    const step5 = document.getElementById("step-5");
+    // Success
+    if (data.message === "User registered successfully") {
+      // insert or update success paragraph
+      let successEl = document.getElementById("register-success");
+      if (!successEl) {
+        successEl = document.createElement("p");
+        successEl.id = "register-success";
+        successEl.className = "success-message";
+        step5.insertBefore(successEl, step5.firstChild);
       }
-    })
-    .catch(error => console.error("Error:", error));
+      successEl.textContent = data.message;
+      // delay then redirect
+      setTimeout(() => {
+        window.location.href = role === "employee"
+          ? "/frontend/employee_inbox.html"
+          : "/frontend/employer_inbox.html";
+      }, 1000);
+    }
+    // Error
+    else {
+      // show server error inline at bottom of form
+      let serverError = document.getElementById("register-server-error");
+      if (!serverError) {
+        serverError = document.createElement("p");
+        serverError.id = "register-server-error";
+        serverError.className = "error-message";
+        const step5 = document.getElementById("step-5");
+        step5.insertBefore(serverError, step5.firstChild);
+      }
+      serverError.textContent = data.error || "Registration failed";
+      serverError.style.display = "block";
+      btn.disabled = false;
+    }
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    let networkError = document.getElementById("register-server-error");
+    if (networkError) {
+      networkError.textContent = "Network error, please try again";
+      networkError.style.display = "block";
+    }
+    btn.disabled = false;
+  });
 }

@@ -20,7 +20,10 @@
         <div id="step-1" class="form-step">
             <input type="text" id="first_name" placeholder="First name" required>
             <input type="text" id="last_name" placeholder="Last name" required>
-            <button onclick="nextStep(1)">Next</button>
+            <p id="name-error" class="error-message" style="display: none; color: red;">
+              Please enter both first and last name.
+            </p>
+            <button onclick="validateName()">Next</button>
         </div>
 
         <!-- Step 2: Birthdate Validation -->
@@ -67,6 +70,9 @@
         <!-- Step 5: Phone Number & Final Sign Up -->
         <div id="step-5" class="form-step" style="display: none;">
             <input type="tel" id="phone" placeholder="Phone Number" required>
+            <p id="phone-error" class="error-message" style="display: none; color: red;">
+              Please enter a valid phone number.
+            </p>
             
             <!-- Categories field - for employees only -->
             <div class="form-group employee-field" id="categories-group" style="display:none;">
@@ -85,10 +91,13 @@
                 <div class="category-item" data-value="Transportation">Transportation</div>
               </div>
               <input type="hidden" id="user_categories" name="user_categories" />
+              <p id="categories-error" class="error-message" style="display: none; color: red;">
+                Please select at least one category.
+              </p>
             </div>
             
             <!-- The external JS (auth.js) will handle the click event for register-btn -->
-            <button id="register-btn">Sign Up</button>
+            <button type="button" id="register-btn" onclick="validateFinal()">Sign Up</button>
         </div>
     </div>
 
@@ -131,20 +140,38 @@
         // 5) Validate birthdate (13+ years old)
         function validateBirthdate() {
             let birthdate = document.getElementById("birthdate").value;
+            if (!birthdate) {
+                document.getElementById("age-error").textContent = "Please enter your birthdate.";
+                document.getElementById("age-error").style.display = "block";
+                return;
+            }
+            
             let birthDateObj = new Date(birthdate);
             let today = new Date();
+            
+            // Calculate age
             let age = today.getFullYear() - birthDateObj.getFullYear();
             let monthDiff = today.getMonth() - birthDateObj.getMonth();
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
                 age--;
             }
-
+            
+            // Check minimum age (13)
             if (age < 13) {
+                document.getElementById("age-error").textContent = "You must be at least 13 years old to register.";
                 document.getElementById("age-error").style.display = "block";
-            } else {
-                document.getElementById("age-error").style.display = "none";
-                nextStep(2);
+                return;
             }
+            
+            // Check maximum age (122)
+            if (age > 122) {
+                document.getElementById("age-error").textContent = "Maximum age cannot exceed 122 years.";
+                document.getElementById("age-error").style.display = "block";
+                return;
+            }
+            
+            document.getElementById("age-error").style.display = "none";
+            nextStep(2);
         }
 
         // 6) Validate email radio choice or custom input
@@ -185,11 +212,88 @@
             let confirmPassword = document.getElementById("confirm_password").value;
             let passwordError   = document.getElementById("password-error");
 
+            // Check for password match
             if (password !== confirmPassword) {
+                passwordError.textContent = "Passwords do not match.";
                 passwordError.style.display = "block";
+                return;
+            }
+            
+            // Check for minimum length
+            if (password.length < 8) {
+                passwordError.textContent = "Password must be at least 8 characters long.";
+                passwordError.style.display = "block";
+                return;
+            }
+            
+            // Check for uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                passwordError.textContent = "Password must include at least one uppercase letter.";
+                passwordError.style.display = "block";
+                return;
+            }
+            
+            // Check for special character
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                passwordError.textContent = "Password must include at least one special character.";
+                passwordError.style.display = "block";
+                return;
+            }
+
+            passwordError.style.display = "none";
+            nextStep(4);
+        }
+        
+        // Final validation before registration (Step 5)
+        function validateFinal() {
+            let phone = document.getElementById("phone").value.trim();
+            let phoneError = document.getElementById("phone-error");
+            let role = document.getElementById("role").value;
+            
+            // Validate phone number
+            let phonePattern = /^[0-9()+\-\s]{7,20}$/;
+            if (!phone) {
+                phoneError.textContent = "Please enter your phone number.";
+                phoneError.style.display = "block";
+                return;
+            } else if (!phonePattern.test(phone)) {
+                phoneError.textContent = "Please enter a valid phone number.";
+                phoneError.style.display = "block";
+                return;
             } else {
-                passwordError.style.display = "none";
-                nextStep(4);
+                phoneError.style.display = "none";
+            }
+            
+            // For employees, validate categories
+            if (role === "employee") {
+                let categories = document.getElementById("user_categories").value;
+                let categoriesError = document.getElementById("categories-error");
+                
+                if (!categories) {
+                    categoriesError.textContent = "Please select at least one category.";
+                    categoriesError.style.display = "block";
+                    return;
+                } else {
+                    categoriesError.style.display = "none";
+                }
+            }
+            
+            // If all validations pass, call the register function
+            register();
+        }
+
+        // New validation for first and last name (Step 1)
+        function validateName() {
+            let firstName = document.getElementById("first_name").value.trim();
+            let lastName = document.getElementById("last_name").value.trim();
+            let nameError = document.getElementById("name-error");
+
+            if (!firstName || !lastName) {
+                nameError.textContent = "Please enter both first and last name.";
+                nameError.style.display = "block";
+            } else {
+                nameError.style.display = "none";
+                nextStep(1);
             }
         }
     </script>

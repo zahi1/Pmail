@@ -209,6 +209,7 @@ input[type="checkbox"] {
   border: 1px solid #444;
   margin-bottom: 8px;
   font-size: 14px;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -308,4 +309,14 @@ input[type="checkbox"] {
 .stat-box h3 {
     font-size: 18px;
     color: #8ab4f8;
+}
+
+/* Success Message */
+.success-message {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-left: 4px solid #28a745;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
 }

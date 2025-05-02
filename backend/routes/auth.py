@@ -3,6 +3,7 @@ from backend.models.database import db
 from backend.models.user import User
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from backend.models.login_history import LoginHistory
 
@@ -37,45 +38,38 @@ def register():
         print("❌ Invalid Email Format:", email)
         return jsonify({"error": "Invalid email format"}), 400
 
-    # Check if email already exists (case-insensitive)
-    existing_user = User.query.filter(func.lower(User.email) == email).first()
-    if existing_user:
-        return jsonify({"error": "Email already in use"}), 400
-
     # Hash the password
     hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
 
-    # Insert into database
+    # Build User object
+    new_user = User(
+        first_name=data["first_name"],
+        last_name=data["last_name"],
+        birthdate=data["birthdate"],
+        email=email,
+        password=hashed_password,
+        phone=data["phone"],
+        role=role
+    )
+    if role == "employee":
+        new_user.user_categories = data.get("user_categories", "")
+
     try:
-        new_user = User(
-            first_name=data["first_name"],
-            last_name=data["last_name"],
-            birthdate=data["birthdate"],
-            email=email,
-            password=hashed_password,
-            phone=data["phone"],
-            role=role
-        )
-        
-        # Save user_categories if provided and role is employee
-        if role == "employee" and "user_categories" in data:
-            new_user.user_categories = data["user_categories"]
-            print(f"✅ Saving categories: {data['user_categories']}")
-        
         db.session.add(new_user)
         db.session.commit()
         print("✅ User Registered:", email)
+        return jsonify({"message": "User registered successfully", "role": new_user.role}), 201
 
-        # Return the role so the frontend can decide where to redirect (optional)
-        return jsonify({
-            "message": "User registered successfully",
-            "role": new_user.role
-        }), 201
+    except IntegrityError as ie:
+        db.session.rollback()
+        if "1062" in str(ie.orig):
+            return jsonify({"error": "Email already in use"}), 400
+        return jsonify({"error": "Database integrity error"}), 400
 
     except Exception as e:
         db.session.rollback()
-        print("❌ Database error:", str(e))
-        return jsonify({"error": "Database error", "details": str(e)}), 500
+        print("❌ Database error:", e)
+        return jsonify({"error": "Database error"}), 500
 
 # --------------------- #
 # ✅ User Login Route   #
