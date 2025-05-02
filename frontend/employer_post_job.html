@@ -229,6 +229,9 @@
         <label for="description">Description:</label>
         <textarea id="description" name="description" rows="4" placeholder="Describe the position..." required></textarea>
 
+        <label for="salary_range">Salary Range:</label>
+        <input type="text" id="salary_range" name="salary_range" placeholder="e.g. $4000 - $5000" required />
+
         <label for="category">Category (Industry):</label>
         <select id="category" name="category" required>
           <option value="">-- Select a Category --</option>
@@ -259,8 +262,8 @@
         <input type="text" id="location" name="location" placeholder="e.g. New York, Remote" required />
 
         <label for="deadline">Application Deadline:</label>
-        <input type="date" id="deadline" name="deadline" />
-        <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Leave blank for no deadline</small>
+        <input type="date" id="deadline" name="deadline" required />
+        <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Choose a deadline for applications</small>
 
         <button type="submit">Post Job</button>
       </form>
@@ -281,10 +284,13 @@
       
       <label for="edit-title">Job Title:</label>
       <input type="text" id="edit-title" required />
-
+      
       <label for="edit-description">Description:</label>
       <textarea id="edit-description" rows="4" required></textarea>
 
+      <label for="edit-salary-range">Salary Range:</label>
+      <input type="text" id="edit-salary-range" placeholder="e.g. $4000 - $5000" required />
+      
       <label for="edit-category">Category (Industry):</label>
       <select id="edit-category" required>
         <option value="">-- Select a Category --</option>
@@ -315,8 +321,8 @@
       <input type="text" id="edit-location" required />
       
       <label for="edit-deadline">Application Deadline:</label>
-      <input type="date" id="edit-deadline" />
-      <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Leave blank for no deadline</small>
+      <input type="date" id="edit-deadline" required />
+      <small style="display:block; color: #999; margin-top: 3px; margin-bottom: 10px;">Choose a deadline for applications</small>
 
       <div class="modal-btns">
         <button class="save-edit-btn" onclick="saveJobEdits()">Save</button>

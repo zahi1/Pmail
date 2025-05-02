@@ -19,8 +19,9 @@ function submitJobForm(event) {
   const jobType = document.getElementById("job_type").value.trim();
   const location = document.getElementById("location").value.trim();
   const deadline = document.getElementById("deadline").value.trim();
+  const salaryRange = document.getElementById("salary_range").value.trim();
 
-  if (!title || !description || !category || !jobType || !location) {
+  if (!title || !description || !category || !jobType || !location || !salaryRange || !deadline) {
     alert("Please fill all required fields.");
     return;
   }
@@ -30,13 +31,10 @@ function submitJobForm(event) {
     description: description,
     category: category,
     job_type: jobType,
-    location: location
+    location: location,
+    salary_range: salaryRange,
+    deadline: deadline  // Always include deadline in the payload
   };
-  
-  // Add deadline if provided
-  if (deadline) {
-    payload.deadline = deadline;
-  }
 
   fetch("/jobs/new", {
     method: "POST",
@@ -87,6 +85,11 @@ function loadEmployerJobs() {
           `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
           '<p><strong>Application Deadline:</strong> No deadline</p>';
           
+        // Format salary range for display
+        const salaryText = job.salary_range ? 
+          `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
+          '<p><strong>Salary Range:</strong> Not specified</p>';
+          
         const jobCard = document.createElement("div");
         jobCard.className = "job-listing-card";
         jobCard.innerHTML = `
@@ -94,6 +97,7 @@ function loadEmployerJobs() {
           <p><strong>Category:</strong> ${job.category}</p>
           <p><strong>Job Type:</strong> ${job.job_type}</p>
           <p><strong>Location:</strong> ${job.location}</p>
+          ${salaryText}
           ${deadlineText}
           <p><strong>Description:</strong> ${job.description}</p>
           <button class="modify-btn" data-id="${job.id}">Modify</button>
@@ -120,6 +124,7 @@ function openEditModal(job) {
   document.getElementById("edit-category").value = job.category;
   document.getElementById("edit-job-type").value = job.job_type;
   document.getElementById("edit-location").value = job.location;
+  document.getElementById("edit-salary-range").value = job.salary_range || "";
   
   // Set deadline if available
   if (job.deadline) {
@@ -146,8 +151,9 @@ function saveJobEdits() {
   const jobType = document.getElementById("edit-job-type").value;
   const location = document.getElementById("edit-location").value.trim();
   const deadline = document.getElementById("edit-deadline").value.trim();
+  const salaryRange = document.getElementById("edit-salary-range").value.trim();
 
-  if (!title || !description || !category || !jobType || !location) {
+  if (!title || !description || !category || !jobType || !location || !salaryRange || !deadline) {
     alert("Please fill all required fields.");
     return;
   }
@@ -157,13 +163,10 @@ function saveJobEdits() {
     description: description,
     category: category,
     job_type: jobType,
-    location: location
+    location: location,
+    salary_range: salaryRange,
+    deadline: deadline  // Always include deadline in the payload
   };
-  
-  // Add deadline if provided
-  if (deadline) {
-    payload.deadline = deadline;
-  }
 
   fetch(`/jobs/${jobId}`, {
     method: "PUT",

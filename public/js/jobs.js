@@ -17,32 +17,41 @@ document.addEventListener("DOMContentLoaded", () => {
     filterBtn.addEventListener("click", () => {
       const category = document.getElementById("category-select").value;
       const jobType = document.getElementById("jobtype-select").value;
+      const salaryRange = document.getElementById("salary-select").value;
       const showClosed = document.getElementById("show-closed-checkbox")?.checked || false;
-      fetchJobs(category, jobType, showClosed);
+      fetchJobs(category, jobType, salaryRange, showClosed);
     });
   
     // Fetch all jobs initially
-    fetchJobs("", "", false);
+    fetchJobs("", "", "", false);
   }
   
-  function fetchJobs(category, jobType, showClosed) {
+  function fetchJobs(category, jobType, salaryRange, showClosed) {
     let url = "/jobs"; // Because we registered jobs_bp at root url_prefix=""
     let params = [];
   
     if (category) params.push(`category=${encodeURIComponent(category)}`);
     if (jobType)   params.push(`job_type=${encodeURIComponent(jobType)}`);
+    if (salaryRange) params.push(`salary_range=${encodeURIComponent(salaryRange)}`);
     params.push(`show_closed=${showClosed}`);
   
     if (params.length > 0) {
       url += "?" + params.join("&");
     }
   
+    // Show loading indicator
+    const listingsContainer = document.getElementById("job-listings");
+    listingsContainer.innerHTML = "<div class='loading-indicator'>Loading jobs...</div>";
+  
     fetch(url)
       .then(response => response.json())
       .then(data => {
         renderJobListings(data);
       })
-      .catch(err => console.error("Error fetching jobs:", err));
+      .catch(err => {
+        console.error("Error fetching jobs:", err);
+        listingsContainer.innerHTML = "<p>Error loading jobs. Please try again.</p>";
+      });
   }
   
   function renderJobListings(jobs) {
@@ -68,10 +77,16 @@ document.addEventListener("DOMContentLoaded", () => {
         `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
         '<p><strong>Application Deadline:</strong> No deadline</p>';
       
+      // Format salary display
+      const salaryDisplay = job.salary_range ? 
+        `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
+        '<p><strong>Salary:</strong> Not specified</p>';
+      
       jobDiv.innerHTML = `
         <h3>${job.title} ${statusBadge}</h3>
         <p><strong>Company:</strong> ${job.company_name}</p>
         <p><strong>Location:</strong> ${job.location}</p>
+        ${salaryDisplay}
         <p><strong>Category:</strong> ${job.category}</p>
         <p><strong>Job Type:</strong> ${job.job_type}</p>
         ${deadlineDisplay}
@@ -126,6 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
       `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
       '<p><strong>Application Deadline:</strong> No deadline</p>';
       
+    // Format salary display
+    const salaryDisplay = job.salary_range ? 
+      `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
+      '<p><strong>Salary:</strong> Not specified</p>';
+      
     // Use the actual employer email from the API response
     const employerEmail = job.employer_email;
     
@@ -143,6 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       <div class="job-detail-info">
         <p><strong>Location:</strong> ${job.location}</p>
+        ${salaryDisplay}
         <p><strong>Category:</strong> ${job.category}</p>
         <p><strong>Job Type:</strong> ${job.job_type}</p>
         ${deadlineDisplay}

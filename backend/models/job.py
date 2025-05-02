@@ -11,7 +11,8 @@ class Job(db.Model):
     job_type = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     company_name = db.Column(db.String(100), nullable=False)
-    deadline = db.Column(db.DateTime, nullable=True)  # Add deadline field
+    salary_range = db.Column(db.String(100), nullable=True)  # Add salary range field
+    deadline = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     
     def is_open(self):

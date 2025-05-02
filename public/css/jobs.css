@@ -163,6 +163,15 @@ body {
     color: #fff;
 }
 
+/* Loading indicator */
+.loading-indicator {
+    text-align: center;
+    padding: 40px 0;
+    color: #8ab4f8;
+    font-style: italic;
+    font-size: 16px;
+}
+
 /* -------------------------------------- */
 /* 🔹 JOB DETAIL PAGE STYLING            */
 /* -------------------------------------- */
