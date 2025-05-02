@@ -239,7 +239,10 @@ document.addEventListener("DOMContentLoaded", () => {
       
       <div class="job-description">
         <h3>Description</h3>
-        <p>${job.description}</p>
+        <div class="description-container">
+          <div class="description-text collapsed">${job.description}</div>
+          <button class="read-more-btn">Read More</button>
+        </div>
       </div>
       
       <div class="job-actions">
@@ -247,4 +250,29 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="back-btn" onclick="window.location.href='jobs.html'">Back to Jobs</button>
       </div>
     `;
+    
+    // Set up the Read More/Less toggle after rendering
+    setupReadMoreLess(container);
+  }
+  
+  /**
+   * Set up Read More/Less functionality for job descriptions
+   */
+  function setupReadMoreLess(container) {
+    const readMoreBtn = container.querySelector('.read-more-btn');
+    const descText = container.querySelector('.description-text');
+    
+    if (!readMoreBtn || !descText) return;
+    
+    readMoreBtn.addEventListener('click', function() {
+      if (descText.classList.contains('collapsed')) {
+        // Expand
+        descText.classList.remove('collapsed');
+        this.textContent = 'Read Less';
+      } else {
+        // Collapse
+        descText.classList.add('collapsed');
+        this.textContent = 'Read More';
+      }
+    });
   }

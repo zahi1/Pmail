@@ -496,7 +496,8 @@ body {
 .message-body {
   line-height: 1.6;
   color: #eaeaea; /* Light text for dark background */
-  white-space: pre-line;
+  white-space: pre-line; /* Preserve line breaks */
+  font-family: Arial, sans-serif;
 }
 
 .back-btn {
@@ -553,6 +554,8 @@ body {
 /* add one empty line (vertical space) between header and body of each reply */
 .reply-body {
   margin-top: 1em;
+  white-space: pre-line; /* Preserve line breaks */
+  font-family: Arial, sans-serif;
 }
 
 /* Thread styling */
@@ -939,7 +942,7 @@ body {
   display: none;
 }
 
-/* Style for preview button */
+/* Style for preview button */ 
 .preview-btn {
   background-color: #333;
   border: 1px solid #444;
@@ -958,4 +961,19 @@ body {
   width: 14px;
   height: 14px;
   filter: brightness(0) invert(0.7) sepia(1) hue-rotate(190deg) saturate(5);
+}
+
+/* Make sure compose textarea preserves line breaks appearance while typing */
+.compose-body textarea {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  min-height: 150px;
+  line-height: 1.5;
+  font-family: Arial, sans-serif; /* Match the display font */
+  resize: vertical;
 }
