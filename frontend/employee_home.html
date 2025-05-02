@@ -4,11 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pmail - Home</title>
+  <title>Pmail - Employee Home</title>
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
   <link rel="stylesheet" href="../public/css/jobs.css" />
   <link rel="stylesheet" href="../public/css/inbox.css" />
   <link rel="stylesheet" href="../public/css/employee_home.css" />
+  <link rel="stylesheet" href="../public/css/style.css">
+  <!-- Add Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <body>
   <!-- Top Navigation -->
@@ -29,53 +32,47 @@
 
   <!-- Main Content Layout -->
   <div class="home-container">
-    <!-- Left Sidebar: Profile Summary -->
-    <div class="profile-sidebar">
-      <div class="profile-card">
+    <!-- Left Sidebar: Employee Profile -->
+    <div class="company-sidebar">
+      <div class="company-profile">
         <div class="profile-header">
-          <img src="../public/images/default_profile.png" alt="Profile Picture" class="profile-picture">
-          <h2>Alex Johnson</h2>
-          <p class="job-title">Software Developer</p>
-          <p class="location">San Francisco, CA</p>
+          <!-- <img src="../public/images/employee_avatar.png" alt="Employee Avatar" class="employee-avatar-large"> -->
+          <h2 id="employee-name">Loading...</h2>
+          <p class="company-info" id="employee-categories">Loading categories...</p>
         </div>
         
         <div class="profile-stats">
           <div class="stat-item">
-            <span class="stat-number">12</span>
+            <span class="stat-number" id="total-applications">...</span>
             <span class="stat-label">Applications</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number">3</span>
+            <span class="stat-number" id="interviews-count">...</span>
             <span class="stat-label">Interviews</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number">85%</span>
-            <span class="stat-label">Profile</span>
+            <span class="stat-number" id="accepted-count">...</span>
+            <span class="stat-label">Accepted</span>
           </div>
         </div>
-        
-        <a href="employee_dashboard.html" class="analytics-btn">
-          <img src="../public/images/dashboard_icon.png" alt="Analytics" class="btn-icon">
-          Check Your Analytics
-        </a>
       </div>
       
-      <div class="activity-card">
-        <h3>Recent Activity</h3>
-        <ul class="activity-list">
-          <li>
-            <div class="activity-date">May 15</div>
-            <div class="activity-content">Applied to <strong>Senior Developer</strong> at Tech Co.</div>
-          </li>
-          <li>
-            <div class="activity-date">May 14</div>
-            <div class="activity-content">Profile viewed by <strong>5 recruiters</strong></div>
-          </li>
-          <li>
-            <div class="activity-date">May 12</div>
-            <div class="activity-content">Received message from <strong>HR Manager</strong></div>
-          </li>
-        </ul>
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons">
+          <a href="jobs.html" class="action-btn">
+            <i class="fas fa-search"></i>
+            Find Jobs
+          </a>
+          <a href="employee_dashboard.html" class="action-btn">
+            <i class="fas fa-chart-line"></i>
+            View Analytics
+          </a>
+          <a href="employee_inbox.html" class="action-btn">
+            <i class="fas fa-envelope"></i>
+            Check Messages
+          </a>
+        </div>
       </div>
     </div>
     

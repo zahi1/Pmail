@@ -178,3 +178,45 @@ def employer_dashboard(employer_id):
         "day_of_week_counts": dict(day_of_week_counts),
         "applications": applications
     }), 200
+
+@dashboard_bp.route('/employee/profile/<int:employee_id>', methods=['GET'])
+def employee_profile(employee_id):
+    """Get employee profile data and application statistics"""
+    
+    # Get the employee's user information
+    employee = User.query.get(employee_id)
+    if not employee:
+        return jsonify({"error": "Employee not found"}), 404
+    
+    # Count different types of applications
+    total_applications = Message.query.filter_by(
+        sender_id=employee_id, 
+        is_draft=False
+    ).count()
+    
+    under_review_count = Message.query.filter_by(
+        sender_id=employee_id,
+        is_draft=False,
+        status="Under Review"
+    ).count()
+    
+    accepted_count = Message.query.filter_by(
+        sender_id=employee_id,
+        is_draft=False,
+        status="Accepted"
+    ).count()
+    
+    # Return all profile data
+    return jsonify({
+        "profile": {
+            "first_name": employee.first_name,
+            "last_name": employee.last_name,
+            "email": employee.email,
+            "categories": employee.user_categories.split(',') if employee.user_categories else []
+        },
+        "stats": {
+            "total_applications": total_applications,
+            "interviews": under_review_count,
+            "accepted": accepted_count
+        }
+    }), 200
