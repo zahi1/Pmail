@@ -3,9 +3,10 @@ document.addEventListener("DOMContentLoaded", function () {
   if (role === "employee") {
     document.querySelectorAll('.employee-field').forEach(el=>el.style.display="block");
   }
-  // attach register()
-  const registerBtn = document.getElementById("register-btn");
-  if (registerBtn) registerBtn.addEventListener("click", register);
+  
+  // Remove the event listener for register-btn since we handle it directly in register.html
+  // const registerBtn = document.getElementById("register-btn");
+  // if (registerBtn) registerBtn.addEventListener("click", register);
 
   // categories click
   document.querySelectorAll('#registration-categories-container .category-item')
@@ -135,128 +136,44 @@ function showLoginSuccessScreen(email, redirectUrl) {
 }
 
 // --------------------------------------
-// 🔹 Registration Function
+// 🔹 Email and Phone Availability Checks
 // --------------------------------------
-function register() {
-  const btn = document.getElementById("register-btn");
-  if (btn.disabled) return;
-  btn.disabled = true;
 
-  // clear previous inline errors
-  document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-
-  const firstName = document.getElementById("first_name").value.trim();
-  const lastName  = document.getElementById("last_name").value.trim();
-  const birthdate = document.getElementById("birthdate").value;
-  const password  = document.getElementById("password").value;
-  const phone     = document.getElementById("phone").value.trim();
-  const role      = new URLSearchParams(window.location.search).get("role");
-  const emailElem = document.querySelector('input[name="email_option"]:checked');
-  const email     = emailElem
-    ? (emailElem.id === "custom_email_option"
-       ? document.getElementById("email_input").value.trim().toLowerCase()
-       : emailElem.value.trim().toLowerCase())
-    : "";
-
-  // phone validation
-  const phoneError = document.getElementById("phone-error");
-  const phonePattern = /^[0-9()+\-\s]{7,20}$/;
-  if (!phone) {
-    phoneError.textContent = "Please enter your phone number.";
-    phoneError.style.display = "block";
-    btn.disabled = false;
-    return;
-  }
-  if (!phonePattern.test(phone)) {
-    phoneError.textContent = "Phone must be 7–20 digits and may include +, -, (), or spaces.";
-    phoneError.style.display = "block";
-    btn.disabled = false;
-    return;
-  }
-
-  // categories validation
-  if (role === "employee") {
-    const cats = document.getElementById("user_categories").value;
-    const catError = document.getElementById("categories-error");
-    if (!cats) {
-      catError.textContent = "Please select at least one job category.";
-      catError.style.display = "block";
-      btn.disabled = false;
-      return;
-    }
-  }
-
-  // email validation
-  const emailError = document.getElementById("email-error");
-  if (!email || !/^[^@]+@pmail\.com$/.test(email)) {
-    emailError.textContent = "Please select or enter a valid Pmail address.";
-    emailError.style.display = "block";
-    btn.disabled = false;
-    return;
-  }
-
-  const userData = {
-    first_name: firstName,
-    last_name: lastName,
-    birthdate: birthdate,
-    email: email,
-    password: password,
-    phone: phone,
-    role: role,
-    user_categories: role === "employee"
-      ? document.getElementById('user_categories').value
-      : undefined
-  };
-
-  fetch("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userData)
-  })
-  .then(res => res.json())
-  .then(data => {
-    const step5 = document.getElementById("step-5");
-    // Success
-    if (data.message === "User registered successfully") {
-      // insert or update success paragraph
-      let successEl = document.getElementById("register-success");
-      if (!successEl) {
-        successEl = document.createElement("p");
-        successEl.id = "register-success";
-        successEl.className = "success-message";
-        step5.insertBefore(successEl, step5.firstChild);
-      }
-      successEl.textContent = data.message;
-      // delay then redirect
-      setTimeout(() => {
-        window.location.href = role === "employee"
-          ? "/frontend/employee_inbox.html"
-          : "/frontend/employer_inbox.html";
-      }, 1000);
-    }
-    // Error
-    else {
-      // show server error inline at bottom of form
-      let serverError = document.getElementById("register-server-error");
-      if (!serverError) {
-        serverError = document.createElement("p");
-        serverError.id = "register-server-error";
-        serverError.className = "error-message";
-        const step5 = document.getElementById("step-5");
-        step5.insertBefore(serverError, step5.firstChild);
-      }
-      serverError.textContent = data.error || "Registration failed";
-      serverError.style.display = "block";
-      btn.disabled = false;
-    }
-  })
-  .catch(err => {
-    console.error("Error:", err);
-    let networkError = document.getElementById("register-server-error");
-    if (networkError) {
-      networkError.textContent = "Network error, please try again";
-      networkError.style.display = "block";
-    }
-    btn.disabled = false;
-  });
+// Check if an email is available (not already in use)
+function checkEmailAvailability(email) {
+  return fetch(`/auth/check-email?email=${encodeURIComponent(email)}`)
+    .then(response => response.json())
+    .catch(error => {
+      console.error("Error checking email:", error);
+      return { error: "Failed to check email availability" };
+    });
 }
+
+// Check if a phone number is available (not already in use)
+function checkPhoneAvailability(phone) {
+  return fetch(`/auth/check-phone?phone=${encodeURIComponent(phone)}`)
+    .then(response => response.json())
+    .catch(error => {
+      console.error("Error checking phone:", error);
+      return { error: "Failed to check phone availability" };
+    });
+}
+
+// Debounce function to limit API calls
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
+// Debounced versions of the check functions
+const debouncedCheckEmail = debounce(function(email, callback) {
+  checkEmailAvailability(email).then(callback);
+}, 300);
+
+const debouncedCheckPhone = debounce(function(phone, callback) {
+  checkPhoneAvailability(phone).then(callback);
+}, 300);

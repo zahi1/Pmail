@@ -220,3 +220,46 @@ def admin_auth_check():
             }), 200
     
     return jsonify({"isAdmin": False, "error": "Not authorized"}), 403
+
+# --------------------- #
+# ✅ Check Email Availability #
+# --------------------- #
+@auth_bp.route("/check-email", methods=["GET"])
+def check_email():
+    """Check if an email is already registered"""
+    email = request.args.get("email", "").strip().lower()
+    
+    if not email:
+        return jsonify({"error": "No email provided"}), 400
+        
+    # Validate email format (must end with @pmail.com)
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@pmail\.com$"
+    if not re.match(email_pattern, email):
+        return jsonify({"error": "Invalid email format"}), 400
+        
+    # Check if the email exists
+    existing_user = User.query.filter(func.lower(User.email) == email).first()
+    
+    if existing_user:
+        return jsonify({"available": False, "message": "Email is already in use"}), 200
+    else:
+        return jsonify({"available": True, "message": "Email is available"}), 200
+
+# --------------------- #
+# ✅ Check Phone Availability #
+# --------------------- #
+@auth_bp.route("/check-phone", methods=["GET"])
+def check_phone():
+    """Check if a phone number is already registered"""
+    phone = request.args.get("phone", "").strip()
+    
+    if not phone:
+        return jsonify({"error": "No phone number provided"}), 400
+        
+    # Check if the phone exists
+    existing_user = User.query.filter(User.phone == phone).first()
+    
+    if existing_user:
+        return jsonify({"available": False, "message": "Phone number is already in use"}), 200
+    else:
+        return jsonify({"available": True, "message": "Phone number is available"}), 200

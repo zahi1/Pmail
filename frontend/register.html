@@ -41,10 +41,10 @@
             <h3>Choose your Pmail address</h3>
             <p>Pick a Pmail address or create your own:</p>
             
-            <input type="radio" id="email_option1" name="email_option" value="user123@pmail.com">
+            <input type="radio" id="email_option1" name="email_option" value="user123@pmail.com" onclick="checkSelectedEmail('user123@pmail.com')">
             <label for="email_option1">user123@pmail.com</label><br>
             
-            <input type="radio" id="email_option2" name="email_option" value="jobseeker@pmail.com">
+            <input type="radio" id="email_option2" name="email_option" value="jobseeker@pmail.com" onclick="checkSelectedEmail('jobseeker@pmail.com')">
             <label for="email_option2">jobseeker@pmail.com</label><br>
             
             <input type="radio" id="custom_email_option" name="email_option" onclick="enableCustomEmail()">
@@ -53,7 +53,8 @@
             <p id="email-error" class="error-message" style="display: none; color: red;">
               Email must end with @pmail.com.
             </p>
-            <button onclick="validateEmail()">Next</button>
+            <div id="email-checking" style="display: none;">Checking availability...</div>
+            <button id="email-next-btn" onclick="validateEmail()">Next</button>
         </div>
 
         <!-- Step 4: Password Setup -->
@@ -73,6 +74,7 @@
             <p id="phone-error" class="error-message" style="display: none; color: red;">
               Please enter a valid phone number.
             </p>
+            <div id="phone-checking" style="display: none;">Checking availability...</div>
             
             <!-- Categories field - for employees only -->
             <div class="form-group employee-field" id="categories-group" style="display:none;">
@@ -126,7 +128,34 @@
 
         // 3) Enable custom email input if user selects that radio
         function enableCustomEmail() {
-            document.getElementById("email_input").disabled = false;
+            let emailInput = document.getElementById("email_input");
+            emailInput.disabled = false;
+            emailInput.focus();
+            
+            // Add input event listener for custom email checking
+            emailInput.addEventListener("input", function() {
+                let email = this.value.trim();
+                if (!email || !/^[a-zA-Z0-9._%+-]+@pmail\.com$/.test(email)) return;
+                
+                let emailError = document.getElementById("email-error");
+                let emailChecking = document.getElementById("email-checking");
+                
+                emailChecking.style.display = "block";
+                emailError.style.display = "none";
+                
+                debouncedCheckEmail(email, function(result) {
+                    emailChecking.style.display = "none";
+                    if (result.error) {
+                        emailError.textContent = "Error checking email.";
+                        emailError.style.display = "block";
+                    } else if (!result.available) {
+                        emailError.textContent = "This email address is already in use.";
+                        emailError.style.display = "block";
+                    } else {
+                        emailError.style.display = "none";
+                    }
+                });
+            });
         }
 
         // 4) Toggle password fields from type=password to text
@@ -175,10 +204,12 @@
         }
 
         // 6) Validate email radio choice or custom input
-        function validateEmail() {
+        async function validateEmail() {
             let selectedEmailOption = document.querySelector('input[name="email_option"]:checked');
             let customEmailInput   = document.getElementById("email_input");
             let emailError         = document.getElementById("email-error");
+            let emailChecking      = document.getElementById("email-checking");
+            let emailNextBtn       = document.getElementById("email-next-btn");
             
             let email = "";
 
@@ -197,13 +228,71 @@
             if (email === "") {
                 emailError.textContent = "Please select or enter a Pmail address.";
                 emailError.style.display = "block";
+                return;
             } else if (!emailPattern.test(email)) {
                 emailError.textContent = "Email must end with @pmail.com.";
                 emailError.style.display = "block";
-            } else {
-                emailError.style.display = "none";
-                nextStep(3);
+                return;
             }
+            
+            // Disable next button while checking
+            emailNextBtn.disabled = true;
+            
+            // Show loading indicator
+            emailChecking.style.display = "block";
+            emailError.style.display = "none";
+            
+            try {
+                const result = await checkEmailAvailability(email);
+                
+                emailChecking.style.display = "none";
+                
+                if (result.error) {
+                    emailError.textContent = "Error checking email. Please try again.";
+                    emailError.style.display = "block";
+                    emailNextBtn.disabled = false;
+                    return;
+                }
+                
+                if (!result.available) {
+                    emailError.textContent = "This email address is already in use.";
+                    emailError.style.display = "block";
+                    emailNextBtn.disabled = false;
+                    return;
+                }
+                
+                // Email is available
+                emailError.style.display = "none";
+                emailNextBtn.disabled = false;
+                nextStep(3);
+            } catch (error) {
+                emailChecking.style.display = "none";
+                emailError.textContent = "Error checking email. Please try again.";
+                emailError.style.display = "block";
+                emailNextBtn.disabled = false;
+            }
+        }
+        
+        // Check email as soon as it's selected via radio buttons
+        function checkSelectedEmail(email) {
+            let emailError = document.getElementById("email-error");
+            let emailChecking = document.getElementById("email-checking");
+            
+            emailChecking.style.display = "block";
+            emailError.style.display = "none";
+            
+            debouncedCheckEmail(email, function(result) {
+                emailChecking.style.display = "none";
+                if (result.error) {
+                    emailError.textContent = "Error checking email.";
+                    emailError.style.display = "block";
+                } else if (!result.available) {
+                    emailError.textContent = "This email address is already in use.";
+                    emailError.style.display = "block";
+                } else {
+                    emailError.style.display = "none";
+                }
+            });
         }
 
         // 7) Validate password match
@@ -245,10 +334,12 @@
         }
         
         // Final validation before registration (Step 5)
-        function validateFinal() {
+        async function validateFinal() {
             let phone = document.getElementById("phone").value.trim();
             let phoneError = document.getElementById("phone-error");
+            let phoneChecking = document.getElementById("phone-checking");
             let role = document.getElementById("role").value;
+            let registerBtn = document.getElementById("register-btn");
             
             // Validate phone number
             let phonePattern = /^[0-9()+\-\s]{7,20}$/;
@@ -260,27 +351,195 @@
                 phoneError.textContent = "Please enter a valid phone number.";
                 phoneError.style.display = "block";
                 return;
-            } else {
-                phoneError.style.display = "none";
             }
             
-            // For employees, validate categories
-            if (role === "employee") {
-                let categories = document.getElementById("user_categories").value;
-                let categoriesError = document.getElementById("categories-error");
+            // Disable button while checking
+            registerBtn.disabled = true;
+            
+            // Show loading indicator
+            phoneChecking.style.display = "block";
+            phoneError.style.display = "none";
+            
+            try {
+                const result = await checkPhoneAvailability(phone);
                 
-                if (!categories) {
-                    categoriesError.textContent = "Please select at least one category.";
-                    categoriesError.style.display = "block";
+                phoneChecking.style.display = "none";
+                
+                if (result.error) {
+                    phoneError.textContent = "Error checking phone number. Please try again.";
+                    phoneError.style.display = "block";
+                    registerBtn.disabled = false;
                     return;
-                } else {
-                    categoriesError.style.display = "none";
                 }
+                
+                if (!result.available) {
+                    phoneError.textContent = "This phone number is already in use.";
+                    phoneError.style.display = "block";
+                    registerBtn.disabled = false;
+                    return;
+                }
+                
+                // For employees, validate categories
+                if (role === "employee") {
+                    let categories = document.getElementById("user_categories").value;
+                    let categoriesError = document.getElementById("categories-error");
+                    
+                    if (!categories) {
+                        categoriesError.textContent = "Please select at least one category.";
+                        categoriesError.style.display = "block";
+                        registerBtn.disabled = false;
+                        return;
+                    } else {
+                        categoriesError.style.display = "none";
+                    }
+                }
+                
+                // If all validations pass, directly call the register function
+                console.log("All validations passed, calling register()");
+                registerUser(); // Use the renamed function to avoid conflict with the element id
+                
+            } catch (error) {
+                console.error("Error in validateFinal:", error);
+                phoneChecking.style.display = "none";
+                phoneError.textContent = "Error checking phone number. Please try again.";
+                phoneError.style.display = "block";
+                registerBtn.disabled = false;
             }
-            
-            // If all validations pass, call the register function
-            register();
         }
+
+        // Renamed register function to avoid conflict with button id
+        function registerUser() {
+            console.log("Starting registration process");
+            
+            const firstName = document.getElementById("first_name").value.trim();
+            const lastName = document.getElementById("last_name").value.trim();
+            const birthdate = document.getElementById("birthdate").value;
+            const password = document.getElementById("password").value;
+            const phone = document.getElementById("phone").value.trim();
+            const role = document.getElementById("role").value;
+            const emailElem = document.querySelector('input[name="email_option"]:checked');
+            const email = emailElem
+              ? (emailElem.id === "custom_email_option"
+                 ? document.getElementById("email_input").value.trim().toLowerCase()
+                 : emailElem.value.trim().toLowerCase())
+              : "";
+              
+            console.log("Preparing registration data:", { email, role, phone });
+            
+            const userData = {
+                first_name: firstName,
+                last_name: lastName,
+                birthdate: birthdate,
+                email: email,
+                password: password,
+                phone: phone,
+                role: role,
+                user_categories: role === "employee"
+                  ? document.getElementById('user_categories').value
+                  : undefined
+            };
+
+            // Show a loading message
+            const registerBtn = document.getElementById("register-btn");
+            registerBtn.textContent = "Registering...";
+            
+            fetch("/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            })
+            .then(response => {
+                console.log("Registration response:", response);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Registration result:", data);
+                const step5 = document.getElementById("step-5");
+                
+                // Success
+                if (data.message === "User registered successfully") {
+                    // insert or update success paragraph
+                    let successEl = document.getElementById("register-success");
+                    if (!successEl) {
+                        successEl = document.createElement("p");
+                        successEl.id = "register-success";
+                        successEl.className = "success-message";
+                        successEl.style.color = "green";
+                        step5.insertBefore(successEl, step5.firstChild);
+                    }
+                    successEl.textContent = data.message + " Redirecting...";
+                    
+                    // delay then redirect
+                    setTimeout(() => {
+                        window.location.href = role === "employee"
+                          ? "/frontend/employee_inbox.html"
+                          : "/frontend/employer_inbox.html";
+                    }, 1500);
+                }
+                // Error
+                else {
+                    // show server error inline at bottom of form
+                    let serverError = document.getElementById("register-server-error");
+                    if (!serverError) {
+                        serverError = document.createElement("p");
+                        serverError.id = "register-server-error";
+                        serverError.className = "error-message";
+                        serverError.style.color = "red";
+                        step5.insertBefore(serverError, step5.firstChild);
+                    }
+                    serverError.textContent = data.error || "Registration failed";
+                    serverError.style.display = "block";
+                    registerBtn.textContent = "Sign Up";
+                    registerBtn.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error("Registration error:", err);
+                let networkError = document.getElementById("register-server-error");
+                if (!networkError) {
+                    networkError = document.createElement("p");
+                    networkError.id = "register-server-error";
+                    networkError.className = "error-message";
+                    networkError.style.color = "red";
+                    const step5 = document.getElementById("step-5");
+                    step5.insertBefore(networkError, step5.firstChild);
+                }
+                networkError.textContent = "Network error, please try again";
+                networkError.style.display = "block";
+                registerBtn.textContent = "Sign Up";
+                registerBtn.disabled = false;
+            });
+        }
+
+        // Setup phone number validation on input
+        document.addEventListener("DOMContentLoaded", function() {
+            const phoneInput = document.getElementById("phone");
+            if (phoneInput) {
+                phoneInput.addEventListener("input", function() {
+                    let phone = this.value.trim();
+                    if (!phone || phone.length < 7) return;
+                    
+                    let phoneError = document.getElementById("phone-error");
+                    let phoneChecking = document.getElementById("phone-checking");
+                    
+                    phoneChecking.style.display = "block";
+                    phoneError.style.display = "none";
+                    
+                    debouncedCheckPhone(phone, function(result) {
+                        phoneChecking.style.display = "none";
+                        if (result.error) {
+                            phoneError.textContent = "Error checking phone number.";
+                            phoneError.style.display = "block";
+                        } else if (!result.available) {
+                            phoneError.textContent = "This phone number is already in use.";
+                            phoneError.style.display = "block";
+                        } else {
+                            phoneError.style.display = "none";
+                        }
+                    });
+                });
+            }
+        });
 
         // New validation for first and last name (Step 1)
         function validateName() {
