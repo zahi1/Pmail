@@ -79,6 +79,7 @@ function filterApplications() {
   const statusValue = document.getElementById("statusFilter").value;
   const categoryValue = document.getElementById("categoryFilter").value;
   const jobTitleValue = document.getElementById("jobTitleFilter").value;
+  const sortByValue = document.getElementById("sortBy").value;
   
   // Filter open applications
   const filteredOpen = window.openApplications.filter(app => {
@@ -112,15 +113,19 @@ function filterApplications() {
     return matchesStatus && matchesCategory && matchesJobTitle;
   });
   
+  // Apply sorting to both filtered lists
+  const sortedOpen = sortApplications(filteredOpen, sortByValue);
+  const sortedClosed = sortApplications(filteredClosed, sortByValue);
+  
   // Display filtered applications in their respective sections
-  displayApplicationCards(filteredOpen, "applicationsGrid");
-  displayApplicationCards(filteredClosed, "closedApplicationsGrid");
+  displayApplicationCards(sortedOpen, "applicationsGrid");
+  displayApplicationCards(sortedClosed, "closedApplicationsGrid");
   
   // Update UI to show/hide closed applications section based on results
   const closedHeader = document.querySelector('.closed-applications-header');
   const closedGrid = document.getElementById("closedApplicationsGrid");
   
-  if (filteredClosed.length === 0) {
+  if (sortedClosed.length === 0) {
     // Hide closed applications section if empty after filtering
     if (closedHeader) closedHeader.style.display = 'none';
     if (closedGrid) closedGrid.style.display = 'none';
@@ -128,6 +133,74 @@ function filterApplications() {
     // Show closed applications section if it has content
     if (closedHeader) closedHeader.style.display = 'block';
     if (closedGrid) closedGrid.style.display = 'grid';
+  }
+}
+
+// Sort applications based on selected criteria
+function sortApplications(applications, sortCriteria) {
+  if (!sortCriteria || sortCriteria === "date-desc") {
+    // Default sorting - newest first
+    return [...applications];
+  }
+
+  const [field, direction] = sortCriteria.split('-');
+  
+  return applications.sort((a, b) => {
+    let comparison = 0;
+    
+    // Sort by date
+    if (field === 'date') {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      comparison = dateA - dateB;
+    } 
+    // Sort by title
+    else if (field === 'title') {
+      // Extract job title from subject
+      let titleA = "", titleB = "";
+      if (a.subject && a.subject.toLowerCase().includes("application for:")) {
+        titleA = a.subject.split("Application for:")[1].trim();
+      }
+      if (b.subject && b.subject.toLowerCase().includes("application for:")) {
+        titleB = b.subject.split("Application for:")[1].trim();
+      }
+      comparison = titleA.localeCompare(titleB);
+    } 
+    // Sort by salary
+    else if (field === 'salary') {
+      // Get min salary values for comparison
+      const salaryA = getSalaryValue(a.salary_range);
+      const salaryB = getSalaryValue(b.salary_range);
+      comparison = salaryA - salaryB;
+    }
+    
+    // Adjust direction based on asc/desc
+    return direction === 'asc' ? comparison : -comparison;
+  });
+}
+
+// Helper function to extract a numeric value from salary range for sorting
+function getSalaryValue(salaryRange) {
+  if (!salaryRange || salaryRange === "Not specified") {
+    return 0; // Place unspecified salaries at the bottom/top depending on sort order
+  }
+  
+  try {
+    // Strip all currency symbols, commas, and spaces
+    const cleanText = salaryRange.replace(/[€$,\s]/g, '');
+    
+    // Check if it's a range with a hyphen
+    if (cleanText.includes('-')) {
+      const parts = cleanText.split('-');
+      // Return the minimum value in the range for sorting
+      return parseInt(parts[0]);
+    } else {
+      // It's a single value
+      return parseInt(cleanText);
+    }
+  } catch (e) {
+    console.error("Error parsing salary for sorting:", e);
+    return 0;
   }
 }
 
@@ -213,6 +286,10 @@ function displayApplicationCards(applications, containerId) {
           <div class="detail-row">
             <span class="detail-label">Company:</span>
             <span class="detail-value">${app.job_company || 'N/A'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Salary Range:</span>
+            <span class="detail-value">${app.salary_range || 'Not specified'}</span>
           </div>
         </div>
       </div>

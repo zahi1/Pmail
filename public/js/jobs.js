@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   
+  // Global variable to store all jobs for sorting
+  let allJobs = [];
+  
   // -----------------------
   // 1) JOBS LIST PAGE
   // -----------------------
@@ -46,6 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(url)
       .then(response => response.json())
       .then(data => {
+        // Store all jobs for sorting
+        allJobs = data;
         renderJobListings(data);
       })
       .catch(err => {
@@ -56,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function renderJobListings(jobs) {
     const listingsContainer = document.getElementById("job-listings");
+    const sortOrder = document.getElementById("sort-select")?.value || "date-desc";
+    
     listingsContainer.innerHTML = ""; // Clear old
   
     if (jobs.length === 0) {
@@ -63,7 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
-    jobs.forEach(job => {
+    // Sort jobs before displaying
+    const sortedJobs = sortJobs(jobs, sortOrder);
+  
+    sortedJobs.forEach(job => {
       const jobDiv = document.createElement("div");
       jobDiv.classList.add("job-item");
       
@@ -103,6 +113,63 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `job_detail.html?id=${jobId}`;
       });
     });
+  }
+  
+  // Generic function to sort jobs (same as in post_job.js)
+  function sortJobs(jobs, sortOrder) {
+    const sortedJobs = [...jobs];
+    
+    switch (sortOrder) {
+      case 'date-desc': // Newest first
+        return sortedJobs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      
+      case 'date-asc': // Oldest first
+        return sortedJobs.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+      
+      case 'title-asc': // A-Z
+        return sortedJobs.sort((a, b) => a.title.localeCompare(b.title));
+      
+      case 'title-desc': // Z-A
+        return sortedJobs.sort((a, b) => b.title.localeCompare(a.title));
+      
+      case 'salary-desc': // High to low
+        return sortedJobs.sort((a, b) => {
+          const salaryA = parseSalaryForSort(a.salary_range);
+          const salaryB = parseSalaryForSort(b.salary_range);
+          return salaryB - salaryA;
+        });
+      
+      case 'salary-asc': // Low to high
+        return sortedJobs.sort((a, b) => {
+          const salaryA = parseSalaryForSort(a.salary_range);
+          const salaryB = parseSalaryForSort(b.salary_range);
+          return salaryA - salaryB;
+        });
+      
+      default:
+        return sortedJobs;
+    }
+  }
+  
+  // Helper function to parse salary for sorting
+  function parseSalaryForSort(salaryText) {
+    if (!salaryText) return 0;
+    try {
+      // Strip all currency symbols, commas, and spaces
+      const cleanText = salaryText.replace(/[€$,\s]/g, '');
+      
+      // Check if it's a range with a hyphen
+      if (cleanText.includes('-')) {
+        const parts = cleanText.split('-');
+        return parseInt(parts[0]); // Use the minimum value for sorting
+      } else {
+        // It's a single value
+        return parseInt(cleanText);
+      }
+    } catch (e) {
+      console.error("Error parsing salary:", e);
+      return 0;
+    }
   }
   
   // -----------------------

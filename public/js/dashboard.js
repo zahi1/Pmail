@@ -7,9 +7,34 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // Global variables for filtering
+  window.allApplications = [];
+  
   fetch(`/dashboard/employee/${currentUserId}`)
     .then(res => res.json())
     .then(data => {
+      // Store applications globally
+      window.allApplications = data.applications;
+      
+      // Extract unique categories for filter dropdown
+      const uniqueCategories = new Set();
+      data.applications.forEach(app => {
+        if (app.job_category && app.job_category !== 'N/A') {
+          uniqueCategories.add(app.job_category);
+        }
+      });
+
+      // Populate category filter dropdown
+      const categoryFilter = document.getElementById("categoryFilter");
+      if (categoryFilter) {
+        uniqueCategories.forEach(category => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          categoryFilter.appendChild(option);
+        });
+      }
+
       // 1) Status distribution (pie)
       renderStatusChart(data.status_counts);
 
@@ -22,13 +47,141 @@ document.addEventListener("DOMContentLoaded", () => {
       // 4) Day of week distribution (bar)
       renderDayOfWeekChart(data.day_of_week_counts);
 
-      // Display applications using cards instead of a table
+      // Display all applications initially
       displayApplicationCards(data.applications);
     })
     .catch(err => {
       console.error("Error fetching dashboard data:", err);
     });
 });
+
+// Function to filter applications based on selected criteria
+function filterApplications() {
+  const statusFilter = document.getElementById("statusFilter").value;
+  const categoryFilter = document.getElementById("categoryFilter").value;
+  const salaryFilter = document.getElementById("salaryFilter").value;
+  const sortBy = document.getElementById("sortBy").value;
+  
+  let filteredApps = [...window.allApplications];
+  
+  // Filter by status
+  if (statusFilter !== "all") {
+    filteredApps = filteredApps.filter(app => app.status === statusFilter);
+  }
+  
+  // Filter by category
+  if (categoryFilter !== "all") {
+    filteredApps = filteredApps.filter(app => app.job_category === categoryFilter);
+  }
+  
+  // Filter by salary range
+  if (salaryFilter !== "all") {
+    filteredApps = filteredApps.filter(app => {
+      // Skip applications without salary data
+      if (!app.salary_range || app.salary_range === "Not specified") {
+        return false;
+      }
+      
+      // Parse the salary filter (e.g., "3000-5000" or "12000+")
+      let filterMin, filterMax;
+      if (salaryFilter.endsWith('+')) {
+        filterMin = parseInt(salaryFilter.replace('+', ''));
+        filterMax = Number.MAX_SAFE_INTEGER;
+      } else {
+        [filterMin, filterMax] = salaryFilter.split('-').map(Number);
+      }
+      
+      // Parse the application's salary range
+      const parsedSalary = parseSalaryRange(app.salary_range);
+      
+      // Check if the ranges overlap
+      return !(parsedSalary.max < filterMin || parsedSalary.min > filterMax);
+    });
+  }
+  
+  // Apply sorting
+  filteredApps = sortApplications(filteredApps, sortBy);
+  
+  // Display filtered and sorted applications
+  displayApplicationCards(filteredApps);
+}
+
+// New function to sort applications based on the selected criteria
+function sortApplications(applications, sortCriteria) {
+  const [field, direction] = sortCriteria.split('-');
+  
+  return applications.sort((a, b) => {
+    let comparison = 0;
+    
+    // Sort by date
+    if (field === 'date') {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      comparison = dateA - dateB;
+    } 
+    // Sort by title
+    else if (field === 'title') {
+      // Extract job title from subject
+      const titleA = a.subject ? a.subject.replace(/^Application for:\s*/i, '') : '';
+      const titleB = b.subject ? b.subject.replace(/^Application for:\s*/i, '') : '';
+      comparison = titleA.localeCompare(titleB);
+    } 
+    // Sort by salary
+    else if (field === 'salary') {
+      // Get min salary values for comparison
+      const salaryA = getSalaryValue(a.salary_range);
+      const salaryB = getSalaryValue(b.salary_range);
+      comparison = salaryA - salaryB;
+    }
+    
+    // Adjust direction based on asc/desc
+    return direction === 'asc' ? comparison : -comparison;
+  });
+}
+
+// Helper function to extract a numeric value from salary range for sorting
+function getSalaryValue(salaryRange) {
+  if (!salaryRange || salaryRange === 'Not specified') {
+    return 0; // Place unspecified salaries at the bottom/top depending on sort order
+  }
+  
+  try {
+    const parsed = parseSalaryRange(salaryRange);
+    // Use min value for comparison by default
+    return parsed.min || 0;
+  } catch (e) {
+    console.error("Error parsing salary for sorting:", e);
+    return 0;
+  }
+}
+
+// Parse salary range string into min and max values
+function parseSalaryRange(salaryText) {
+  if (!salaryText || salaryText === "Not specified") {
+    return { min: 0, max: 0 };
+  }
+  
+  try {
+    // Strip all currency symbols, commas, and spaces
+    const cleanText = salaryText.replace(/[€$,\s]/g, '');
+    
+    // Check if it's a range with a hyphen
+    if (cleanText.includes('-')) {
+      const parts = cleanText.split('-');
+      return {
+        min: parseInt(parts[0]),
+        max: parseInt(parts[1])
+      };
+    } else {
+      // It's a single value
+      const value = parseInt(cleanText);
+      return { min: value, max: value };
+    }
+  } catch (e) {
+    console.error("Error parsing salary range:", e);
+    return { min: 0, max: Number.MAX_SAFE_INTEGER };
+  }
+}
 
 function renderStatusChart(statusCounts) {
   const statuses = Object.keys(statusCounts);
@@ -202,15 +355,13 @@ function renderDayOfWeekChart(dayOfWeekData) {
 }
 
 function displayApplicationCards(applications) {
-  // First, find or create a container for the applications
+  // First, find or create the applications container
   let applicationsContainer = document.querySelector('.applications-container');
   if (!applicationsContainer) {
-    // If the container doesn't exist yet, create it
     applicationsContainer = document.createElement('div');
     applicationsContainer.className = 'applications-container';
-    applicationsContainer.innerHTML = '<h2>My Applications</h2>'; // Changed from uppercase to proper case
+    applicationsContainer.innerHTML = '<h2>My Applications</h2>';
     
-    // Add it to the page after the charts
     const chartsGrid = document.querySelector('.charts-grid');
     if (chartsGrid) {
       chartsGrid.parentNode.insertBefore(applicationsContainer, chartsGrid.nextSibling);
@@ -219,15 +370,15 @@ function displayApplicationCards(applications) {
     }
   }
   
-  // Create grid container for cards
-  const applicationsGrid = document.createElement('div');
-  applicationsGrid.className = 'applications-grid';
-  applicationsContainer.appendChild(applicationsGrid);
-  
-  // Remove the old table if it exists
-  const oldTable = document.getElementById('applicationsTable');
-  if (oldTable) {
-    oldTable.parentNode.removeChild(oldTable);
+  // Find existing grid or create new one
+  let applicationsGrid = applicationsContainer.querySelector('.applications-grid');
+  if (!applicationsGrid) {
+    applicationsGrid = document.createElement('div');
+    applicationsGrid.className = 'applications-grid';
+    applicationsContainer.appendChild(applicationsGrid);
+  } else {
+    // Clear existing cards
+    applicationsGrid.innerHTML = "";
   }
   
   // Handle empty state
@@ -235,8 +386,7 @@ function displayApplicationCards(applications) {
     applicationsGrid.innerHTML = `
       <div class="no-applications">
         <img src="../public/images/inbox_icon.png" alt="No Applications">
-        <p>You haven't submitted any job applications yet.</p>
-        <p>Once you apply for jobs, they will appear here.</p>
+        <p>No applications found matching your criteria.</p>
       </div>
     `;
     return;
@@ -289,6 +439,10 @@ function displayApplicationCards(applications) {
           <div class="detail-row">
             <span class="detail-label">Company:</span>
             <span class="detail-value">${app.job_company || 'N/A'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Salary Range:</span>
+            <span class="detail-value">${app.salary_range || 'Not specified'}</span>
           </div>
         </div>
       </div>

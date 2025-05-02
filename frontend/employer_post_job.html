@@ -200,6 +200,58 @@
       color: #8ab4f8;
       font-style: italic;
     }
+
+    /* Improved sorting control styles */
+    .job-sorting {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .sorting-control {
+      display: flex;
+      align-items: center;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      padding: 8px 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .sorting-control label {
+      color: #8ab4f8;
+      font-weight: 500;
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+    
+    .select-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .select-wrapper select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      padding-right: 24px;
+      outline: none;
+      cursor: pointer;
+      min-width: 180px;
+      font-weight: 500;
+    }
+    
+    .sort-icon {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8ab4f8;
+      font-size: 10px;
+      pointer-events: none;
+    }
   </style>
   <script src="../public/js/post_job.js" defer></script>
 </head>
@@ -271,6 +323,27 @@
 
     <!-- Employer's Existing Jobs -->
     <h2 class="jobs-section-title">Your Posted Jobs</h2>
+    
+    <!-- Enhanced sorting control -->
+    <div class="job-sorting">
+      <div class="sorting-control">
+        <label for="jobs-sort">Sort by:</label>
+        <div class="select-wrapper">
+          <select id="jobs-sort" onchange="sortEmployerJobs()">
+            <option value="date-desc">Date (Newest First)</option>
+            <option value="date-asc">Date (Oldest First)</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+            <option value="status">Status (Open First)</option>
+            <option value="status-closed">Status (Closed First)</option>
+            <option value="salary-desc">Salary (High-Low)</option>
+            <option value="salary-asc">Salary (Low-High)</option>
+          </select>
+          <span class="sort-icon">▼</span>
+        </div>
+      </div>
+    </div>
+    
     <div id="employer-jobs-container">
       <!-- Job cards will be inserted here by JS -->
     </div>

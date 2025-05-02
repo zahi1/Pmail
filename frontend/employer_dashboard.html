@@ -72,6 +72,16 @@
             <option value="all">All Categories</option>
             <!-- Will be populated dynamically -->
           </select>
+
+          <label for="sortBy">Sort By:</label>
+          <select id="sortBy" onchange="filterApplications()">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+            <option value="salary-desc">Salary (High-Low)</option>
+            <option value="salary-asc">Salary (Low-High)</option>
+          </select>
         </div>
       </div>
 

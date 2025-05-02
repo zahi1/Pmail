@@ -75,7 +75,18 @@
         <option value="12000+">€12,000+</option>
       </select>
 
-      <button id="filter-btn">Filter</button>
+      <!-- Add Sorting Dropdown -->
+      <label for="sort-select">Sort By:</label>
+      <select id="sort-select">
+        <option value="date-desc">Date (Newest First)</option>
+        <option value="date-asc">Date (Oldest First)</option>
+        <option value="title-asc">Title (A-Z)</option>
+        <option value="title-desc">Title (Z-A)</option>
+        <option value="salary-desc">Salary (High-Low)</option>
+        <option value="salary-asc">Salary (Low-High)</option>
+      </select>
+
+      <button id="filter-btn">Apply</button>
     </div>
 
     <!-- Job Listings Section -->

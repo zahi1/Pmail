@@ -47,9 +47,51 @@
       </div>
     </div>
 
-    <!-- Applications section will be inserted here by JavaScript -->
-    <!-- The old table structure has been replaced with card-based layout -->
-    
+    <div class="applications-container">
+      <h2>My Applications</h2>
+      
+      <!-- Application filter controls - MATCHING EMPLOYER DASHBOARD -->
+      <div class="applications-filters">
+        <div class="filter-controls">
+          <label for="statusFilter">Status:</label>
+          <select id="statusFilter" onchange="filterApplications()">
+            <option value="all">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          
+          <label for="categoryFilter">Category:</label>
+          <select id="categoryFilter" onchange="filterApplications()">
+            <option value="all">All Categories</option>
+            <!-- Will be populated dynamically -->
+          </select>
+          
+          <label for="salaryFilter">Salary Range:</label>
+          <select id="salaryFilter" onchange="filterApplications()">
+            <option value="all">All Salaries</option>
+            <option value="0-3000">Under €3,000</option>
+            <option value="3000-5000">€3,000 - €5,000</option>
+            <option value="5000-8000">€5,000 - €8,000</option>
+            <option value="8000-12000">€8,000 - €12,000</option>
+            <option value="12000+">€12,000+</option>
+          </select>
+
+          <label for="sortBy">Sort By:</label>
+          <select id="sortBy" onchange="filterApplications()">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="title-desc">Title (Z-A)</option>
+            <option value="salary-desc">Salary (High-Low)</option>
+            <option value="salary-asc">Salary (Low-High)</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- The applications grid will be added by JavaScript -->
+    </div>
   </div>
 
   <script src="../public/js/dashboard.js"></script>

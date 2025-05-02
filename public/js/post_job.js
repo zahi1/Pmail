@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadEmployerJobs();
 });
 
+// Global variable to store all jobs for sorting
+let allEmployerJobs = [];
+
 function submitJobForm(event) {
   event.preventDefault();
 
@@ -66,53 +69,133 @@ function loadEmployerJobs() {
   fetch("/jobs/employer")
     .then(res => res.json())
     .then(jobs => {
-      container.innerHTML = "";
+      // Store all jobs globally for sorting
+      allEmployerJobs = jobs;
       
-      if (!jobs || jobs.length === 0) {
-        container.innerHTML = "<p>No jobs posted yet.</p>";
-        return;
-      }
-
-      // Display each job
-      jobs.forEach(job => {
-        // Create status badge for open/closed status
-        const statusBadge = job.is_open ? 
-          '<span class="status-badge open">OPEN</span>' : 
-          '<span class="status-badge closed">CLOSED</span>';
-        
-        // Format deadline for display
-        const deadlineText = job.deadline ? 
-          `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
-          '<p><strong>Application Deadline:</strong> No deadline</p>';
-          
-        // Format salary range for display
-        const salaryText = job.salary_range ? 
-          `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
-          '<p><strong>Salary Range:</strong> Not specified</p>';
-          
-        const jobCard = document.createElement("div");
-        jobCard.className = "job-listing-card";
-        jobCard.innerHTML = `
-          <h3>${job.title} ${statusBadge}</h3>
-          <p><strong>Category:</strong> ${job.category}</p>
-          <p><strong>Job Type:</strong> ${job.job_type}</p>
-          <p><strong>Location:</strong> ${job.location}</p>
-          ${salaryText}
-          ${deadlineText}
-          <p><strong>Description:</strong> ${job.description}</p>
-          <button class="modify-btn" data-id="${job.id}">Modify</button>
-        `;
-        container.appendChild(jobCard);
-        
-        // Add event listener to the Modify button
-        const modifyBtn = jobCard.querySelector(".modify-btn");
-        modifyBtn.addEventListener("click", () => openEditModal(job));
-      });
+      // Display jobs with current sort order
+      sortEmployerJobs();
     })
     .catch(err => {
       console.error("Error loading jobs:", err);
       container.innerHTML = "<p>Error loading jobs. Please try again later.</p>";
     });
+}
+
+// Function to sort and display employer jobs
+function sortEmployerJobs() {
+  const sortOrder = document.getElementById("jobs-sort").value;
+  const container = document.getElementById("employer-jobs-container");
+  
+  if (!container || !allEmployerJobs) return;
+  
+  container.innerHTML = "";
+  
+  if (!allEmployerJobs || allEmployerJobs.length === 0) {
+    container.innerHTML = "<p>No jobs posted yet.</p>";
+    return;
+  }
+  
+  // Sort the jobs based on selected criteria
+  const sortedJobs = sortJobs(allEmployerJobs, sortOrder);
+  
+  // Display each job
+  sortedJobs.forEach(job => {
+    // Create status badge for open/closed status
+    const statusBadge = job.is_open ? 
+      '<span class="status-badge open">OPEN</span>' : 
+      '<span class="status-badge closed">CLOSED</span>';
+    
+    // Format deadline for display
+    const deadlineText = job.deadline ? 
+      `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
+      '<p><strong>Application Deadline:</strong> No deadline</p>';
+      
+    // Format salary range for display
+    const salaryText = job.salary_range ? 
+      `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
+      '<p><strong>Salary Range:</strong> Not specified</p>';
+      
+    const jobCard = document.createElement("div");
+    jobCard.className = "job-listing-card";
+    jobCard.innerHTML = `
+      <h3>${job.title} ${statusBadge}</h3>
+      <p><strong>Category:</strong> ${job.category}</p>
+      <p><strong>Job Type:</strong> ${job.job_type}</p>
+      <p><strong>Location:</strong> ${job.location}</p>
+      ${salaryText}
+      ${deadlineText}
+      <p><strong>Description:</strong> ${job.description}</p>
+      <button class="modify-btn" data-id="${job.id}">Modify</button>
+    `;
+    container.appendChild(jobCard);
+    
+    // Add event listener to the Modify button
+    const modifyBtn = jobCard.querySelector(".modify-btn");
+    modifyBtn.addEventListener("click", () => openEditModal(job));
+  });
+}
+
+// Generic function to sort jobs
+function sortJobs(jobs, sortOrder) {
+  const sortedJobs = [...jobs];
+  
+  switch (sortOrder) {
+    case 'date-desc': // Newest first
+      return sortedJobs.sort((a, b) => new Date(b.deadline || 0) - new Date(a.deadline || 0));
+    
+    case 'date-asc': // Oldest first
+      return sortedJobs.sort((a, b) => new Date(a.deadline || 0) - new Date(b.deadline || 0));
+    
+    case 'title-asc': // A-Z
+      return sortedJobs.sort((a, b) => a.title.localeCompare(b.title));
+    
+    case 'title-desc': // Z-A
+      return sortedJobs.sort((a, b) => b.title.localeCompare(a.title));
+    
+    case 'status': // Open first
+      return sortedJobs.sort((a, b) => (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0));
+    
+    case 'status-closed': // Closed first
+      return sortedJobs.sort((a, b) => (a.is_open ? 1 : 0) - (b.is_open ? 1 : 0));
+    
+    case 'salary-desc': // High to low
+      return sortedJobs.sort((a, b) => {
+        const salaryA = parseSalaryForSort(a.salary_range);
+        const salaryB = parseSalaryForSort(b.salary_range);
+        return salaryB - salaryA;
+      });
+    
+    case 'salary-asc': // Low to high
+      return sortedJobs.sort((a, b) => {
+        const salaryA = parseSalaryForSort(a.salary_range);
+        const salaryB = parseSalaryForSort(b.salary_range);
+        return salaryA - salaryB;
+      });
+    
+    default:
+      return sortedJobs;
+  }
+}
+
+// Helper function to parse salary for sorting
+function parseSalaryForSort(salaryText) {
+  if (!salaryText) return 0;
+  try {
+    // Strip all currency symbols, commas, and spaces
+    const cleanText = salaryText.replace(/[€$,\s]/g, '');
+    
+    // Check if it's a range with a hyphen
+    if (cleanText.includes('-')) {
+      const parts = cleanText.split('-');
+      return parseInt(parts[0]); // Use the minimum value for sorting
+    } else {
+      // It's a single value
+      return parseInt(cleanText);
+    }
+  } catch (e) {
+    console.error("Error parsing salary:", e);
+    return 0;
+  }
 }
 
 // Function to open the edit modal with job data
@@ -190,3 +273,4 @@ function saveJobEdits() {
 window.openEditModal = openEditModal;
 window.closeEditModal = closeEditModal;
 window.saveJobEdits = saveJobEdits;
+window.sortEmployerJobs = sortEmployerJobs;

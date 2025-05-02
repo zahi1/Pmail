@@ -74,7 +74,8 @@ def employee_dashboard(employee_id):
             "job_category": found_job.category if found_job else "N/A",
             "job_type": found_job.job_type if found_job else "N/A",
             "job_location": found_job.location if found_job else "N/A",
-            "job_company": found_job.company_name if found_job else "N/A"
+            "job_company": found_job.company_name if found_job else "N/A",
+            "salary_range": found_job.salary_range if found_job else "Not specified"
         })
 
     return jsonify({
@@ -166,7 +167,8 @@ def employer_dashboard(employer_id):
             "job_type": found_job.job_type if found_job else "N/A",
             "job_location": found_job.location if found_job else "N/A",
             "job_company": found_job.company_name if found_job else "N/A",
-            "job_closed": is_closed  # New field to indicate if job is closed
+            "job_closed": is_closed,  # New field to indicate if job is closed
+            "salary_range": found_job.salary_range if found_job else "Not specified"
         })
 
     return jsonify({
