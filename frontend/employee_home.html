@@ -165,33 +165,30 @@
           <a href="employee_dashboard.html" class="view-all">View All</a>
         </div>
         
-        <div class="recent-applications">
-          <div class="application-item">
-            <img src="../public/images/company4.png" alt="Company Logo" class="company-logo-sm">
-            <div class="application-details">
-              <h3>UX Designer</h3>
-              <p>DesignHub • Applied May 15, 2023</p>
-            </div>
-            <div class="status-badge status-under-review">Under Review</div>
-          </div>
-          
-          <div class="application-item">
-            <img src="../public/images/company5.png" alt="Company Logo" class="company-logo-sm">
-            <div class="application-details">
-              <h3>JavaScript Developer</h3>
-              <p>WebTech • Applied May 10, 2023</p>
-            </div>
-            <div class="status-badge status-accepted">Interview</div>
-          </div>
-          
-          <div class="application-item">
-            <img src="../public/images/company6.png" alt="Company Logo" class="company-logo-sm">
-            <div class="application-details">
-              <h3>Backend Engineer</h3>
-              <p>DataSystems • Applied May 5, 2023</p>
-            </div>
-            <div class="status-badge status-rejected">Not Selected</div>
-          </div>
+        <div class="applications-table-container">
+          <table class="applications-table">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Company</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recent-applications-container">
+              <!-- Loading indicator -->
+              <tr id="applications-loading" class="loading-indicator-row">
+                <td colspan="5">
+                  <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <p>Loading your applications...</p>
+                  </div>
+                </td>
+              </tr>
+              <!-- Applications will be dynamically loaded here -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

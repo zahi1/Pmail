@@ -18,10 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "admin_dashboard.html";
     } else if (localStorage.getItem("isEmployer") === "true" || localStorage.getItem("role") === "employer") {
       console.log("Redirecting to employer inbox");
-      window.location.href = "employer_inbox.html";
+      window.location.href = "employer_home.html";
     } else {
       console.log("Redirecting to employee inbox");
-      window.location.href = "employee_inbox.html";
+      window.location.href = "employee_home.html";
     }
   }, 3000);
 });

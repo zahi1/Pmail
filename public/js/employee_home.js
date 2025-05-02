@@ -129,73 +129,108 @@ function showErrorMessage(message) {
 // Function to fetch recent applications for the current user
 function fetchRecentApplications() {
     const container = document.getElementById('recent-applications-container');
+    if (!container) return;
+    
     const loadingElement = document.getElementById('applications-loading');
     
-    // Simulating API call with setTimeout
-    // In a real application, this would be an actual API fetch
-    setTimeout(() => {
-        // Remove loading spinner
-        if (loadingElement) {
-            loadingElement.remove();
-        }
-        
-        // Mock data - in a real app, this would come from your backend
-        const applications = [
-            {
-                companyLogo: '../public/images/company4.png',
-                jobTitle: 'UX Designer',
-                companyName: 'DesignHub',
-                applicationDate: 'May 15, 2023',
-                status: 'Under Review'
-            },
-            {
-                companyLogo: '../public/images/company5.png',
-                jobTitle: 'JavaScript Developer',
-                companyName: 'WebTech',
-                applicationDate: 'May 10, 2023',
-                status: 'Interview'
-            },
-            {
-                companyLogo: '../public/images/company6.png',
-                jobTitle: 'Backend Engineer',
-                companyName: 'DataSystems',
-                applicationDate: 'May 5, 2023',
-                status: 'Not Selected'
+    // Get current user ID
+    const userId = localStorage.getItem('user_id');
+    if (!userId) {
+        console.error('User not logged in');
+        if (loadingElement) loadingElement.remove();
+        container.innerHTML = '<tr><td colspan="5" class="error-message">Please log in to view your applications</td></tr>';
+        return;
+    }
+    
+    // Fetch from the dashboard API which contains application data
+    fetch(`/dashboard/employee/${userId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch application data');
             }
-        ];
-        
-        // Check if there are applications
-        if (applications.length === 0) {
-            container.innerHTML = '<p class="no-applications">You haven\'t submitted any applications yet.</p>';
-            return;
-        }
-        
-        // Create HTML for each application
-        applications.forEach(app => {
-            const statusClass = getStatusClass(app.status);
+            return response.json();
+        })
+        .then(data => {
+            // Remove loading indicator
+            if (loadingElement) {
+                loadingElement.remove();
+            }
             
-            const applicationElement = document.createElement('div');
-            applicationElement.className = 'application-item';
-            applicationElement.innerHTML = `
-                <img src="${app.companyLogo}" alt="${app.companyName} Logo" class="company-logo-sm">
-                <div class="application-details">
-                    <h3>${app.jobTitle}</h3>
-                    <p>${app.companyName} • Applied ${app.applicationDate}</p>
-                </div>
-                <div class="status-badge ${statusClass}">${app.status}</div>
-            `;
+            // Get the applications from the response
+            const applications = data.applications || [];
             
-            container.appendChild(applicationElement);
+            // Check if there are applications
+            if (applications.length === 0) {
+                container.innerHTML = '<tr><td colspan="5" class="no-applications">You haven\'t submitted any applications yet.</td></tr>';
+                return;
+            }
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Get just the most recent 5 applications for this section
+            const recentApps = applications.slice(0, 4);
+            
+            // Create HTML for each application
+            recentApps.forEach(app => {
+                // Extract job title from subject (usually starts with "Application for: ")
+                let jobTitle = app.subject;
+                if (jobTitle.toLowerCase().startsWith('application for:')) {
+                    jobTitle = jobTitle.split(':', 2)[1].trim();
+                }
+                
+                // Extract company name
+                const companyName = app.job_company || app.recipient_email.split('@')[0];
+                
+                // Format date
+                const appDate = new Date(app.created_at);
+                const formattedDate = appDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                // Determine status class
+                const statusClass = getStatusClass(app.status);
+                
+                // Create the row element
+                const tr = document.createElement('tr');
+                tr.className = 'application-row';
+                tr.innerHTML = `
+                    <td class="position-cell">${jobTitle}</td>
+                    <td class="company-cell">${companyName}</td>
+                    <td class="date-cell">${formattedDate}</td>
+                    <td class="status-cell">
+                        <span class="status-badge ${statusClass}">${app.status || 'Pending'}</span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="view-btn">View</button>
+                    </td>
+                `;
+                
+                // Add click event to view button
+                const viewBtn = tr.querySelector('.view-btn');
+                viewBtn.addEventListener('click', () => {
+                    window.location.href = `employee_inbox.html?message_id=${app.id}`;
+                });
+                
+                container.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (loadingElement) loadingElement.remove();
+            container.innerHTML = '<tr><td colspan="5" class="error-message">Failed to load applications. Please try again later.</td></tr>';
         });
-    }, 1000);
 }
 
 // Helper function to get the CSS class for each status
 function getStatusClass(status) {
-    switch(status) {
-        case 'Under Review': return 'status-under-review';
-        case 'Interview': return 'status-accepted';
-        case 'Not Selected': return 'status-rejected';
-        default: return '';
-    }
+    if (!status) return '';
+    
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('under review')) return 'status-under-review';
+    if (statusLower.includes('accept') || statusLower.includes('interview')) return 'status-accepted';
+    if (statusLower.includes('reject') || statusLower.includes('not selected')) return 'status-rejected';
+    return ''; // Default (Pending)
 }
