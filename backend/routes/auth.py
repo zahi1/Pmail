@@ -263,3 +263,78 @@ def check_phone():
         return jsonify({"available": False, "message": "Phone number is already in use"}), 200
     else:
         return jsonify({"available": True, "message": "Phone number is available"}), 200
+
+# --------------------- #
+# ✅ Verify User Identity for Password Reset #
+# --------------------- #
+@auth_bp.route("/verify-identity", methods=["POST"])
+def verify_identity():
+    """Verify user identity for password reset"""
+    data = request.get_json()
+    
+    # Validate required fields
+    required_fields = ["email", "first_name", "last_name", "birthdate", "phone", "role"]
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"success": False, "error": f"Missing field: {field}"}), 400
+    
+    # Get email and convert to lowercase for case-insensitive matching
+    email = data["email"].strip().lower()
+    
+    # Find user by email
+    user = User.query.filter(func.lower(User.email) == email).first()
+    if not user:
+        return jsonify({"success": False, "error": "No account found with this email"}), 404
+    
+    # Verify all fields match exactly
+    if (user.first_name != data["first_name"] or
+        user.last_name != data["last_name"] or
+        str(user.birthdate) != data["birthdate"] or
+        user.phone != data["phone"] or
+        user.role != data["role"]):
+        # Return generic error to prevent information leakage
+        return jsonify({"success": False, "error": "Identity verification failed. Please check your information."}), 400
+    
+    # All verified successfully
+    return jsonify({"success": True, "message": "Identity verified successfully"}), 200
+
+# --------------------- #
+# ✅ Reset Password #
+# --------------------- #
+@auth_bp.route("/reset-password", methods=["POST"])
+def reset_password():
+    """Reset user password after identity verification"""
+    data = request.get_json()
+    
+    # Validate required fields
+    if not data.get("email") or not data.get("password"):
+        return jsonify({"success": False, "error": "Missing email or password"}), 400
+    
+    # Get email and convert to lowercase for case-insensitive matching
+    email = data["email"].strip().lower()
+    
+    # Find user by email
+    user = User.query.filter(func.lower(User.email) == email).first()
+    if not user:
+        return jsonify({"success": False, "error": "No account found with this email"}), 404
+    
+    # Update password
+    try:
+        # Hash the new password
+        hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
+        user.password = hashed_password
+        
+        # Save to database
+        db.session.commit()
+        
+        return jsonify({
+            "success": True, 
+            "message": "Password has been reset successfully"
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error resetting password: {e}")
+        return jsonify({
+            "success": False, 
+            "error": "An error occurred while resetting your password"
+        }), 500
