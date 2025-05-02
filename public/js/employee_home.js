@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fetch user's recent applications
     fetchRecentApplications();
+    
+    // Fetch matching jobs based on user's categories
+    fetchMatchingJobs(userId);
 });
 
 /**
@@ -222,6 +225,104 @@ function fetchRecentApplications() {
             if (loadingElement) loadingElement.remove();
             container.innerHTML = '<tr><td colspan="5" class="error-message">Failed to load applications. Please try again later.</td></tr>';
         });
+}
+
+/**
+ * Fetch jobs that match the user's categories/interests
+ */
+function fetchMatchingJobs(userId) {
+    const jobsContainer = document.querySelector('.job-matches');
+    if (!jobsContainer) return;
+    
+    // Show loading state
+    jobsContainer.innerHTML = '<div class="loading-jobs">Finding jobs that match your profile...</div>';
+    
+    fetch(`/dashboard/employee/matching-jobs/${userId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch matching jobs');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle empty state
+            if (!data.jobs || data.jobs.length === 0) {
+                jobsContainer.innerHTML = `
+                    <div class="no-matches">
+                        <p>No matching jobs found based on your categories.</p>
+                        <p>Update your profile with more categories to see matches.</p>
+                    </div>`;
+                return;
+            }
+            
+            // Clear container before adding new jobs
+            jobsContainer.innerHTML = '';
+            
+            // Get all jobs to display (we can show more in horizontal layout)
+            const displayJobs = data.jobs;
+            
+            // Create HTML for each job
+            displayJobs.forEach(job => {
+                // Format days ago text
+                const daysAgoText = job.posted_days_ago === 0 ? 'today' : 
+                                    job.posted_days_ago === 1 ? '1 day ago' : 
+                                    `${job.posted_days_ago} days ago`;
+                
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-match-card';
+                jobCard.innerHTML = `
+                    <div class="job-match-header">
+                        <div class="job-match-title">
+                            <h3>${job.title}</h3>
+                            <p class="company-name">${job.company_name}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="job-match-details">
+                        <div class="job-detail"><span class="detail-label">Location:</span> ${job.location}</div>
+                        <div class="job-detail"><span class="detail-label">Salary:</span> ${job.salary_range || 'Not specified'}</div>
+                        <div class="job-detail"><span class="detail-label">Posted:</span> ${daysAgoText}</div>
+                    </div>
+                    
+                    <div class="job-match-footer">
+                        <a href="job_detail.html?id=${job.id}" class="apply-btn">Apply Now</a>
+                    </div>
+                `;
+                
+                jobsContainer.appendChild(jobCard);
+            });
+            
+            // Setup horizontal scroll controls
+            setupHorizontalScroller();
+        })
+        .catch(error => {
+            console.error('Error fetching matching jobs:', error);
+            jobsContainer.innerHTML = '<div class="error-message">Failed to load matching jobs</div>';
+        });
+}
+
+// New function to setup horizontal scrolling controls
+function setupHorizontalScroller() {
+    const container = document.querySelector('.job-matches');
+    const btnPrev = document.querySelector('.slider-btn.prev');
+    const btnNext = document.querySelector('.slider-btn.next');
+    const controls = document.querySelector('.slider-controls');
+    
+    if (!container || !btnPrev || !btnNext || !controls) return;
+    
+    // Show controls only if content overflows
+    if (container.scrollWidth > container.clientWidth) {
+        controls.style.display = 'flex';
+    }
+    
+    // Button click handlers
+    btnPrev.addEventListener('click', () => {
+        container.scrollBy({ left: -300, behavior: 'smooth' });
+    });
+    
+    btnNext.addEventListener('click', () => {
+        container.scrollBy({ left: 300, behavior: 'smooth' });
+    });
 }
 
 // Helper function to get the CSS class for each status

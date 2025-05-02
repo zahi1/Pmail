@@ -220,3 +220,56 @@ def employee_profile(employee_id):
             "accepted": accepted_count
         }
     }), 200
+
+@dashboard_bp.route('/employee/matching-jobs/<int:employee_id>', methods=['GET'])
+def get_matching_jobs(employee_id):
+    """
+    Find jobs that match the employee's categories (interests)
+    """
+    try:
+        # Get the user's categories
+        employee = User.query.get(employee_id)
+        if not employee:
+            return jsonify({"error": "Employee not found"}), 404
+            
+        # Parse the user's categories (comma-separated string)
+        user_categories = []
+        if employee.user_categories:
+            user_categories = [cat.strip().lower() for cat in employee.user_categories.split(',')]
+            
+        if not user_categories:
+            return jsonify({"message": "No categories set for this user", "jobs": []}), 200
+            
+        # Find jobs that match any of the user's categories
+        # Only show open jobs (deadline in future or no deadline)
+        jobs = Job.query.filter(
+            func.lower(Job.category).in_([cat.lower() for cat in user_categories]),
+            (Job.deadline >= datetime.now()) | (Job.deadline.is_(None))
+        ).order_by(Job.created_at.desc()).all()
+        
+        # Format the job data
+        matching_jobs = []
+        for job in jobs:
+            # Calculate match percentage based on exact category match
+            match_percentage = 85  # Base match percentage
+            if job.category.lower() in user_categories:
+                match_percentage += 7  # Boost for exact category match
+                
+            # Format the job details
+            matching_jobs.append({
+                "id": job.id,
+                "title": job.title,
+                "company_name": job.company_name,
+                "match_percentage": match_percentage,
+                "location": job.location,
+                "salary_range": job.salary_range,
+                "posted_date": job.created_at.strftime("%Y-%m-%d"),
+                "posted_days_ago": (datetime.now() - job.created_at).days,
+                "category": job.category,
+                "job_type": job.job_type
+            })
+            
+        return jsonify({"jobs": matching_jobs}), 200
+    except Exception as e:
+        print(f"Error fetching matching jobs: {e}")
+        return jsonify({"error": str(e)}), 500

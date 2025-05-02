@@ -82,78 +82,27 @@
       <!-- Similar Jobs Section -->
       <div class="content-section">
         <div class="section-header">
-          <h2>Jobs Matching Your Applications</h2>
+          <h2>Job Suggestions Based On Your Profile</h2>
           <a href="jobs.html" class="view-all">View All</a>
         </div>
         
-        <div class="job-matches">
-          <!-- Job Match 1 -->
-          <div class="job-match-card">
-            <div class="job-match-header">
-              <img src="../public/images/company1.png" alt="Company Logo" class="company-logo">
-              <div class="job-match-title">
-                <h3>Senior Frontend Developer</h3>
-                <p class="company-name">TechSolutions Inc.</p>
-              </div>
-              <div class="match-percentage">92% Match</div>
-            </div>
-            
-            <div class="job-match-details">
-              <div class="job-detail"><span class="detail-label">Location:</span> San Francisco (Remote)</div>
-              <div class="job-detail"><span class="detail-label">Salary:</span> $120k - $150k</div>
-              <div class="job-detail"><span class="detail-label">Posted:</span> 2 days ago</div>
-            </div>
-            
-            <div class="job-match-footer">
-              <a href="#" class="apply-btn">Apply Now</a>
-              <a href="#" class="save-btn">Save</a>
-            </div>
+        <div class="job-matches-slider">
+          <!-- Add navigation controls -->
+          <div class="slider-controls">
+            <button class="slider-btn prev" aria-label="Previous jobs">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next" aria-label="Next jobs">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
           
-          <!-- Job Match 2 -->
-          <div class="job-match-card">
-            <div class="job-match-header">
-              <img src="../public/images/company2.png" alt="Company Logo" class="company-logo">
-              <div class="job-match-title">
-                <h3>React Developer</h3>
-                <p class="company-name">InnovateSoft</p>
-              </div>
-              <div class="match-percentage">88% Match</div>
-            </div>
-            
-            <div class="job-match-details">
-              <div class="job-detail"><span class="detail-label">Location:</span> Remote</div>
-              <div class="job-detail"><span class="detail-label">Salary:</span> $110k - $135k</div>
-              <div class="job-detail"><span class="detail-label">Posted:</span> 1 week ago</div>
-            </div>
-            
-            <div class="job-match-footer">
-              <a href="#" class="apply-btn">Apply Now</a>
-              <a href="#" class="save-btn">Save</a>
-            </div>
+          <div class="job-matches">
+            <!-- Job cards will be dynamically loaded here -->
           </div>
           
-          <!-- Job Match 3 -->
-          <div class="job-match-card">
-            <div class="job-match-header">
-              <img src="../public/images/company3.png" alt="Company Logo" class="company-logo">
-              <div class="job-match-title">
-                <h3>Full Stack Engineer</h3>
-                <p class="company-name">GlobalTech</p>
-              </div>
-              <div class="match-percentage">85% Match</div>
-            </div>
-            
-            <div class="job-match-details">
-              <div class="job-detail"><span class="detail-label">Location:</span> New York</div>
-              <div class="job-detail"><span class="detail-label">Salary:</span> $130k - $160k</div>
-              <div class="job-detail"><span class="detail-label">Posted:</span> 3 days ago</div>
-            </div>
-            
-            <div class="job-match-footer">
-              <a href="#" class="apply-btn">Apply Now</a>
-              <a href="#" class="save-btn">Save</a>
-            </div>
+          <div class="scroll-hint">
+            <i class="fas fa-arrows-alt-h"></i> Scroll to see more job matches
           </div>
         </div>
       </div>
