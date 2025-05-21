@@ -5,22 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pmail - Find Jobs</title>
 
-  <!-- Favicon (Pmail Logo) -->
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
 
-  <!-- Main CSS -->
   <link rel="stylesheet" href="../public/css/jobs.css" />
   <link rel="stylesheet" href="../public/css/inbox.css" />
 
 </head>
 <body>
-  <!-- Top Navigation -->
   <div class="top-nav">
-    <!-- Left: Logo -->
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
-    <!-- Right: Links -->
     <div class="nav-right">
       <a href="employee_home.html" class="nav-link"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
       <a href="jobs.html" class="nav-link"><img src="../public/images/findjob_icon.png" alt="Find Jobs" class="nav-icon"> Find Jobs</a>
@@ -30,13 +25,10 @@
     </div>
   </div>
 
-  <!-- Main Jobs Container -->
   <div class="jobs-container">
-    <!-- Filter Section (Sticky Panel) -->
     <div class="filter-panel">
       <h3>Filter by</h3>
       
-      <!-- Category Filter -->
       <label for="category-select">Category (Industry):</label>
       <select id="category-select">
         <option value="">All</option>
@@ -53,7 +45,6 @@
         <option value="Transportation">Transportation</option>
       </select>
 
-      <!-- Job Type Filter -->
       <label for="jobtype-select">Job Type:</label>
       <select id="jobtype-select">
         <option value="">All</option>
@@ -64,7 +55,6 @@
         <option value="Freelance">Freelance</option>
       </select>
       
-      <!-- Salary Range Filter -->
       <label for="salary-select">Salary Range:</label>
       <select id="salary-select">
         <option value="">All Salaries</option>
@@ -75,7 +65,6 @@
         <option value="12000+">€12,000+</option>
       </select>
 
-      <!-- Add Sorting Dropdown -->
       <label for="sort-select">Sort By:</label>
       <select id="sort-select">
         <option value="date-desc">Date (Newest First)</option>
@@ -89,13 +78,10 @@
       <button id="filter-btn">Apply</button>
     </div>
 
-    <!-- Job Listings Section -->
     <div class="job-listings" id="job-listings">
-      <!-- Jobs will be dynamically inserted by JavaScript (jobs.js) -->
     </div>
   </div>
 
-  <!-- JavaScript for Jobs (loading/filtering) -->
   <script src="../public/js/jobs.js"></script>
 </body>
 </html>

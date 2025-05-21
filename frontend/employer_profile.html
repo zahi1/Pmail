@@ -11,7 +11,6 @@
   <script src="../public/js/profile.js" defer></script>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
@@ -25,10 +24,8 @@
     </div>
   </div>
 
-  <!-- Profile Container -->
   <div class="profile-container">
     <div class="profile-layout">
-      <!-- Left Sidebar -->
       <div class="profile-sidebar">
         <div class="profile-picture-container">
           <div class="profile-picture" id="profile-picture">
@@ -64,9 +61,7 @@
         </div>
       </div>
       
-      <!-- Right Content Area -->
       <div class="profile-content-area">
-        <!-- Tabs -->
         <div class="profile-tabs">
           <ul class="tab-nav">
             <li class="active" data-tab="info-tab">Company Information</li>
@@ -76,11 +71,8 @@
           </ul>
         </div>
         
-        <!-- Tab Content -->
         <div class="tab-content">
-          <!-- Company Information Tab -->
           <div id="info-tab" class="tab-pane active">
-            <!-- Info View Mode -->
             <div id="profile-info" class="profile-info">
               <div class="info-card">
                 <h3>
@@ -108,7 +100,6 @@
               </div>
             </div>
             
-            <!-- Edit Form (Hidden by default) -->
             <div id="profile-form-container" class="hidden">
               <div class="info-card">
                 <h3>
@@ -155,7 +146,6 @@
             </div>
           </div>
           
-          <!-- Jobs Tab -->
           <div id="jobs-tab" class="tab-pane">
             <div class="activity-card">
               <h3>
@@ -163,7 +153,6 @@
                 Posted Jobs
               </h3>
               <div id="employer-jobs">
-                <!-- Jobs will be loaded dynamically -->
                 <div class="text-center mt-4">
                   <p>Loading your posted jobs...</p>
                 </div>
@@ -171,7 +160,6 @@
             </div>
           </div>
           
-          <!-- Applications Tab -->
           <div id="applications-tab" class="tab-pane">
             <div class="activity-card">
               <h3>
@@ -179,17 +167,14 @@
                 Received Applications <span id="applications-count" class="applications-count">(0)</span>
               </h3>
               
-              <!-- Add filter dropdown -->
               <div class="filter-container" style="margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #eee;">
                 <label for="job-filter">Filter by Job: </label>
                 <select id="job-filter" class="job-filter" style="padding: 5px; border-radius: 4px; border: 1px solid #4285f4; background-color: #aec6f8; color: #333; cursor: pointer; font-weight: 500;">
                   <option value="all">All Jobs</option>
-                  <!-- Job options will be populated dynamically -->
                 </select>
               </div>
               
               <div id="received-applications">
-                <!-- Applications will be loaded dynamically -->
                 <div class="text-center mt-4">
                   <p>Loading received applications...</p>
                 </div>
@@ -197,7 +182,6 @@
             </div>
           </div>
           
-          <!-- Status Messages Tab -->
           <div id="status-messages-tab" class="tab-pane">
             <div class="activity-card">
               <h3>

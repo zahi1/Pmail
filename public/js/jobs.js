@@ -1,20 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Check if we're on jobs.html
     if (document.getElementById("job-listings")) {
       initJobsPage();
     }
-    // Check if we're on job_detail.html
     if (document.getElementById("job-detail-container")) {
       initJobDetailPage();
     }
   });
   
-  // Global variable to store all jobs for sorting
   let allJobs = [];
   
-  // -----------------------
-  // 1) JOBS LIST PAGE
-  // -----------------------
   function initJobsPage() {
     const filterBtn = document.getElementById("filter-btn");
     filterBtn.addEventListener("click", () => {
@@ -25,12 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
       fetchJobs(category, jobType, salaryRange, showClosed);
     });
   
-    // Fetch all jobs initially
     fetchJobs("", "", "", false);
   }
   
   function fetchJobs(category, jobType, salaryRange, showClosed) {
-    let url = "/jobs"; // Because we registered jobs_bp at root url_prefix=""
+    let url = "/jobs"; 
     let params = [];
   
     if (category) params.push(`category=${encodeURIComponent(category)}`);
@@ -42,14 +35,12 @@ document.addEventListener("DOMContentLoaded", () => {
       url += "?" + params.join("&");
     }
   
-    // Show loading indicator
     const listingsContainer = document.getElementById("job-listings");
     listingsContainer.innerHTML = "<div class='loading-indicator'>Loading jobs...</div>";
   
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        // Store all jobs for sorting
         allJobs = data;
         renderJobListings(data);
       })
@@ -63,31 +54,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const listingsContainer = document.getElementById("job-listings");
     const sortOrder = document.getElementById("sort-select")?.value || "date-desc";
     
-    listingsContainer.innerHTML = ""; // Clear old
+    listingsContainer.innerHTML = ""; 
   
     if (jobs.length === 0) {
       listingsContainer.innerHTML = "<p>No jobs found.</p>";
       return;
     }
   
-    // Sort jobs before displaying
     const sortedJobs = sortJobs(jobs, sortOrder);
   
     sortedJobs.forEach(job => {
       const jobDiv = document.createElement("div");
       jobDiv.classList.add("job-item");
       
-      // Add status badge
       const statusBadge = job.is_open ? 
         '<span class="status-badge open">OPEN</span>' : 
         '<span class="status-badge closed">CLOSED</span>';
       
-      // Format deadline
       const deadlineDisplay = job.deadline ? 
         `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
         '<p><strong>Application Deadline:</strong> No deadline</p>';
       
-      // Format salary display
       const salaryDisplay = job.salary_range ? 
         `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
         '<p><strong>Salary:</strong> Not specified</p>';
@@ -105,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
       listingsContainer.appendChild(jobDiv);
     });
   
-    // Attach event listeners for "View Details" buttons
     const detailButtons = document.querySelectorAll(".view-details-btn");
     detailButtons.forEach(btn => {
       btn.addEventListener("click", (e) => {
@@ -115,31 +101,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  // Generic function to sort jobs (same as in post_job.js)
   function sortJobs(jobs, sortOrder) {
     const sortedJobs = [...jobs];
     
     switch (sortOrder) {
-      case 'date-desc': // Newest first
+      case 'date-desc': 
         return sortedJobs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
       
-      case 'date-asc': // Oldest first
+      case 'date-asc': 
         return sortedJobs.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
       
-      case 'title-asc': // A-Z
+      case 'title-asc': 
         return sortedJobs.sort((a, b) => a.title.localeCompare(b.title));
       
-      case 'title-desc': // Z-A
+      case 'title-desc': 
         return sortedJobs.sort((a, b) => b.title.localeCompare(a.title));
       
-      case 'salary-desc': // High to low
+      case 'salary-desc': 
         return sortedJobs.sort((a, b) => {
           const salaryA = parseSalaryForSort(a.salary_range);
           const salaryB = parseSalaryForSort(b.salary_range);
           return salaryB - salaryA;
         });
       
-      case 'salary-asc': // Low to high
+      case 'salary-asc': 
         return sortedJobs.sort((a, b) => {
           const salaryA = parseSalaryForSort(a.salary_range);
           const salaryB = parseSalaryForSort(b.salary_range);
@@ -151,19 +136,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Helper function to parse salary for sorting
   function parseSalaryForSort(salaryText) {
     if (!salaryText) return 0;
     try {
-      // Strip all currency symbols, commas, and spaces
       const cleanText = salaryText.replace(/[€$,\s]/g, '');
       
-      // Check if it's a range with a hyphen
+   
       if (cleanText.includes('-')) {
         const parts = cleanText.split('-');
-        return parseInt(parts[0]); // Use the minimum value for sorting
+        return parseInt(parts[0]); 
       } else {
-        // It's a single value
+        
         return parseInt(cleanText);
       }
     } catch (e) {
@@ -172,11 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // -----------------------
-  // 2) JOB DETAIL PAGE
-  // -----------------------
+
   function initJobDetailPage() {
-    // Grab the job ID from the URL
     const params = new URLSearchParams(window.location.search);
     const jobId = params.get("id");
     if (!jobId) {
@@ -198,26 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderJobDetail(job) {
     const container = document.getElementById("job-detail-container");
     
-    // Create status badge
     const statusBadge = job.is_open ? 
       '<span class="status-badge open">OPEN</span>' : 
       '<span class="status-badge closed">CLOSED</span>';
       
-    // Format deadline
     const deadlineDisplay = job.deadline ? 
       `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
       '<p><strong>Application Deadline:</strong> No deadline</p>';
       
-    // Format salary display
+   
     const salaryDisplay = job.salary_range ? 
       `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
       '<p><strong>Salary:</strong> Not specified</p>';
       
-    // Use the actual employer email from the API response
+    
     const employerEmail = job.employer_email;
     
-    // Apply button - only enabled if job is open
-    // Pass the actual employer email to the inbox compose
+  
     const applyButton = job.is_open ?
       `<button class="apply-btn" onclick="window.location.href='employee_inbox.html?compose=true&employer=${encodeURIComponent(employerEmail)}&job=${encodeURIComponent(job.title)}'">Apply Now</button>` :
       `<button class="apply-btn" disabled>Applications Closed</button>`;
@@ -251,13 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
     
-    // Set up the Read More/Less toggle after rendering
     setupReadMoreLess(container);
   }
   
-  /**
-   * Set up Read More/Less functionality for job descriptions
-   */
+  
   function setupReadMoreLess(container) {
     const readMoreBtn = container.querySelector('.read-more-btn');
     const descText = container.querySelector('.description-text');
@@ -266,11 +240,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     readMoreBtn.addEventListener('click', function() {
       if (descText.classList.contains('collapsed')) {
-        // Expand
         descText.classList.remove('collapsed');
         this.textContent = 'Read Less';
       } else {
-        // Collapse
         descText.classList.add('collapsed');
         this.textContent = 'Read More';
       }

@@ -10,9 +10,7 @@ from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__)
 
-# Admin authentication check decorator
 def admin_required(f):
-    """Decorator to check if user is an admin"""
     def decorated_function(*args, **kwargs):
         user_id = session.get("user_id")
         role = session.get("role")
@@ -29,7 +27,6 @@ def admin_required(f):
 
 @admin_bp.route('/admin/auth-check', methods=['GET'])
 def admin_auth_check():
-    """Check if current user is admin"""
     user_id = session.get("user_id")
     role = session.get("role")
     print(f"Auth check - Session data: user_id={user_id}, role={role}")
@@ -59,7 +56,6 @@ def admin_auth_check():
 @admin_bp.route('/admin/users', methods=['GET'])
 @admin_required
 def get_users():
-    """Get all users with pagination and filtering"""
     try:
         page        = int(request.args.get('page', 1))
         per_page    = int(request.args.get('per_page', 10))
@@ -114,7 +110,6 @@ def get_users():
 @admin_bp.route('/admin/users/<int:user_id>', methods=['DELETE'])
 @admin_required
 def delete_user(user_id):
-    """Delete a user and all associated data"""
     try:
         user = User.query.get(user_id)
         if not user:
@@ -138,7 +133,6 @@ def delete_user(user_id):
 @admin_bp.route('/admin/dashboard-stats', methods=['GET'])
 @admin_required
 def get_dashboard_stats():
-    """Get statistics for admin dashboard"""
     try:
         total_users       = User.query.count()
         employee_count    = User.query.filter_by(role="employee").count()
@@ -249,7 +243,6 @@ def admin_job_actions(job_id):
 @admin_bp.route('/admin/job-categories', methods=['GET'])
 @admin_required
 def get_job_categories_admin():
-    """Return distinct job categories for admin filter"""
     cats = db.session.query(Job.category).distinct().all()
     return jsonify({
         "categories": [{"id": cat[0], "name": cat[0]} for cat in cats]
@@ -260,17 +253,15 @@ from datetime import datetime
 @admin_bp.route('/admin/reports/user-growth', methods=['GET'])
 @admin_required
 def report_user_growth():
-    # grab filters
+
     start = request.args.get('start')
     end   = request.args.get('end')
 
-    # base query
     q = db.session.query(
         func.date_format(User.created_at, '%Y-%m').label('month'),
         func.count(User.id).label('count')
     )
 
-    # only include rows in [start, end]
     if start and end:
         start_dt = datetime.strptime(start, '%Y-%m-%d')
         end_dt   = datetime.strptime(end,   '%Y-%m-%d')
@@ -307,7 +298,6 @@ def report_user_growth():
 @admin_bp.route('/admin/reports/job-postings', methods=['GET'])
 @admin_required
 def report_job_postings():
-    # ─── grab date filters ──────────────────────────────────────────────────────
     start = request.args.get('start')
     end   = request.args.get('end')
     if start and end:
@@ -319,7 +309,6 @@ def report_job_postings():
     else:
         start_dt = end_dt = None
 
-    # ─── postings over time ────────────────────────────────────────────────────
     q = db.session.query(
         func.date_format(Job.created_at, '%Y-%m').label('month'),
         func.count(Job.id).label('count')
@@ -331,7 +320,6 @@ def report_job_postings():
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
-    # ─── breakdown by category (also date-filtered) ───────────────────────────
     cat_q = db.session.query(Job.category, func.count(Job.id))
     if start_dt and end_dt:
         cat_q = cat_q.filter(Job.created_at >= start_dt,
@@ -339,7 +327,6 @@ def report_job_postings():
     cats = cat_q.group_by(Job.category).all()
     job_categories = [{'name': cat, 'count': cnt} for cat,cnt in cats]
 
-    # ─── global metrics (you can choose to date-filter these too if you like) ──
     total_users  = User.query.count()
     total_jobs   = Job.query.filter(
         (Job.created_at >= start_dt) if start_dt else True,
@@ -370,7 +357,7 @@ def report_job_postings():
 @admin_bp.route('/admin/reports/application-stats', methods=['GET'])
 @admin_required
 def report_application_stats():
-    # ─── date filters ──────────────────────────────────────────────────────────
+  
     start = request.args.get('start')
     end   = request.args.get('end')
     if start and end:
@@ -382,7 +369,7 @@ def report_application_stats():
     else:
         start_dt = end_dt = None
 
-    # ─── time-series of applications ───────────────────────────────────────────
+
     app_q = db.session.query(
         func.date_format(Message.created_at, '%Y-%m').label('month'),
         func.count(Message.id).label('count')
@@ -398,7 +385,6 @@ def report_application_stats():
     labels = [m for m,_ in growth]
     data   = [c for _,c in growth]
 
-    # ─── status distribution ───────────────────────────────────────────────────
     status_q = db.session.query(
         Message.status, func.count(Message.id)
     ).filter(
@@ -410,11 +396,10 @@ def report_application_stats():
         status_q = status_q.filter(Message.created_at >= start_dt,
                                    Message.created_at <= end_dt)
     status_counts = dict(status_q.group_by(Message.status).all())
-    # ensure all states present
     for s in ['Pending','Under Review','Accepted','Rejected']:
         status_counts.setdefault(s, 0)
 
-    # ─── metrics ───────────────────────────────────────────────────────────────
+
     total_users        = User.query.count()
     total_jobs         = Job.query.count()
     total_applications = sum(data)
@@ -437,7 +422,7 @@ def report_application_stats():
 @admin_required
 def report_user_activity():
     try:
-        # ─── date filters ────────────────────────────────────────────────────────
+
         start = request.args.get('start')
         end   = request.args.get('end')
         if start and end:
@@ -449,7 +434,7 @@ def report_user_activity():
         else:
             start_dt = end_dt = None
 
-        # ─── monthly logins ─────────────────────────────────────────────────────
+    
         m_q = db.session.query(
             func.date_format(LoginHistory.login_time, '%Y-%m').label('month'),
             func.count(LoginHistory.id).label('count')
@@ -461,7 +446,7 @@ def report_user_activity():
         labels    = [m for m,_ in monthly_q]
         data      = [c for _,c in monthly_q]
 
-        # ─── applications count in this window ─────────────────────────────────
+       
         app_q = Message.query.filter(
             Message.subject.like('%Application for:%'),
             Message.is_draft == False,
@@ -479,7 +464,7 @@ def report_user_activity():
             'other':           0
         }
 
-        # ─── heatmap data ───────────────────────────────────────────────────────
+  
         h_q = db.session.query(
             func.dayofweek(LoginHistory.login_time).label('dow'),
             func.hour(LoginHistory.login_time).label('hour'),
@@ -498,7 +483,6 @@ def report_user_activity():
             for dow, hour, cnt in heatmap_q
         ]
 
-        # ─── avg logins per week by hour ────────────────────────────────────────
         week_count_q = db.session.query(
             func.count(func.distinct(func.yearweek(LoginHistory.login_time, 3)))
         )
@@ -517,7 +501,7 @@ def report_user_activity():
         avg_hour_q = avg_q.group_by('hour').order_by('hour').all()
         avgByHour = [{'hour': str(int(h)), 'avg': float(a)} for h,a in avg_hour_q]
 
-        # ─── overall metrics ────────────────────────────────────────────────────
+    
         total_users  = User.query.count()
         total_jobs   = Job.query.count()
         active_users = total_users

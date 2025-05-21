@@ -4,8 +4,8 @@ class StatusMessage(db.Model):
     __tablename__ = 'status_messages'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)  # Employer user ID
-    status = db.Column(db.String(20), nullable=False)  # 'pending', 'under_review', 'accepted', 'rejected'
+    user_id = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), nullable=False)
     message = db.Column(db.Text, nullable=False)
 
     __table_args__ = (

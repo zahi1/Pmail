@@ -9,9 +9,8 @@
   <link rel="stylesheet" href="../public/css/inbox.css" />
   <link rel="stylesheet" href="../public/css/profile.css" />
   <link rel="stylesheet" href="../public/css/admin.css" />
-<!-- html2canvas -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.1"></script>
@@ -19,7 +18,6 @@
 
 </head>
 <body>
-  <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
@@ -31,10 +29,8 @@
     </div>
   </div>
 
-  <!-- Admin Dashboard Container -->
   <div class="profile-container">
     <div class="profile-layout admin-layout">
-      <!-- Left Sidebar -->
       <div class="profile-sidebar admin-sidebar">
         <div class="profile-picture-container">
           <div class="profile-picture admin-picture">
@@ -64,9 +60,7 @@
         </div>
       </div>
       
-      <!-- Right Content Area -->
       <div class="profile-content-area">
-        <!-- Tabs -->
         <div class="profile-tabs">
           <ul class="tab-nav">
             <li class="active" data-tab="users-tab">User Management</li>
@@ -77,9 +71,7 @@
           </ul>
         </div>
         
-        <!-- Tab Content -->
         <div class="tab-content">
-          <!-- Users Management Tab -->
           <div id="users-tab" class="tab-pane active">
             <div class="admin-card">
               <div class="card-header">
@@ -117,7 +109,6 @@
                     </tr>
                   </thead>
                   <tbody id="users-table-body">
-                    <!-- User data will be loaded dynamically -->
                   </tbody>
                 </table>
               </div>
@@ -130,7 +121,6 @@
             </div>
           </div>
           
-          <!-- Jobs Listings Tab -->
           <div id="jobs-tab" class="tab-pane">
             <div class="admin-card">
               <div class="card-header">
@@ -185,7 +175,6 @@
                     </tr>
                   </thead>
                   <tbody id="jobs-table-body">
-                    <!-- Job data will be loaded dynamically -->
                     <tr>
                       <td colspan="9" class="text-center">Loading jobs...</td>
                     </tr>
@@ -201,7 +190,6 @@
             </div>
           </div>
           
-          <!-- Reports & Analytics Tab -->
           <div id="reports-tab" class="tab-pane">
             <div class="admin-card">
               <div class="card-header">
@@ -216,8 +204,6 @@
                     <option value="application-stats">Application Statistics</option>
                     <option value="user-activity">User Activity</option>
                   </select>
-                  <button id="generate-report-btn" class="admin-btn">Generate Report</button>
-                  <button id="export-report-btn" class="admin-btn">Export as PDF</button>
                 </div>
               </div>
               
@@ -255,7 +241,6 @@
                   <canvas id="usage-heatmap" style="height:200px;"></canvas>
                 </div>
                 
-                
                 <div class="secondary-charts">
                   <div class="chart-wrapper half-width">
                     <h4>User Distribution</h4>
@@ -268,126 +253,87 @@
                 </div>
               </div>
             </div>
-            
-            <!-- User Detail Report Section -->
-            <div class="admin-card mt-20">
-              <div class="card-header">
-                <h3>
-                  <img src="../public/images/person_icon.png" alt="User Detail" class="section-icon">
-                  User Detail Report
-                </h3>
-                <div class="search-filter-container">
-                  <div class="search-group full-width">
-                    <input type="text" id="user-report-search" placeholder="Search user by email or ID..." class="admin-search">
-                    <button id="search-user-report-btn" class="search-btn">
-                      <img src="../public/images/search_icon.png" alt="Search" class="search-icon">
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div id="user-report-container" class="user-report-container hidden">
-                <!-- User report will be generated here -->
-                <div class="user-report-header">
-                  <div class="user-report-identity">
-                    <h4 id="report-user-name">User Name</h4>
-                    <p id="report-user-email">user@example.com</p>
-                    <span id="report-user-role" class="status-badge">Role</span>
-                  </div>
-                  <div class="user-report-actions">
-                    <button id="export-user-report" class="admin-btn">Export Report</button>
-                  </div>
-                </div>
-                
-                <div class="user-report-stats">
-                  <div class="user-stat-card">
-                    <h5>Account Age</h5>
-                    <div class="stat-value" id="user-account-age">0 days</div>
-                  </div>
-                  <div class="user-stat-card">
-                    <h5>Last Active</h5>
-                    <div class="stat-value" id="user-last-active">Never</div>
-                  </div>
-                  <div class="user-stat-card">
-                    <h5>Total Logins</h5>
-                    <div class="stat-value" id="user-total-logins">0</div>
-                  </div>
-                  <div class="user-stat-card">
-                    <h5>Total Applications</h5>
-                    <div class="stat-value" id="user-total-applications">0</div>
-                  </div>
-                </div>
-                
-                <div class="user-activity-chart">
-                  <h4>User Activity Timeline</h4>
-                  <canvas id="user-activity-chart"></canvas>
-                </div>
-                
-                <!-- Specific sections based on user role -->
-                <div id="employee-specific-section" class="role-specific-section hidden">
-                  <h4>Application History</h4>
-                  <table class="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Job Title</th>
-                        <th>Company</th>
-                        <th>Applied Date</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="employee-applications-table">
-                      <!-- Will be populated dynamically -->
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div id="employer-specific-section" class="role-specific-section hidden">
-                  <h4>Posted Jobs</h4>
-                  <table class="admin-table">
-                    <thead>
-                      <tr>
-                        <th>Job Title</th>
-                        <th>Posted Date</th>
-                        <th>Applications</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="employer-jobs-table">
-                      <!-- Will be populated dynamically -->
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              
-              <div id="user-report-placeholder" class="text-center p-20">
-                <p>Search for a user to view detailed reports and analytics</p>
-              </div>
-            </div>
           </div>
 
           <div id="export-tab" class="tab-pane">
             <div class="admin-card">
               <div class="card-header">
-                <h3><img src="../public/images/pdf_icon.png" alt="PDF" class="section-icon"> Export as PDF</h3>
-                <div class="search-filter-container">
-                  <div class="filter-group">
-                    <label>Date Range:</label>
-                    <input type="date" id="export-start-date" title="Start date"> –
-                    <input type="date" id="export-end-date" title="End date">
+                <h3><img src="../public/images/pdf_icon.png" alt="PDF" class="section-icon"> Export Dashboard Reports</h3>
+              </div>
+              
+              <div class="export-options">
+                <div class="export-section">
+                  <h4>1. Select Date Range</h4>
+                  <div class="date-range-selector">
+                    <div class="date-input-group">
+                      <label for="export-start-date">From:</label>
+                      <input type="date" id="export-start-date" class="styled-date-input">
+                    </div>
+                    <div class="date-range-separator">to</div>
+                    <div class="date-input-group">
+                      <label for="export-end-date">To:</label>
+                      <input type="date" id="export-end-date" class="styled-date-input">
+                    </div>
                   </div>
-                  <div class="filter-group">
-                    <label>Include:</label>
-                    <label><input type="checkbox" class="export-module" value="user-growth" checked> User Growth</label>
-                    <label><input type="checkbox" class="export-module" value="job-postings" checked> Job Postings</label>
-                    <label><input type="checkbox" class="export-module" value="application-stats" checked> Application Stats</label>
-                    <label><input type="checkbox" class="export-module" value="user-activity" checked> User Activity</label>
+                </div>
+                
+                <div class="export-section">
+                  <h4>2. Select Report Sections</h4>
+                  <div class="report-options-grid">
+                    <div class="report-option">
+                      <input type="checkbox" id="user-growth-option" class="export-module styled-checkbox" value="user-growth" checked>
+                      <label for="user-growth-option">
+                        <span class="checkbox-indicator"></span>
+                        <img src="../public/images/user_icon.png" alt="Users" class="option-icon">
+                        User Growth
+                      </label>
+                    </div>
+                    
+                    <div class="report-option">
+                      <input type="checkbox" id="job-postings-option" class="export-module styled-checkbox" value="job-postings" checked>
+                      <label for="job-postings-option">
+                        <span class="checkbox-indicator"></span>
+                        <img src="../public/images/job_icon.png" alt="Jobs" class="option-icon">
+                        Job Postings
+                      </label>
+                    </div>
+                    
+                    <div class="report-option">
+                      <input type="checkbox" id="application-stats-option" class="export-module styled-checkbox" value="application-stats" checked>
+                      <label for="application-stats-option">
+                        <span class="checkbox-indicator"></span>
+                        <img src="../public/images/dashboard_icon.png" alt="Applications" class="option-icon">
+                        Application Stats
+                      </label>
+                    </div>
+                    
+                    <div class="report-option">
+                      <input type="checkbox" id="user-activity-option" class="export-module styled-checkbox" value="user-activity" checked>
+                      <label for="user-activity-option">
+                        <span class="checkbox-indicator"></span>
+                        <img src="../public/images/activity_icon.png" alt="Activity" class="option-icon">
+                        User Activity
+                      </label>
+                    </div>
                   </div>
-                  <button id="export-generate-btn" class="admin-btn">Generate PDF Preview</button>
-                  <button id="export-download-btn" class="admin-btn" disabled>Download PDF</button>
+                </div>
+                
+                <div class="export-section">
+                  <h4>3. Generate & Download</h4>
+                  <div class="export-actions">
+                    <button id="export-generate-btn" class="export-btn preview-btn">
+                      <img src="../public/images/eye_icon.png" alt="Preview" class="btn-icon">
+                      Generate Preview
+                    </button>
+                    <button id="export-download-btn" class="export-btn download-btn" disabled>
+                      <img src="../public/images/download_icon.png" alt="Download" class="btn-icon">
+                      Download PDF
+                    </button>
+                  </div>
                 </div>
               </div>
+              
               <div id="export-preview" class="export-preview">
-                <!-- dynamically injected: summary cards + chart canvases -->
               </div>
             </div>
           </div>
@@ -397,8 +343,6 @@
   </div>
 
   
-  <!-- Modals -->
-  <!-- Edit User Modal -->
   <div id="edit-user-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -409,7 +353,6 @@
         <form id="edit-user-form">
           <input type="hidden" id="edit-user-id">
           
-          <!-- Employee specific fields -->
           <div id="employee-fields" class="role-fields">
             <div class="form-group">
               <label for="edit-first-name">First Name</label>
@@ -421,7 +364,6 @@
             </div>
           </div>
           
-          <!-- Employer specific fields -->
           <div id="employer-fields" class="role-fields">
             <div class="form-group">
               <label for="edit-company-name">Company Name</label>
@@ -437,7 +379,6 @@
             </div>
           </div>
           
-          <!-- Common fields -->
           <div class="form-group">
             <label for="edit-email">Email</label>
             <input type="email" id="edit-email" class="form-control">
@@ -465,7 +406,6 @@
 
  
   
-  <!-- Edit Job Modal -->
   <div id="edit-job-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -483,7 +423,6 @@
           <div class="form-group">
             <label for="edit-job-category">Category</label>
             <select id="edit-job-category" class="form-control">
-              <!-- Will be populated dynamically -->
             </select>
           </div>
           <div class="form-group">
@@ -521,7 +460,6 @@
     </div>
   </div>
   
-  <!-- Confirmation Modal -->
   <div id="confirm-modal" class="modal">
     <div class="modal-content confirm-modal-content">
       <div class="modal-header">
@@ -538,7 +476,6 @@
     </div>
   </div>
   
-  <!-- Job Detail Modal -->
   <div id="job-detail-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">

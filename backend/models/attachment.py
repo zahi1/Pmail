@@ -9,8 +9,7 @@ class Attachment(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     file_type = db.Column(db.String(100), nullable=False)
     file_size = db.Column(db.Integer, nullable=False)
-    file_data = db.Column(db.LargeBinary, nullable=False)  # Store the actual PDF data
+    file_data = db.Column(db.LargeBinary, nullable=False)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship with Message model
     message = db.relationship('Message', backref=db.backref('attachments', lazy=True, cascade='all, delete-orphan'))

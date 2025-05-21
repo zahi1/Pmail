@@ -6,12 +6,6 @@ bulk_updates_bp = Blueprint('bulk_updates', __name__)
 
 @bulk_updates_bp.route('/messages/bulk-status-update', methods=['PUT'])
 def bulk_status_update():
-    """
-    Update the status of multiple messages at once
-    Expects JSON payload with:
-    - message_ids: array of message IDs
-    - status: new status to set
-    """
     data = request.json
     
     if not data or 'message_ids' not in data or 'status' not in data:

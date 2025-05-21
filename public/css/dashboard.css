@@ -1,6 +1,3 @@
-/* frontend/public/css/dashboard.css */
-
-/* Force black background, white text */
 body {
   background-color: #121212 !important;
   color: #ffffff !important;
@@ -10,11 +7,10 @@ body {
 }
 
 .dashboard-container {
-  margin-top: 80px; /* Avoid top nav overlap */
+  margin-top: 80px; 
   padding: 20px;
 }
 
-/* Title */
 .dashboard-title {
   text-align: center;
   font-size: 24px;
@@ -22,16 +18,14 @@ body {
   color: #8ab4f8;
 }
 
-/* 2 columns x 2 rows for exactly 4 charts */
 .charts-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* Exactly 2 columns */
+  grid-template-columns: 1fr 1fr;  
   gap: 20px;
   margin-bottom: 40px;
   justify-items: center;
 }
 
-/* Base styling for all chart boxes */
 .chart-box {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -39,13 +33,11 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-/* 1) The first chart box (Application Status Distribution) */
 .charts-grid .chart-box:nth-child(1) {
   width: 450px;
   min-height: 450px;
 }
 
-/* 2) The other three chart boxes (time series, category, day of week) */
 .charts-grid .chart-box:nth-child(2),
 .charts-grid .chart-box:nth-child(3),
 .charts-grid .chart-box:nth-child(4) {
@@ -53,21 +45,18 @@ body {
   min-height: 450px;
 }
 
-/* Canvas sizing for the first chart */
 .charts-grid .chart-box:nth-child(1) canvas {
   width: 100% !important;
-  height: 400px !important; /* e.g. slightly smaller than container */
+  height: 400px !important; 
 }
 
-/* Canvas sizing for the other three charts */
 .charts-grid .chart-box:nth-child(2) canvas,
 .charts-grid .chart-box:nth-child(3) canvas,
 .charts-grid .chart-box:nth-child(4) canvas {
   width: 100% !important;
-  height: 400px !important; /* same height, but box is wider */
+  height: 400px !important; 
 }
 
-/* Table Container */
 .table-container {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -76,14 +65,12 @@ body {
   margin-top: 20px;
 }
 
-/* Table Title */
 .table-container h2 {
   margin-bottom: 15px;
   color: #8ab4f8;
   text-align: center;
 }
 
-/* Applications Table */
 #applicationsTable {
   width: 100%;
   border-collapse: collapse;
@@ -106,13 +93,11 @@ body {
   background-color: #2a2a2a;
 }
 
-/* Optional: row hover for a slightly fancier table */
 #applicationsTable tbody tr:hover {
   background-color: #3a3a3a;
   transition: background-color 0.2s;
 }
 
-/* --- General Dashboard Styles --- */
 body {
   font-family: Arial, sans-serif;
   background-color: #121212;
@@ -135,7 +120,6 @@ body {
   color: #8ab4f8;
 }
 
-/* --- Charts Grid --- */
 .charts-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -150,7 +134,6 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Applications Container --- */
 .applications-container {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -162,7 +145,6 @@ body {
   overflow: hidden;
 }
 
-/* Add highlight accent to applications container */
 .applications-container::before {
   content: '';
   position: absolute;
@@ -179,13 +161,11 @@ body {
   color: #8ab4f8;
   font-size: 28px;
   text-align: center;
-  /* Removed text-transform: uppercase; to keep the proper case */
   letter-spacing: 1px;
   font-weight: bold;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Filter Controls --- */
 .applications-filters {
   display: flex;
   justify-content: center;
@@ -223,7 +203,6 @@ body {
   outline: none;
 }
 
-/* Remove search bar styles as they're no longer needed */
 .search-bar {
   display: none;
 }
@@ -281,29 +260,24 @@ body {
   color: #fff;
 }
 
-/* --- Applications Grid --- */
 .applications-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 20px;
 }
 
-/* --- Application Card --- */
 .application-card {
   background-color: #2a2a2a;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  /* Removed automatic animation:
-  animation: cardPulse 3s infinite;
-  animation-delay: calc(var(--card-index, 0) * 0.5s); */
 }
 
 .application-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  animation: cardPulse 2s infinite; /* Animation only on hover */
+  animation: cardPulse 2s infinite; 
 }
 
 .card-header {
@@ -325,7 +299,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Status Styles */
 .status-badge {
   padding: 5px 10px;
   border-radius: 20px;
@@ -455,7 +428,6 @@ body {
   border-radius: 3px;
 }
 
-/* Toast notification styling for status updates */
 .toast-notification {
   position: fixed;
   bottom: 30px;
@@ -475,14 +447,12 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Animation for cards to draw attention */
 @keyframes cardPulse {
   0% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
   50% { box-shadow: 0 6px 12px rgba(138, 180, 248, 0.4); }
   100% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
 }
 
-/* Add "No applications" styling for empty state */
 .no-applications {
   text-align: center;
   padding: 40px;
@@ -496,7 +466,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1200px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -527,7 +496,6 @@ body {
   }
 }
 
-/* Bulk Actions Styling */
 .bulk-actions-panel {
   display: flex;
   justify-content: space-between;
@@ -592,7 +560,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Application Card Selection */
 .application-card {
   position: relative;
 }
@@ -615,7 +582,6 @@ body {
   box-shadow: 0 0 0 2px #8ab4f8;
 }
 
-/* Custom checkbox styling */
 input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -645,12 +611,10 @@ input[type="checkbox"]:checked::after {
   transform: rotate(45deg);
 }
 
-/* Adjust card header to make room for checkbox */
 .application-card .card-header {
   padding-left: 40px;
 }
 
-/* Closed applications section styling */
 .section-header {
   margin-top: 30px;
   padding-bottom: 10px;
@@ -675,7 +639,6 @@ input[type="checkbox"]:checked::after {
   opacity: 0.8;
 }
 
-/* Enhanced Filter and Sort Controls */
 .applications-filters {
   margin-bottom: 20px;
 }
@@ -719,7 +682,6 @@ input[type="checkbox"]:checked::after {
   border-color: #8ab4f8;
 }
 
-/* Special styling for sort dropdown */
 .filter-controls label[for="sortBy"],
 .filter-controls label[for="jobTitleFilter"],
 .filter-controls label[for="statusFilter"],

@@ -5,34 +5,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Global variables to store all applications for filtering
   window.allApplications = []; 
   window.openApplications = [];
   window.closedApplications = [];
   window.jobTitles = new Set();
 
-  // Fetch dashboard data
   fetch(`/dashboard/employer/${currentUserId}`)
     .then(res => res.json())
     .then(data => {
-      // Store applications globally for filtering
       window.allApplications = data.applications;
       
-      // Extract unique categories and job titles
       const uniqueCategories = new Set();
       data.applications.forEach(app => {
         if (app.job_category && app.job_category !== "N/A") {
           uniqueCategories.add(app.job_category);
         }
         
-        // Extract job title from subject (after "Application for:")
         if (app.subject && app.subject.toLowerCase().includes("application for:")) {
           const jobTitle = app.subject.split("Application for:")[1].trim();
           window.jobTitles.add(jobTitle);
         }
       });
       
-      // Populate category filter
       const categoryFilter = document.getElementById("categoryFilter");
       uniqueCategories.forEach(category => {
         const option = document.createElement("option");
@@ -41,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
         categoryFilter.appendChild(option);
       });
       
-      // Populate job title filter
       const jobTitleFilter = document.getElementById("jobTitleFilter");
       window.jobTitles.forEach(title => {
         const option = document.createElement("option");
@@ -50,16 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
         jobTitleFilter.appendChild(option);
       });
       
-      // Render charts with the data
       renderStatusChart(data.status_counts);
       renderTimeSeriesChart(data.time_series);
       renderCategoryChart(data.category_counts);
       renderDayOfWeekChart(data.day_of_week_counts);
       
-      // Separate open and closed applications
       separateApplications(window.allApplications);
       
-      // Display applications in their respective sections
       displayApplicationCards(window.openApplications, "applicationsGrid");
       displayApplicationCards(window.closedApplications, "closedApplicationsGrid");
     })
@@ -68,25 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Separate applications into open and closed based on job deadline
 function separateApplications(applications) {
   window.openApplications = applications.filter(app => !app.job_closed);
   window.closedApplications = applications.filter(app => app.job_closed);
 }
 
-// Filter applications based on selected status, category and job title
 function filterApplications() {
   const statusValue = document.getElementById("statusFilter").value;
   const categoryValue = document.getElementById("categoryFilter").value;
   const jobTitleValue = document.getElementById("jobTitleFilter").value;
   const sortByValue = document.getElementById("sortBy").value;
   
-  // Filter open applications
   const filteredOpen = window.openApplications.filter(app => {
     const matchesStatus = statusValue === "all" || app.status === statusValue;
     const matchesCategory = categoryValue === "all" || app.job_category === categoryValue;
     
-    // Extract job title from subject for comparison
     let appJobTitle = "";
     if (app.subject && app.subject.toLowerCase().includes("application for:")) {
       appJobTitle = app.subject.split("Application for:")[1].trim();
@@ -97,12 +83,10 @@ function filterApplications() {
     return matchesStatus && matchesCategory && matchesJobTitle;
   });
   
-  // Filter closed applications
   const filteredClosed = window.closedApplications.filter(app => {
     const matchesStatus = statusValue === "all" || app.status === statusValue;
     const matchesCategory = categoryValue === "all" || app.job_category === categoryValue;
     
-    // Extract job title from subject for comparison
     let appJobTitle = "";
     if (app.subject && app.subject.toLowerCase().includes("application for:")) {
       appJobTitle = app.subject.split("Application for:")[1].trim();
@@ -113,33 +97,26 @@ function filterApplications() {
     return matchesStatus && matchesCategory && matchesJobTitle;
   });
   
-  // Apply sorting to both filtered lists
   const sortedOpen = sortApplications(filteredOpen, sortByValue);
   const sortedClosed = sortApplications(filteredClosed, sortByValue);
   
-  // Display filtered applications in their respective sections
   displayApplicationCards(sortedOpen, "applicationsGrid");
   displayApplicationCards(sortedClosed, "closedApplicationsGrid");
   
-  // Update UI to show/hide closed applications section based on results
   const closedHeader = document.querySelector('.closed-applications-header');
   const closedGrid = document.getElementById("closedApplicationsGrid");
   
   if (sortedClosed.length === 0) {
-    // Hide closed applications section if empty after filtering
     if (closedHeader) closedHeader.style.display = 'none';
     if (closedGrid) closedGrid.style.display = 'none';
   } else {
-    // Show closed applications section if it has content
     if (closedHeader) closedHeader.style.display = 'block';
     if (closedGrid) closedGrid.style.display = 'grid';
   }
 }
 
-// Sort applications based on selected criteria
 function sortApplications(applications, sortCriteria) {
   if (!sortCriteria || sortCriteria === "date-desc") {
-    // Default sorting - newest first
     return [...applications];
   }
 
@@ -148,15 +125,12 @@ function sortApplications(applications, sortCriteria) {
   return applications.sort((a, b) => {
     let comparison = 0;
     
-    // Sort by date
     if (field === 'date') {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
       comparison = dateA - dateB;
     } 
-    // Sort by title
     else if (field === 'title') {
-      // Extract job title from subject
       let titleA = "", titleB = "";
       if (a.subject && a.subject.toLowerCase().includes("application for:")) {
         titleA = a.subject.split("Application for:")[1].trim();
@@ -166,36 +140,28 @@ function sortApplications(applications, sortCriteria) {
       }
       comparison = titleA.localeCompare(titleB);
     } 
-    // Sort by salary
     else if (field === 'salary') {
-      // Get min salary values for comparison
       const salaryA = getSalaryValue(a.salary_range);
       const salaryB = getSalaryValue(b.salary_range);
       comparison = salaryA - salaryB;
     }
     
-    // Adjust direction based on asc/desc
     return direction === 'asc' ? comparison : -comparison;
   });
 }
 
-// Helper function to extract a numeric value from salary range for sorting
 function getSalaryValue(salaryRange) {
   if (!salaryRange || salaryRange === "Not specified") {
-    return 0; // Place unspecified salaries at the bottom/top depending on sort order
+    return 0; 
   }
   
   try {
-    // Strip all currency symbols, commas, and spaces
     const cleanText = salaryRange.replace(/[€$,\s]/g, '');
     
-    // Check if it's a range with a hyphen
     if (cleanText.includes('-')) {
       const parts = cleanText.split('-');
-      // Return the minimum value in the range for sorting
       return parseInt(parts[0]);
     } else {
-      // It's a single value
       return parseInt(cleanText);
     }
   } catch (e) {
@@ -204,17 +170,14 @@ function getSalaryValue(salaryRange) {
   }
 }
 
-// Global variable to track selected application IDs
 window.selectedApplications = [];
 
-// Display application cards with checkboxes for selection
 function displayApplicationCards(applications, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   
   container.innerHTML = "";
   
-  // Update the bulk actions panel based on initial state
   if (containerId === "applicationsGrid") {
     updateBulkActionsPanel();
   }
@@ -229,20 +192,16 @@ function displayApplicationCards(applications, containerId) {
   }
   
   applications.forEach(app => {
-    // Create card element
     const card = document.createElement("div");
     card.className = "application-card";
-    card.dataset.appId = app.id; // Store application ID in the DOM element
+    card.dataset.appId = app.id; 
     
-    // Apply closed class for styling if in closed container
     if (containerId === "closedApplicationsGrid") {
       card.classList.add("closed-application");
     }
     
-    // Get applicant initial for avatar
     const initial = app.sender_email ? app.sender_email.charAt(0).toUpperCase() : "?";
     
-    // Format date for display
     const date = new Date(app.created_at);
     const formattedDate = date.toLocaleDateString("en-US", { 
       year: 'numeric', 
@@ -250,13 +209,11 @@ function displayApplicationCards(applications, containerId) {
       day: 'numeric' 
     });
     
-    // Extract job title for display
     let jobTitle = app.subject;
     if (app.subject && app.subject.toLowerCase().includes("application for:")) {
       jobTitle = app.subject.split("Application for:")[1].trim();
     }
     
-    // First build the card HTML structure without the checkbox
     card.innerHTML = `
       <div class="card-header">
         <h3 class="job-title">${jobTitle || 'No Subject'}</h3>
@@ -307,7 +264,6 @@ function displayApplicationCards(applications, containerId) {
       </div>
     `;
     
-    // Only add checkbox for open applications
     if (containerId === "applicationsGrid") {
       const cardCheckbox = document.createElement("input");
       cardCheckbox.type = "checkbox";
@@ -317,7 +273,6 @@ function displayApplicationCards(applications, containerId) {
         toggleApplicationSelection(app.id, this.checked);
       });
       
-      // Insert checkbox at the beginning of the card
       card.insertBefore(cardCheckbox, card.firstChild);
     }
     
@@ -325,42 +280,32 @@ function displayApplicationCards(applications, containerId) {
   });
 }
 
-// Toggle selection for an individual application
 function toggleApplicationSelection(appId, isSelected) {
   if (isSelected) {
-    // Add to selection if not already there
     if (!window.selectedApplications.includes(appId)) {
       window.selectedApplications.push(appId);
       
-      // Visually mark the card as selected
       const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
       if (card) card.classList.add('selected');
     }
   } else {
-    // Remove from selection
     window.selectedApplications = window.selectedApplications.filter(id => id != appId);
     
-    // Remove selected styling
     const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
     if (card) card.classList.remove('selected');
     
-    // Uncheck "Select All" if it was checked
     document.getElementById("selectAll").checked = false;
   }
   
-  // Update bulk actions panel
   updateBulkActionsPanel();
 }
 
-// Toggle select all applications
 function toggleSelectAll() {
   const isChecked = document.getElementById("selectAll").checked;
   const checkboxes = document.querySelectorAll('.card-checkbox');
   
-  // Clear the current selection
   window.selectedApplications = [];
   
-  // Update checkboxes and selection
   checkboxes.forEach(checkbox => {
     checkbox.checked = isChecked;
     
@@ -368,28 +313,22 @@ function toggleSelectAll() {
       const appId = parseInt(checkbox.dataset.id);
       window.selectedApplications.push(appId);
       
-      // Add selected class to card
       const card = checkbox.closest('.application-card');
       if (card) card.classList.add('selected');
     } else {
-      // Remove selected class from all cards
       const cards = document.querySelectorAll('.application-card');
       cards.forEach(card => card.classList.remove('selected'));
     }
   });
   
-  // Update bulk actions panel
   updateBulkActionsPanel();
 }
 
-// Update the bulk actions UI based on selection
 function updateBulkActionsPanel() {
   const selectedCount = window.selectedApplications.length;
   
-  // Update counter display
   document.getElementById("selectedCount").textContent = `(${selectedCount} selected)`;
   
-  // Enable/disable bulk actions
   const bulkActionSelect = document.getElementById("bulkActionSelect");
   const applyButton = document.getElementById("applyBulkAction");
   
@@ -402,7 +341,6 @@ function updateBulkActionsPanel() {
   }
 }
 
-// Enable/disable apply button when bulk action changes
 document.addEventListener('DOMContentLoaded', () => {
   const bulkActionSelect = document.getElementById("bulkActionSelect");
   if (bulkActionSelect) {
@@ -413,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Apply bulk action to selected applications
 function applyBulkAction() {
   const action = document.getElementById("bulkActionSelect").value;
   
@@ -421,13 +358,11 @@ function applyBulkAction() {
     return;
   }
   
-  // Confirm before applying bulk action
   const confirmMessage = `Are you sure you want to change ${window.selectedApplications.length} application(s) to status "${action}"?`;
   if (!confirm(confirmMessage)) {
     return;
   }
   
-  // Call API to update status for all selected applications
   fetch('/messages/bulk-status-update', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -443,15 +378,12 @@ function applyBulkAction() {
     return response.json();
   })
   .then(data => {
-    // Update UI for all affected applications
     window.selectedApplications.forEach(appId => {
-      // Update in the global array
       const appIndex = window.allApplications.findIndex(app => app.id == appId);
       if (appIndex !== -1) {
         window.allApplications[appIndex].status = action;
       }
       
-      // Update the card's status badge and dropdown
       const card = document.querySelector(`.application-card[data-app-id="${appId}"]`);
       if (card) {
         const statusBadge = card.querySelector('.status-badge');
@@ -466,19 +398,16 @@ function applyBulkAction() {
           statusSelect.value = action;
         }
         
-        // Remove selected styling
         card.classList.remove('selected');
         const checkbox = card.querySelector('.card-checkbox');
         if (checkbox) checkbox.checked = false;
       }
     });
     
-    // Reset selection
     window.selectedApplications = [];
     document.getElementById("selectAll").checked = false;
     updateBulkActionsPanel();
     
-    // Show success toast
     showToast(`Successfully updated ${data.updated_count || data.count || 'all'} applications`);
   })
   .catch(error => {
@@ -488,7 +417,6 @@ function applyBulkAction() {
 }
 
 function updateApplicationStatus(messageId, newStatus) {
-  // Debug logs
   console.log(`Updating status for message ${messageId} to ${newStatus}`);
   
   fetch(`/messages/${messageId}/status`, {
@@ -505,12 +433,10 @@ function updateApplicationStatus(messageId, newStatus) {
   .then(data => {
     console.log("Status update response:", data);
     
-    // Update application in the global array
     const appIndex = window.allApplications.findIndex(app => app.id == messageId);
     if (appIndex !== -1) {
       window.allApplications[appIndex].status = newStatus;
       
-      // Update the badge visually in the DOM
       const card = document.querySelector(`.application-card[data-app-id="${messageId}"]`);
       if (card) {
         const statusBadge = card.querySelector('.status-badge');
@@ -538,18 +464,15 @@ function replyToApplicant(email, subject) {
 }
 
 function showToast(message) {
-  // Create toast notification
   let toast = document.createElement("div");
   toast.className = "toast-notification";
   toast.innerText = message;
   document.body.appendChild(toast);
   
-  // Show toast
   setTimeout(() => {
     toast.classList.add("visible");
   }, 100);
   
-  // Hide toast after delay
   setTimeout(() => {
     toast.classList.remove("visible");
     setTimeout(() => {
@@ -558,9 +481,7 @@ function showToast(message) {
   }, 3000);
 }
 
-// Chart rendering functions
 function renderStatusChart(statusCounts) {
-  // Implementation for status chart
   const ctx = document.getElementById("statusChart").getContext("2d");
   new Chart(ctx, {
     type: 'pie',
@@ -590,7 +511,6 @@ function renderStatusChart(statusCounts) {
 }
 
 function renderTimeSeriesChart(timeSeriesData) {
-  // Implementation for time series chart
   const months = Object.keys(timeSeriesData).sort();
   const counts = months.map(m => timeSeriesData[m]);
   
@@ -645,7 +565,6 @@ function renderTimeSeriesChart(timeSeriesData) {
 }
 
 function renderCategoryChart(categoryCounts) {
-  // Implementation for category chart
   const categories = Object.keys(categoryCounts);
   const counts = categories.map(c => categoryCounts[c]);
   
@@ -695,7 +614,6 @@ function renderCategoryChart(categoryCounts) {
 }
 
 function renderDayOfWeekChart(dayOfWeekData) {
-  // Implementation for day of week chart
   const order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const days = order.filter(day => dayOfWeekData[day] !== undefined);
   const counts = days.map(day => dayOfWeekData[day]);

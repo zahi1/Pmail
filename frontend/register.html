@@ -13,10 +13,8 @@
         <img src="/public/images/Pmail1.png" alt="Pmail Logo">
         <h2>Create a Pmail Account</h2>
 
-        <!-- Hidden input for role selection -->
         <input type="hidden" id="role">
 
-        <!-- Step 1: Name -->
         <div id="step-1" class="form-step">
             <input type="text" id="first_name" placeholder="First name" required>
             <input type="text" id="last_name" placeholder="Last name" required>
@@ -26,7 +24,6 @@
             <button onclick="validateName()">Next</button>
         </div>
 
-        <!-- Step 2: Birthdate Validation -->
         <div id="step-2" class="form-step" style="display: none;">
             <label>Birthdate:</label>
             <input type="date" id="birthdate" required>
@@ -36,20 +33,9 @@
             <button onclick="validateBirthdate()">Next</button>
         </div>
 
-        <!-- Step 3: Choose Email -->
         <div id="step-3" class="form-step" style="display: none;">
-            <h3>Choose your Pmail address</h3>
-            <p>Pick a Pmail address or create your own:</p>
-            
-            <input type="radio" id="email_option1" name="email_option" value="user123@pmail.com" onclick="checkSelectedEmail('user123@pmail.com')">
-            <label for="email_option1">user123@pmail.com</label><br>
-            
-            <input type="radio" id="email_option2" name="email_option" value="jobseeker@pmail.com" onclick="checkSelectedEmail('jobseeker@pmail.com')">
-            <label for="email_option2">jobseeker@pmail.com</label><br>
-            
-            <input type="radio" id="custom_email_option" name="email_option" onclick="enableCustomEmail()">
-            <input type="email" id="email_input" placeholder="Create your own Pmail address" disabled required>
-        
+           
+            <input type="email" id="email_input" placeholder="Enter your Pmail address" required>
             <p id="email-error" class="error-message" style="display: none; color: red;">
               Email must end with @pmail.com.
             </p>
@@ -57,7 +43,6 @@
             <button id="email-next-btn" onclick="validateEmail()">Next</button>
         </div>
 
-        <!-- Step 4: Password Setup -->
         <div id="step-4" class="form-step" style="display: none;">
             <input type="password" id="password" placeholder="Password" required>
             <input type="password" id="confirm_password" placeholder="Confirm Password" required>
@@ -68,7 +53,6 @@
             <button onclick="validatePassword()">Next</button>
         </div>
 
-        <!-- Step 5: Phone Number & Final Sign Up -->
         <div id="step-5" class="form-step" style="display: none;">
             <input type="tel" id="phone" placeholder="Phone Number" required>
             <p id="phone-error" class="error-message" style="display: none; color: red;">
@@ -76,7 +60,6 @@
             </p>
             <div id="phone-checking" style="display: none;">Checking availability...</div>
             
-            <!-- Categories field - for employees only -->
             <div class="form-group employee-field" id="categories-group" style="display:none;">
               <label>Job Categories of Interest</label>
               <div class="categories-container" id="registration-categories-container">
@@ -98,17 +81,13 @@
               </p>
             </div>
             
-            <!-- The external JS (auth.js) will handle the click event for register-btn -->
             <button type="button" id="register-btn" onclick="validateFinal()">Sign Up</button>
         </div>
     </div>
 
-    <!-- External script for login & register calls -->
     <script src="/public/js/auth.js"></script>
 
-    <!-- Inline script for multi-step logic ONLY -->
     <script>
-        // 1) On page load, check the URL for a valid role (employee/employer)
         function getRoleFromURL() {
             const params = new URLSearchParams(window.location.search);
             let role = params.get("role");
@@ -120,45 +99,11 @@
         }
         document.addEventListener("DOMContentLoaded", getRoleFromURL);
 
-        // 2) nextStep: hides the current step, shows the next
         function nextStep(step) {
             document.getElementById("step-" + step).style.display = "none";
             document.getElementById("step-" + (step + 1)).style.display = "block";
         }
 
-        // 3) Enable custom email input if user selects that radio
-        function enableCustomEmail() {
-            let emailInput = document.getElementById("email_input");
-            emailInput.disabled = false;
-            emailInput.focus();
-            
-            // Add input event listener for custom email checking
-            emailInput.addEventListener("input", function() {
-                let email = this.value.trim();
-                if (!email || !/^[a-zA-Z0-9._%+-]+@pmail\.com$/.test(email)) return;
-                
-                let emailError = document.getElementById("email-error");
-                let emailChecking = document.getElementById("email-checking");
-                
-                emailChecking.style.display = "block";
-                emailError.style.display = "none";
-                
-                debouncedCheckEmail(email, function(result) {
-                    emailChecking.style.display = "none";
-                    if (result.error) {
-                        emailError.textContent = "Error checking email.";
-                        emailError.style.display = "block";
-                    } else if (!result.available) {
-                        emailError.textContent = "This email address is already in use.";
-                        emailError.style.display = "block";
-                    } else {
-                        emailError.style.display = "none";
-                    }
-                });
-            });
-        }
-
-        // 4) Toggle password fields from type=password to text
         function togglePassword() {
             let password = document.getElementById("password");
             let confirmPassword = document.getElementById("confirm_password");
@@ -166,7 +111,6 @@
             confirmPassword.type = (confirmPassword.type === "password") ? "text" : "password";
         }
 
-        // 5) Validate birthdate (13+ years old)
         function validateBirthdate() {
             let birthdate = document.getElementById("birthdate").value;
             if (!birthdate) {
@@ -178,21 +122,18 @@
             let birthDateObj = new Date(birthdate);
             let today = new Date();
             
-            // Calculate age
             let age = today.getFullYear() - birthDateObj.getFullYear();
             let monthDiff = today.getMonth() - birthDateObj.getMonth();
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
                 age--;
             }
             
-            // Check minimum age (13)
             if (age < 13) {
                 document.getElementById("age-error").textContent = "You must be at least 13 years old to register.";
                 document.getElementById("age-error").style.display = "block";
                 return;
             }
             
-            // Check maximum age (122)
             if (age > 122) {
                 document.getElementById("age-error").textContent = "Maximum age cannot exceed 122 years.";
                 document.getElementById("age-error").style.display = "block";
@@ -203,30 +144,18 @@
             nextStep(2);
         }
 
-        // 6) Validate email radio choice or custom input
         async function validateEmail() {
-            let selectedEmailOption = document.querySelector('input[name="email_option"]:checked');
-            let customEmailInput   = document.getElementById("email_input");
-            let emailError         = document.getElementById("email-error");
-            let emailChecking      = document.getElementById("email-checking");
-            let emailNextBtn       = document.getElementById("email-next-btn");
+            let customEmailInput = document.getElementById("email_input");
+            let emailError = document.getElementById("email-error");
+            let emailChecking = document.getElementById("email-checking");
+            let emailNextBtn = document.getElementById("email-next-btn");
             
-            let email = "";
+            let email = customEmailInput.value.trim();
 
-            // If user picked a standard radio option (not custom)
-            if (selectedEmailOption && selectedEmailOption.id !== "custom_email_option") {
-                email = selectedEmailOption.value;
-            }
-            // Else if user typed a custom email
-            else if (customEmailInput && !customEmailInput.disabled) {
-                email = customEmailInput.value.trim();
-            }
-
-            // Must end with @pmail.com
             let emailPattern = /^[a-zA-Z0-9._%+-]+@pmail\.com$/;
 
             if (email === "") {
-                emailError.textContent = "Please select or enter a Pmail address.";
+                emailError.textContent = "Please enter a Pmail address.";
                 emailError.style.display = "block";
                 return;
             } else if (!emailPattern.test(email)) {
@@ -235,10 +164,8 @@
                 return;
             }
             
-            // Disable next button while checking
             emailNextBtn.disabled = true;
             
-            // Show loading indicator
             emailChecking.style.display = "block";
             emailError.style.display = "none";
             
@@ -261,7 +188,6 @@
                     return;
                 }
                 
-                // Email is available
                 emailError.style.display = "none";
                 emailNextBtn.disabled = false;
                 nextStep(3);
@@ -272,57 +198,30 @@
                 emailNextBtn.disabled = false;
             }
         }
-        
-        // Check email as soon as it's selected via radio buttons
-        function checkSelectedEmail(email) {
-            let emailError = document.getElementById("email-error");
-            let emailChecking = document.getElementById("email-checking");
-            
-            emailChecking.style.display = "block";
-            emailError.style.display = "none";
-            
-            debouncedCheckEmail(email, function(result) {
-                emailChecking.style.display = "none";
-                if (result.error) {
-                    emailError.textContent = "Error checking email.";
-                    emailError.style.display = "block";
-                } else if (!result.available) {
-                    emailError.textContent = "This email address is already in use.";
-                    emailError.style.display = "block";
-                } else {
-                    emailError.style.display = "none";
-                }
-            });
-        }
 
-        // 7) Validate password match
         function validatePassword() {
             let password        = document.getElementById("password").value;
             let confirmPassword = document.getElementById("confirm_password").value;
             let passwordError   = document.getElementById("password-error");
 
-            // Check for password match
             if (password !== confirmPassword) {
                 passwordError.textContent = "Passwords do not match.";
                 passwordError.style.display = "block";
                 return;
             }
             
-            // Check for minimum length
             if (password.length < 8) {
                 passwordError.textContent = "Password must be at least 8 characters long.";
                 passwordError.style.display = "block";
                 return;
             }
             
-            // Check for uppercase letter
             if (!/[A-Z]/.test(password)) {
                 passwordError.textContent = "Password must include at least one uppercase letter.";
                 passwordError.style.display = "block";
                 return;
             }
             
-            // Check for special character
             if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
                 passwordError.textContent = "Password must include at least one special character.";
                 passwordError.style.display = "block";
@@ -333,7 +232,6 @@
             nextStep(4);
         }
         
-        // Final validation before registration (Step 5)
         async function validateFinal() {
             let phone = document.getElementById("phone").value.trim();
             let phoneError = document.getElementById("phone-error");
@@ -341,7 +239,6 @@
             let role = document.getElementById("role").value;
             let registerBtn = document.getElementById("register-btn");
             
-            // Validate phone number
             let phonePattern = /^[0-9()+\-\s]{7,20}$/;
             if (!phone) {
                 phoneError.textContent = "Please enter your phone number.";
@@ -353,10 +250,8 @@
                 return;
             }
             
-            // Disable button while checking
             registerBtn.disabled = true;
             
-            // Show loading indicator
             phoneChecking.style.display = "block";
             phoneError.style.display = "none";
             
@@ -379,7 +274,6 @@
                     return;
                 }
                 
-                // For employees, validate categories
                 if (role === "employee") {
                     let categories = document.getElementById("user_categories").value;
                     let categoriesError = document.getElementById("categories-error");
@@ -394,9 +288,8 @@
                     }
                 }
                 
-                // If all validations pass, directly call the register function
                 console.log("All validations passed, calling register()");
-                registerUser(); // Use the renamed function to avoid conflict with the element id
+                registerUser();
                 
             } catch (error) {
                 console.error("Error in validateFinal:", error);
@@ -407,7 +300,7 @@
             }
         }
 
-        // Renamed register function to avoid conflict with button id
+
         function registerUser() {
             console.log("Starting registration process");
             
@@ -417,13 +310,8 @@
             const password = document.getElementById("password").value;
             const phone = document.getElementById("phone").value.trim();
             const role = document.getElementById("role").value;
-            const emailElem = document.querySelector('input[name="email_option"]:checked');
-            const email = emailElem
-              ? (emailElem.id === "custom_email_option"
-                 ? document.getElementById("email_input").value.trim().toLowerCase()
-                 : emailElem.value.trim().toLowerCase())
-              : "";
-              
+            const email = document.getElementById("email_input").value.trim().toLowerCase();
+            
             console.log("Preparing registration data:", { email, role, phone });
             
             const userData = {
@@ -439,7 +327,6 @@
                   : undefined
             };
 
-            // Show a loading message
             const registerBtn = document.getElementById("register-btn");
             registerBtn.textContent = "Registering...";
             
@@ -456,9 +343,7 @@
                 console.log("Registration result:", data);
                 const step5 = document.getElementById("step-5");
                 
-                // Success
                 if (data.message === "User registered successfully") {
-                    // insert or update success paragraph
                     let successEl = document.getElementById("register-success");
                     if (!successEl) {
                         successEl = document.createElement("p");
@@ -469,16 +354,13 @@
                     }
                     successEl.textContent = data.message + " Redirecting...";
                     
-                    // delay then redirect
                     setTimeout(() => {
                         window.location.href = role === "employee"
                           ? "/frontend/employee_inbox.html"
                           : "/frontend/employer_inbox.html";
                     }, 1500);
                 }
-                // Error
                 else {
-                    // show server error inline at bottom of form
                     let serverError = document.getElementById("register-server-error");
                     if (!serverError) {
                         serverError = document.createElement("p");
@@ -511,7 +393,6 @@
             });
         }
 
-        // Setup phone number validation on input
         document.addEventListener("DOMContentLoaded", function() {
             const phoneInput = document.getElementById("phone");
             if (phoneInput) {
@@ -541,7 +422,6 @@
             }
         });
 
-        // New validation for first and last name (Step 1)
         function validateName() {
             let firstName = document.getElementById("first_name").value.trim();
             let lastName = document.getElementById("last_name").value.trim();

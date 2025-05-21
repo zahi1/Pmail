@@ -9,14 +9,11 @@
   <script src="../public/js/inbox.js" defer></script>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
   <div class="top-nav">
-    <!-- Left: Logo -->
     <div class="nav-left">
       <img src="../public/images/burger_icon.png" alt="Menu" class="menu-toggle" id="menu-toggle" />
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
-    <!-- Right: Navigation Links -->
     <div class="nav-right">
       <a href="employee_home.html" class="nav-link"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
       <a href="jobs.html" class="nav-link"><img src="../public/images/findjob_icon.png" alt="Find Jobs" class="nav-icon"> Find Jobs</a>
@@ -26,7 +23,6 @@
     </div>
   </div>
 
-  <!-- Sidebar for Mail Folders -->
   <aside class="sidebar" id="sidebar">
     <button class="compose-btn" id="compose-btn">
       <img src="../public/images/pen_icon.png" alt="Compose" class="compose-icon" />
@@ -49,21 +45,16 @@
         <img src="../public/images/spam_icon.png" alt="Spam Icon" />
         <span>Spam</span>
       </li>
-      <!--<li>
-        <img src="../public/images/trash_icon.png" alt="Trash Icon" />
-        <span>Trash</span>
-      </li> -->
+
     </ul>
   </aside>
 
-  <!-- Main Content: Inbox Messages -->
+
   <main class="main-content">
     <div id="inbox-messages" class="email-list">
-      <!-- JavaScript will load the messages here -->
     </div>
   </main>
 
-  <!-- Compose Modal (hidden by default) -->
   <div class="compose-modal hidden" id="compose-modal">
     <div class="compose-window">
       <div class="compose-header">
@@ -77,13 +68,11 @@
         <label>Subject (Job Position):</label>
         <select id="subject-dropdown" title="Select a Job Position">
           <option value="">-- Select a Job Position --</option>
-          <!-- Job titles will be loaded dynamically -->
         </select>
         
         <label>Message:</label>
         <textarea id="message-body" rows="8" placeholder="Write your message..."></textarea>
         
-        <!-- File upload section -->
         <label for="attachment-input">Attachment (PDF only):</label>
         <div class="attachment-container">
           <input type="file" id="attachment-input" accept=".pdf" title="Upload PDF attachment" />
@@ -103,7 +92,6 @@
   </div>
 
   <script>
-    // Add toggle functionality for sidebar
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('sidebar').classList.toggle('collapsed');
       document.querySelector('.main-content').classList.toggle('expanded');

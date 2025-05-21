@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <!-- Top Navigation Bar (employer version) -->
+ 
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
@@ -27,9 +27,9 @@
   <div class="dashboard-container">
     <h1 class="dashboard-title">Employer Dashboard</h1>
 
-    <!-- 2x2 Grid for 4 Charts -->
+
     <div class="charts-grid">
-      <!-- Top row (2 charts) -->
+   
       <div class="chart-box">
         <canvas id="statusChart"></canvas>
       </div>
@@ -37,7 +37,7 @@
         <canvas id="timeSeriesChart"></canvas>
       </div>
 
-      <!-- Bottom row (2 charts) -->
+ 
       <div class="chart-box">
         <canvas id="categoryChart"></canvas>
       </div>
@@ -49,13 +49,11 @@
     <div class="applications-container">
       <h2>Active Applications</h2>
       
-      <!-- Application filter controls -->
       <div class="applications-filters">
         <div class="filter-controls">
           <label for="jobTitleFilter">Job Title:</label>
           <select id="jobTitleFilter" onchange="filterApplications()">
             <option value="all">All Jobs</option>
-            <!-- Will be populated dynamically -->
           </select>
           
           <label for="statusFilter">Status:</label>
@@ -70,7 +68,6 @@
           <label for="categoryFilter">Category:</label>
           <select id="categoryFilter" onchange="filterApplications()">
             <option value="all">All Categories</option>
-            <!-- Will be populated dynamically -->
           </select>
 
           <label for="sortBy">Sort By:</label>
@@ -85,7 +82,6 @@
         </div>
       </div>
 
-      <!-- Bulk Actions Panel -->
       <div id="bulkActionsPanel" class="bulk-actions-panel">
         <div class="bulk-selection">
           <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
@@ -105,22 +101,17 @@
         </div>
       </div>
       
-      <!-- Active Applications cards container -->
+    
       <div id="applicationsGrid" class="applications-grid">
-        <!-- Application cards will be added here dynamically -->
       </div>
       
-      <!-- Closed Applications Section -->
       <h2 class="section-header closed-applications-header">Closed Applications</h2>
       
-      <!-- Closed Applications cards container -->
       <div id="closedApplicationsGrid" class="applications-grid closed-applications-grid">
-        <!-- Closed application cards will be added here dynamically -->
       </div>
     </div>
   </div>
 
-  <!-- Employer dashboard script -->
   <script src="../public/js/employer_dashboard.js"></script>
 </body>
 </html>

@@ -3,90 +3,73 @@ document.addEventListener("DOMContentLoaded", () => {
     
     initAdminDashboard();
     
-    // Load users and jobs immediately on load
     loadUsers().catch(err => console.error("Error loading users on init:", err));
     loadJobs().catch(err => console.error("Error loading jobs on init:", err));
 });    
 
-// Main initialization function with proper sequencing
 function initAdminDashboard() {
     console.log("Starting admin dashboard initialization...");
     
-    // First check if we're on an admin page before proceeding
     if (!document.querySelector('.admin-layout')) {
         console.log("Not on admin dashboard page, skipping initialization");
         return;
     }
 
-    // First load dashboard stats (most visible/important)
     loadDashboardStats()
         .then(statsData => {
             console.log("Dashboard stats loaded successfully:", statsData);
             
-            // After stats are loaded, check admin authentication
             return checkAdminAuth();
         })
         .then(() => {
             console.log("Admin authentication verified, setting up UI...");
             
-            // Setup UI components
             setupTabNavigation();
             setupEventListeners();
             
-            // Load all data in parallel but handle each separately to prevent cascading failures
             loadUsers().catch(err => {
                 console.error("Error loading users:", err);
-                // Don't rethrow - continue with execution
             });
             
             loadJobs().catch(err => {
                 console.error("Error loading jobs:", err);
-                // Don't rethrow - continue with execution
             });
             
             loadJobCategories().catch(err => {
                 console.error("Error loading job categories:", err);
-                // Don't rethrow - continue with execution
             });
             
-            // Check if reports tab is already active (initial page load to reports tab)
             const isReportsTabActive = document.getElementById('reports-tab').classList.contains('active');
             
-            // Initialize charts after a short delay to ensure DOM is ready
             setTimeout(() => {
                 try {
                     initializeCharts();
                     console.log("Charts initialized successfully");
                     
-                    // Always force real data load after charts are initialized
                     if (isReportsTabActive) {
                         console.log("Reports tab is active on load, fetching real data");
-                        loadUserGrowthData(true); // Pass true to indicate this is the initial load
+                        loadUserGrowthData(true);
                     }
                 } catch (err) {
                     console.error("Error initializing charts:", err);
                 }
-            }, 300); // Increased timeout for chart initialization
+            }, 300); 
         })
         .catch(err => {
             console.error("Error during admin dashboard initialization:", err);
-            // Only show notification for authentication failures, not for non-critical data loading
             if (err.message === "Not authorized") {
                 showNotification("Authentication failed. Please log in again.", "error");
             }
         });
 }
 
-// Convert checkAdminAuth to return a Promise - With better error handling
 function checkAdminAuth() {
     return new Promise((resolve, reject) => {
-        // First check localStorage to see if user is marked as admin
         const isAdminLocal = localStorage.getItem("isAdmin") === "true" || localStorage.getItem("role") === "admin";
         console.log("Local storage admin check:", isAdminLocal ? "admin" : "not admin");
         
-        // Check if the current user is an admin via server
         fetch('/admin/auth-check', {
-            credentials: 'include' // Include credentials to ensure cookies are sent
+            credentials: 'include' 
         })
             .then(response => {
                 if (!response.ok) {
@@ -96,7 +79,6 @@ function checkAdminAuth() {
             })
             .then(data => {
                 if (data.isAdmin) {
-                    // Update admin info
                     console.log("Server confirms user is admin");
                     const adminEmailEl = document.getElementById('admin-email');
                     const adminNameEl = document.getElementById('admin-name');
@@ -104,7 +86,6 @@ function checkAdminAuth() {
                     if (adminEmailEl) adminEmailEl.textContent = data.email || "admin@pmail.com";
                     if (adminNameEl) adminNameEl.textContent = data.name || "Administrator";
                     
-                    // Set/update admin status in localStorage
                     localStorage.setItem("isAdmin", "true");
                     localStorage.setItem("role", "admin");
                     resolve(data);
@@ -117,8 +98,7 @@ function checkAdminAuth() {
             .catch(error => {
                 console.error('Auth check failed:', error);
                 
-                // If we're fairly confident this is an admin from localStorage,
-                // try to continue anyway instead of immediately redirecting
+  
                 if (isAdminLocal) {
                     console.log("Auth check failed but admin in localStorage, trying to continue");
                     const adminEmailEl = document.getElementById('admin-email');
@@ -130,14 +110,13 @@ function checkAdminAuth() {
                     return;
                 }
                 
-                // Otherwise redirect to login page
                 window.location.href = 'login.html';
                 reject(error);
             });
     });
 }
 
-// Update loadDashboardStats to be more robust with retries
+
 function loadDashboardStats() {
     return new Promise((resolve, reject) => {
         const maxRetries = 2;
@@ -146,9 +125,9 @@ function loadDashboardStats() {
         function attemptLoad() {
             console.log(`Fetching dashboard statistics... (attempt ${retryCount + 1})`);
             fetch('/admin/dashboard-stats', {
-                credentials: 'include', // Ensure cookies are sent
+                credentials: 'include', 
                 headers: {
-                    'Cache-Control': 'no-cache', // Prevent caching issues
+                    'Cache-Control': 'no-cache', 
                     'Pragma': 'no-cache'
                 }
             })
@@ -161,7 +140,6 @@ function loadDashboardStats() {
                 .then(data => {
                     console.log("Dashboard stats loaded:", data);
                     
-                    // Immediately update UI with the stats data
                     updateDashboardStats(data);
                     resolve(data);
                 })
@@ -171,10 +149,9 @@ function loadDashboardStats() {
                     if (retryCount < maxRetries) {
                         retryCount++;
                         console.log(`Retrying... (${retryCount}/${maxRetries})`);
-                        setTimeout(attemptLoad, 1000); // Wait 1 second before retry
+                        setTimeout(attemptLoad, 1000); 
                     } else {
                         showNotification('Failed to load dashboard statistics', 'error');
-                        // Resolve with default values instead of rejecting to continue execution flow
                         resolve({
                             totalUsers: 0,
                             activeJobs: 0,
@@ -187,14 +164,11 @@ function loadDashboardStats() {
                 });
         }
         
-        // Start the first attempt
         attemptLoad();
     });
 }
 
-// New function to update dashboard stats in UI
 function updateDashboardStats(data) {
-    // Update header stats - ensure values are displayed even if zero
     const totalUsersEl = document.getElementById('total-users');
     const totalJobsEl = document.getElementById('total-jobs');
     const totalAppsEl = document.getElementById('total-applications');
@@ -203,7 +177,6 @@ function updateDashboardStats(data) {
     if (totalJobsEl) totalJobsEl.textContent = data.activeJobs !== undefined ? data.activeJobs : 0;
     if (totalAppsEl) totalAppsEl.textContent = data.totalApplications !== undefined ? data.totalApplications : 0;
     
-    // Update metric cards in reports section
     const metricUsersEl = document.getElementById('metric-total-users');
     const metricJobsEl = document.getElementById('metric-new-jobs');
     const metricAppsEl = document.getElementById('metric-applications');
@@ -214,11 +187,9 @@ function updateDashboardStats(data) {
     if (metricAppsEl) metricAppsEl.textContent = data.totalApplications !== undefined ? data.totalApplications : 0;
     if (metricActiveUsersEl) metricActiveUsersEl.textContent = data.activeUsers !== undefined ? data.activeUsers : 0;
     
-    // Update growth indicators
     updateGrowthIndicators(data.growth || {});
 }
 
-// Update loadUsers to be more robust
 function loadUsers() {
     const tableBody = document.getElementById('users-table-body');
     if (!tableBody) {
@@ -235,7 +206,6 @@ function loadUsers() {
         </tr>
     `;
     
-    // use current state instead of resetting
     const params = new URLSearchParams({
         page: userState.currentPage,
         per_page: 10,
@@ -268,13 +238,12 @@ function loadUsers() {
     });
 }
 
-// Modified loadJobs to return a Promise
 function loadJobs() {
     return new Promise((resolve, reject) => {
         const tableBody = document.getElementById('jobs-table-body');
         if (!tableBody) {
             console.log("Jobs table body not found in DOM");
-            resolve(null); // Not an error, just not on the jobs page
+            resolve(null); 
             return;
         }
         
@@ -319,7 +288,6 @@ function loadJobs() {
     });
 }
 
-// Modified loadJobCategories to return a Promise
 function loadJobCategories() {
     return new Promise((resolve, reject) => {
         fetch('/admin/job-categories', {
@@ -347,9 +315,7 @@ function loadJobCategories() {
     });
 }
 
-// Enhanced deleteUser function to refresh dashboard stats
 function deleteUser(userId) {
-    // Show loading notification
     showNotification('Deleting user...', 'info');
     
     fetch(`/admin/users/${userId}`, {
@@ -368,7 +334,6 @@ function deleteUser(userId) {
         if (data.success) {
             showNotification('User deleted successfully', 'success');
             
-            // Reload critical data
             Promise.all([
                 loadDashboardStats(),
                 loadUsers()
@@ -393,19 +358,15 @@ function setupTabNavigation() {
     const tabLinks = document.querySelectorAll('.tab-nav li');
     tabLinks.forEach(link => {
       link.addEventListener('click', function() {
-        // remove .active from all
         tabLinks.forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   
-        // activate this one
         this.classList.add('active');
         const tabId = this.getAttribute('data-tab');
         document.getElementById(tabId).classList.add('active');
   
         if (tabId === 'reports-tab') {
-          // ① set the dropdown‐driven main chart
           updateReportView();
-          // ② always load & render the heatmap
           loadUserActivityData();
         }
       });
@@ -414,10 +375,8 @@ function setupTabNavigation() {
   
 
 function setupEventListeners() {
-    // Logout button
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
-    // User management
     document.getElementById('user-search').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') {
             searchUsers();
@@ -428,7 +387,6 @@ function setupEventListeners() {
     document.getElementById('prev-page-users').addEventListener('click', () => navigateUserPage(-1));
     document.getElementById('next-page-users').addEventListener('click', () => navigateUserPage(1));
     
-    // Job management
     document.getElementById('job-search').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') {
             searchJobs();
@@ -440,12 +398,10 @@ function setupEventListeners() {
     document.getElementById('prev-page-jobs').addEventListener('click', () => navigateJobPage(-1));
     document.getElementById('next-page-jobs').addEventListener('click', () => navigateJobPage(1));
     
-    // Report generation
     document.getElementById('report-type').addEventListener('change', updateReportView);
     document.getElementById('generate-report-btn').addEventListener('click', generateReport);
     document.getElementById('export-report-btn').addEventListener('click', exportReport);
     
-    // User report search
     document.getElementById('user-report-search').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') {
             searchUserForReport();
@@ -454,15 +410,12 @@ function setupEventListeners() {
     document.getElementById('search-user-report-btn').addEventListener('click', searchUserForReport);
     document.getElementById('export-user-report').addEventListener('click', exportUserReport);
     
-    // Modal event listeners
     setupModalListeners();
     
-    // Form submissions
     document.getElementById('edit-user-form').addEventListener('submit', handleEditUserSubmit);
     document.getElementById('edit-job-form').addEventListener('submit', handleEditJobSubmit);
 }
 
-//import { jsPDF } from "jspdf";
 
 function setupExportTab() {
   document.getElementById('export-generate-btn').addEventListener('click', generateExportPreview);
@@ -480,7 +433,6 @@ async function generateExportPreview() {
     preview.innerHTML = `<p>Loading preview…</p>`;
     downloadBtn.disabled = true;
   
-    // 1) Fetch data
     const results = await Promise.all(
       modules.map(mod =>
         fetch(`/admin/reports/${mod}?start=${start}&end=${end}`, { credentials: 'include' })
@@ -488,7 +440,6 @@ async function generateExportPreview() {
       )
     );
   
-    // 2) Titles & totals
     const titles = {
       'user-growth':       'User Growth Over Time',
       'job-postings':      'Job Postings Over Time',
@@ -502,7 +453,6 @@ async function generateExportPreview() {
       'user-activity':     data => data.metrics.activeUsers
     };
   
-    // 3) Summary cards
     let html = `<div class="summary-cards" style="display:flex;gap:1rem;">`;
     results.forEach((data, i) => {
       const mod = modules[i];
@@ -525,7 +475,6 @@ async function generateExportPreview() {
     });
     html += `</div>`;
   
-    // 4) Chart containers
     modules.forEach(mod => {
       html += `
         <div class="chart-container" style="
@@ -585,7 +534,6 @@ async function generateExportPreview() {
   
     preview.innerHTML = html;
   
-    // 5) Base Chart.js options
     const baseOpts = {
       responsive: true,
       maintainAspectRatio: true,
@@ -608,7 +556,6 @@ async function generateExportPreview() {
       }
     };
   
-    // 6) Render time‐series charts
     modules.forEach((mod, i) => {
       const ctx = document.getElementById(`export-chart-${mod}`).getContext('2d');
       const labels = results[i].labels;
@@ -642,7 +589,6 @@ async function generateExportPreview() {
       }
     });
   
-    // 7) Render secondary doughnuts & heatmap
     modules.forEach((mod, i) => {
       const dat = results[i];
       if (mod === 'user-growth') {
@@ -718,9 +664,6 @@ async function generateExportPreview() {
   }
   
 
-  
-  
-
 async function downloadPDF() {
     const preview    = document.getElementById('export-preview');
     const { jsPDF }  = window.jspdf;
@@ -728,15 +671,13 @@ async function downloadPDF() {
     const pageW      = pdf.internal.pageSize.getWidth();
     const pageH      = pdf.internal.pageSize.getHeight();
     const margin     = 40;
-    let yOffset      = margin + 30; // leave room for logo
+    let yOffset      = margin + 30; 
   
-    // 1) load your logo once
     const logoImg = await html2canvas(
       document.querySelector('.pmail-logo'),
       { backgroundColor: null, scale: 2 }
     ).then(c => c.toDataURL('image/png'));
     
-    // 2) helper to print header on each page
     function printHeader() {
       pdf.setFontSize(16);
       pdf.text('Pmail Official Report', margin + 110, margin);
@@ -745,7 +686,6 @@ async function downloadPDF() {
   
     printHeader();
   
-    // 3) loop each logical section (summary cards + charts)
     const sections = preview.querySelectorAll(
       '.summary-cards, .chart-container'
     );
@@ -754,7 +694,6 @@ async function downloadPDF() {
       const img    = canvas.toDataURL('image/png');
       const imgH   = (canvas.height * (pageW - margin*2)) / canvas.width;
   
-      // new page if we’d overflow
       if (yOffset + imgH > pageH - margin) {
         pdf.addPage();
         yOffset = margin + 30;
@@ -774,7 +713,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupModalListeners() {
-    // Close buttons for all modals
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -782,7 +720,6 @@ function setupModalListeners() {
         });
     });
     
-    // Cancel buttons
     document.getElementById('cancel-edit-user').addEventListener('click', function() {
         document.getElementById('edit-user-modal').style.display = 'none';
     });
@@ -795,7 +732,6 @@ function setupModalListeners() {
         document.getElementById('confirm-modal').style.display = 'none';
     });
     
-    // Close modal when clicking outside
     window.addEventListener('click', function(event) {
         document.querySelectorAll('.modal').forEach(modal => {
             if (event.target === modal) {
@@ -818,7 +754,6 @@ function handleLogout() {
         });
 }
 
-// Dashboard Stats
 function updateGrowthIndicators(growth) {
     const elements = {
         users: document.querySelector('#metric-total-users + .metric-change'),
@@ -852,7 +787,6 @@ function updateGrowthIndicators(growth) {
     }
 }
 
-// User Management
 let userState = {
     currentPage: 1,
     totalPages: 1,
@@ -867,7 +801,6 @@ function renderUsers(users) {
     users.forEach(user => {
         const row = document.createElement('tr');
         
-        // Format name based on role - ensuring we properly combine first_name and last_name
         let nameOrCompany = user.company_name || '-';
         if (user.role === 'employee') {
             const firstName = user.first_name || '';
@@ -875,10 +808,8 @@ function renderUsers(users) {
             nameOrCompany = `${firstName} ${lastName}`.trim() || '-';
         }
         
-        // Format date
         const dateJoined = formatDate(user.created_at) || '-';
         
-        // Determine role badge class
         const roleBadgeClass = `status-badge status-${user.role || 'employee'}`;
         
         row.innerHTML = `
@@ -900,7 +831,7 @@ function renderUsers(users) {
     });
 }
 
-// Format date helper function
+
 function formatDate(dateString) {
     if (!dateString) return '';
     
@@ -914,9 +845,8 @@ function formatDate(dateString) {
 
 function searchUsers() {
     userState.searchTerm = document.getElementById('user-search').value.trim();
-    userState.currentPage = 1;  // Reset to first page
+    userState.currentPage = 1;  
     
-    // Show searching indicator
     const tableBody = document.getElementById('users-table-body');
     tableBody.innerHTML = `
         <tr>
@@ -929,13 +859,12 @@ function searchUsers() {
         </tr>
     `;
     
-    // Load users with search term
     loadUsers();
 }
 
 function filterUsers() {
     userState.roleFilter = document.getElementById('user-role-filter').value;
-    userState.currentPage = 1;  // Reset to first page
+    userState.currentPage = 1; 
     loadUsers();
 }
 
@@ -958,7 +887,6 @@ function updateUserPagination() {
     pageInfo.textContent = `Page ${userState.currentPage} of ${userState.totalPages}`;
 }
 
-// Global function for confirmation dialog
 window.confirmDeleteUser = function(userId, userEmail) {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmTitle = document.getElementById('confirm-title');
@@ -968,35 +896,27 @@ window.confirmDeleteUser = function(userId, userEmail) {
     confirmTitle.textContent = 'Delete User';
     confirmMessage.textContent = `Are you sure you want to delete user "${userEmail}"? This action cannot be undone.`;
     
-    // Setup confirm button action
     confirmButton.onclick = function() {
         deleteUser(userId);
         confirmModal.style.display = 'none';
     };
     
-    // Show the modal
     confirmModal.style.display = 'block';
 };
 
-// Global function to view user details
 window.viewUserDetails = function(userId) {
-    // Navigate to user report section and search for this user
     const reportTab = document.querySelector('[data-tab="reports-tab"]');
     if (reportTab) {
-        // Switch to reports tab
         reportTab.click();
         
-        // Generate user report
         generateUserReport(userId);
         
-        // Scroll to the user report section
         document.getElementById('user-report-container').scrollIntoView({
             behavior: 'smooth'
         });
     }
 };
 
-// Job Management
 let jobState = {
     currentPage: 1,
     totalPages: 1,
@@ -1051,11 +971,9 @@ function populateCategories(categories) {
     const filterSelect = document.getElementById('job-category-filter');
     const editSelect = document.getElementById('edit-job-category');
     
-    // Clear existing options except first one
     while (filterSelect.options.length > 1) filterSelect.remove(1);
     while (editSelect.options.length > 0) editSelect.remove(0);
     
-    // Add categories to filter dropdown
     categories.forEach(category => {
         const filterOption = document.createElement('option');
         filterOption.value = category.id;
@@ -1076,11 +994,9 @@ function renderJobs(jobs) {
     jobs.forEach(job => {
         const row = document.createElement('tr');
         
-        // Format dates
         const postedDate = new Date(job.created_at).toLocaleDateString();
         const deadline = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'No deadline';
         
-        // Create status badge
         const statusClass = job.is_open ? 'status-open' : 'status-closed';
         const statusText = job.is_open ? 'Open' : 'Closed';
         
@@ -1089,7 +1005,6 @@ function renderJobs(jobs) {
             <td>${job.title || '-'}</td>
             <td>${job.company_name || '-'}</td>
             <td>${job.category || '-'}</td>
-            <td>${job.location || '-'}</td>
             <td>${deadline}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
             <td>${postedDate || '-'}</td>
@@ -1109,7 +1024,6 @@ function renderJobs(jobs) {
     });
 }
 
-// open detail modal with full job info
 function openAdminJobModal(jobId) {
     fetch(`/admin/jobs/${jobId}`)
       .then(res => res.json())
@@ -1171,7 +1085,6 @@ window.openEditJobModal = function(jobId) {
     fetch(`/admin/jobs/${jobId}`)
         .then(response => response.json())
         .then(job => {
-            // Fill form with job data
             document.getElementById('edit-job-id').value = job.id;
             document.getElementById('edit-job-title').value = job.title || '';
             document.getElementById('edit-job-category').value = job.category_id || '';
@@ -1180,7 +1093,6 @@ window.openEditJobModal = function(jobId) {
             document.getElementById('edit-job-status').value = job.is_open ? '1' : '0';
             document.getElementById('edit-job-description').value = job.description || '';
             
-            // Show the modal
             document.getElementById('edit-job-modal').style.display = 'block';
         })
         .catch(error => {
@@ -1202,13 +1114,11 @@ window.confirmDeleteJob = function(jobId) {
     confirmTitle.textContent = 'Delete Job Listing';
     confirmMessage.textContent = 'Are you sure you want to delete this job listing? This action cannot be undone.';
     
-    // Setup confirm button action
     confirmButton.onclick = function() {
         deleteJob(jobId);
         confirmModal.style.display = 'none';
     };
     
-    // Show the modal
     confirmModal.style.display = 'block';
 };
 
@@ -1220,8 +1130,8 @@ function deleteJob(jobId) {
         .then(data => {
             if (data.success) {
                 showNotification('Job deleted successfully', 'success');
-                loadJobs(); // Reload the job list
-                loadDashboardStats(); // Update stats
+                loadJobs();
+                loadDashboardStats(); 
             } else {
                 throw new Error(data.message || 'Failed to delete job');
             }
@@ -1257,7 +1167,7 @@ function handleEditJobSubmit(event) {
             if (data.success) {
                 showNotification('Job updated successfully', 'success');
                 document.getElementById('edit-job-modal').style.display = 'none';
-                loadJobs(); // Reload the job list
+                loadJobs(); 
             } else {
                 throw new Error(data.message || 'Failed to update job');
             }
@@ -1268,7 +1178,6 @@ function handleEditJobSubmit(event) {
         });
 }
 
-// Reports & Analytics
 let charts = {
     mainChart: null,
     userDistributionChart: null,
@@ -1285,7 +1194,6 @@ function initializeCharts() {
         const userDistCanvas = document.getElementById('user-distribution-chart');
         const jobCatCanvas = document.getElementById('job-categories-chart');
         
-        // Check if canvas elements exist in the DOM
         if (!mainChartCanvas || !userDistCanvas || !jobCatCanvas) {
             console.error("Chart canvas elements not found in DOM:", {
                 mainChart: !!mainChartCanvas,
@@ -1297,13 +1205,11 @@ function initializeCharts() {
         
         console.log("All chart canvases found, creating chart instances...");
         
-        // Guarantee parent container height
         const chartWrapper = mainChartCanvas.closest('.chart-wrapper');
         if (chartWrapper && !chartWrapper.style.height) {
             chartWrapper.style.height = '300px';
         }
         
-        // Initialize main chart with empty data
         const mainChartCtx = mainChartCanvas.getContext('2d');
         charts.mainChart = new Chart(mainChartCtx, {
             type: 'line',
@@ -1327,7 +1233,7 @@ function initializeCharts() {
                         display: true,
                         position: 'top',
                         labels: {
-                            color: '#fff' // Make legend text visible on dark background
+                            color: '#fff' 
                         }
                     },
                     tooltip: {
@@ -1341,13 +1247,13 @@ function initializeCharts() {
                         title: {
                             display: true,
                             text: 'Month',
-                            color: '#fff' // Make axis title visible
+                            color: '#fff' 
                         },
                         ticks: {
-                            color: '#fff' // Make axis labels visible
+                            color: '#fff' 
                         },
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)' // Subtle grid lines
+                            color: 'rgba(255, 255, 255, 0.1)' 
                         }
                     },
                     y: {
@@ -1355,21 +1261,20 @@ function initializeCharts() {
                         title: {
                             display: true,
                             text: 'Value',
-                            color: '#fff' // Make axis title visible
+                            color: '#fff' 
                         },
                         beginAtZero: true,
                         ticks: {
-                            color: '#fff' // Make axis labels visible
+                            color: '#fff' 
                         },
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)' // Subtle grid lines
+                            color: 'rgba(255, 255, 255, 0.1)' 
                         }
                     }
                 }
             }
         });
         
-        // Initialize user distribution chart
         const userDistributionCtx = userDistCanvas.getContext('2d');
         charts.userDistributionChart = new Chart(userDistributionCtx, {
             type: 'doughnut',
@@ -1392,7 +1297,6 @@ function initializeCharts() {
             }
         });
         
-        // Initialize job categories chart with identical settings as user distribution chart
         const jobCategoriesCtx = document.getElementById('job-categories-chart').getContext('2d');
         charts.jobCategoriesChart = new Chart(jobCategoriesCtx, {
             type: 'doughnut',
@@ -1422,14 +1326,14 @@ function initializeCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 1, // Force 1:1 aspect ratio like a circle
+                aspectRatio: 1, 
                 cutout: '50%',
                 plugins: {
                     legend: {
-                        display: true, // Changed from false to true to show the legend
+                        display: true, 
                         position: 'bottom',
                         labels: {
-                            color: '#fff', // Make legend text visible on dark background
+                            color: '#fff', 
                             boxWidth: 15,
                             padding: 10
                         }
@@ -1454,13 +1358,11 @@ function initializeCharts() {
     
     console.log("Charts initialized - loading real data");
     
-    // Load job categories data after initialization
     setTimeout(() => {
         loadJobCategoriesForChart();
     }, 500);
 }
 
-// Add a function to load job categories data specifically
 function loadJobCategoriesForChart() {
     console.log("Fetching job categories data for chart visualization...");
     
@@ -1481,11 +1383,9 @@ function loadJobCategoriesForChart() {
         console.log("Job categories data received:", data);
         
         if (data.jobCategories && data.jobCategories.length > 0) {
-            // Update the job categories chart with real data
             updateJobCategoriesChart(data.jobCategories);
         } else {
             console.warn("No job categories data found");
-            // Create dummy data for demonstration if no data available
             const dummyData = [
                 {name: "Information Technology", count: 5},
                 {name: "Healthcare", count: 3},
@@ -1502,7 +1402,6 @@ function loadJobCategoriesForChart() {
     });
 }
 
-// Then in your existing updateReportView():
 function updateReportView() {
     const reportType = document.getElementById('report-type').value;
     const titleEl    = document.getElementById('chart-title');
@@ -1532,7 +1431,6 @@ function updateReportView() {
   
   
 
-// Enhanced loadJobPostingsData function
 function loadJobPostingsData() {
     fetch('/admin/reports/job-postings', {
         credentials: 'include',
@@ -1540,13 +1438,10 @@ function loadJobPostingsData() {
     })
     .then(response => response.json())
     .then(data => {
-        // Update main chart with job postings over time
         updateMainChart(data.labels, data.datasets, 'Job Postings');
         
-        // Update the job categories chart
         updateJobCategoriesChart(data.jobCategories);
         
-        // Also update metrics
         updateMetrics(data.metrics);
     })
     .catch(error => {
@@ -1555,7 +1450,6 @@ function loadJobPostingsData() {
     });
 }
 
-// Update the job categories chart function to maintain circular appearance
 function updateJobCategoriesChart(categories) {
     const chart = charts.jobCategoriesChart;
     if (!chart) {
@@ -1565,44 +1459,36 @@ function updateJobCategoriesChart(categories) {
     
     console.log("Updating job categories chart with:", categories);
     
-    // Sort categories by count in descending order for better visualization
     categories.sort((a, b) => b.count - a.count);
     
-    // Extract category names and counts
     const categoryNames = categories.map(cat => cat.name);
     const categoryCounts = categories.map(cat => cat.count);
     
-    // Generate colors for the chart - limit to 8 colors for readability
     const colorPalette = generateCategoryColors(Math.min(categories.length, 8));
     
-    // Update chart configuration
     chart.data.labels = categoryNames;
     chart.data.datasets[0].data = categoryCounts;
     chart.data.datasets[0].backgroundColor = colorPalette.backgrounds;
     chart.data.datasets[0].borderColor = colorPalette.borders;
     
-    // Ensure legend is displayed
     chart.options.plugins.legend.display = true;
     
-    // Update the chart
     chart.update();
 }
 
-// Helper function to generate beautiful colors for the categories
 function generateCategoryColors(count) {
     const backgrounds = [];
     const borders = [];
     
-    // Use predefined brand colors for consistency
     const brandColors = [
-        { bg: 'rgba(66, 133, 244, 0.7)', border: '#4285f4' },   // Google Blue
-        { bg: 'rgba(52, 168, 83, 0.7)', border: '#34a853' },    // Google Green
-        { bg: 'rgba(251, 188, 5, 0.7)', border: '#fbbc05' },    // Google Yellow
-        { bg: 'rgba(234, 67, 53, 0.7)', border: '#ea4335' },    // Google Red
-        { bg: 'rgba(138, 180, 248, 0.7)', border: '#8ab4f8' },  // Light Blue
-        { bg: 'rgba(128, 0, 128, 0.7)', border: '#800080' },    // Purple
-        { bg: 'rgba(0, 128, 128, 0.7)', border: '#008080' },    // Teal
-        { bg: 'rgba(255, 153, 0, 0.7)', border: '#ff9900' }     // Orange
+        { bg: 'rgba(66, 133, 244, 0.7)', border: '#4285f4' },  
+        { bg: 'rgba(52, 168, 83, 0.7)', border: '#34a853' },    
+        { bg: 'rgba(251, 188, 5, 0.7)', border: '#fbbc05' },    
+        { bg: 'rgba(234, 67, 53, 0.7)', border: '#ea4335' },    
+        { bg: 'rgba(138, 180, 248, 0.7)', border: '#8ab4f8' },  
+        { bg: 'rgba(128, 0, 128, 0.7)', border: '#800080' },    
+        { bg: 'rgba(0, 128, 128, 0.7)', border: '#008080' },   
+        { bg: 'rgba(255, 153, 0, 0.7)', border: '#ff9900' }     
     ];
     
     for (let i = 0; i < count; i++) {
@@ -1619,7 +1505,6 @@ function generateCategoryColors(count) {
 
 function loadUserGrowthData(isInitialLoad = false) {
     console.log("Fetching user growth data from database...");
-    //document.getElementById('chart-title').textContent = 'User Growth Over Time (Loading...)';
     
     fetch('/admin/reports/user-growth', {
         credentials: 'include',
@@ -1645,17 +1530,9 @@ function loadUserGrowthData(isInitialLoad = false) {
                 return;
             }
             
-            // Use real data
             updateMainChart(data.labels, data.datasets, 'User Growth');
             updateDistributionChart(data.userDistribution);
             updateMetrics(data.metrics);
-            
-            // Only show the success notification
-            // if (!isInitialLoad) {
-            //     showNotification('Data loaded successfully', 'success');
-            // }
-            
-            // Force a resize to ensure the chart renders correctly
             window.dispatchEvent(new Event('resize'));
         })
         .catch(error => {
@@ -1665,21 +1542,18 @@ function loadUserGrowthData(isInitialLoad = false) {
         });
 }
 
-// Ensure window.load also triggers data loading if needed
 window.addEventListener('load', function() {
     console.log("Window fully loaded, checking if reports tab is active");
     const reportsTab = document.getElementById('reports-tab');
     
     if (reportsTab && reportsTab.classList.contains('active') && charts.mainChart) {
         console.log("Reports tab active after full page load, ensuring real data is loaded");
-        // Small delay to ensure everything else is initialized
         setTimeout(() => {
             loadUserGrowthData(true);
         }, 500);
     }
 });
 
-// Simpler updateMainChart that trusts the data from the server
 function updateMainChart(labels, datasets, label) {
     const chart = charts.mainChart;
     if (!chart) {
@@ -1690,7 +1564,6 @@ function updateMainChart(labels, datasets, label) {
     
     console.log("Updating main chart with database data:", {labels, datasets});
     
-    // Format labels if they're YYYY-MM format to be more readable
     const formattedLabels = labels.map(l => {
         if (typeof l === 'string' && l.match(/^\d{4}-\d{2}$/)) {
             const [year, month] = l.split('-');
@@ -1706,7 +1579,6 @@ function updateMainChart(labels, datasets, label) {
     
     chart.update();
     
-    // Debug info for verification
     console.log("Chart updated with real data from database");
     console.log("Labels:", chart.data.labels);
     console.log("Data:", chart.data.datasets[0].data);
@@ -1736,14 +1608,12 @@ function updateMetrics(metrics) {
 function generateReport() {
     const reportType = document.getElementById('report-type').value;
     
-    // Show loading state
     document.getElementById('generate-report-btn').textContent = 'Generating...';
     document.getElementById('generate-report-btn').disabled = true;
     
     fetch(`/admin/reports/generate?type=${reportType}`)
         .then(response => response.json())
         .then(data => {
-            // Update charts with new data
             updateReportView();
             showNotification('Report generated successfully', 'success');
         })
@@ -1752,7 +1622,6 @@ function generateReport() {
             showNotification('Failed to generate report', 'error');
         })
         .finally(() => {
-            // Reset button state
             document.getElementById('generate-report-btn').textContent = 'Generate Report';
             document.getElementById('generate-report-btn').disabled = false;
         });
@@ -1763,7 +1632,6 @@ function exportReport() {
     window.open(`/admin/reports/export?type=${reportType}`, '_blank');
 }
 
-// User Reports
 function searchUserForReport() {
     const searchTerm = document.getElementById('user-report-search').value.trim();
     if (!searchTerm) {
@@ -1809,19 +1677,16 @@ function generateUserReport(userId) {
 function renderUserReport(data) {
     const user = data.user;
     
-    // Set user identity
     document.getElementById('report-user-name').textContent = getUserDisplayName(user);
     document.getElementById('report-user-email').textContent = user.email;
     document.getElementById('report-user-role').textContent = capitalizeFirstLetter(user.role);
     document.getElementById('report-user-role').className = `status-badge status-${user.role}`;
     
-    // Set user stats
     document.getElementById('user-account-age').textContent = data.accountAge;
     document.getElementById('user-last-active').textContent = data.lastActive || 'Never';
     document.getElementById('user-total-logins').textContent = data.totalLogins || 0;
     document.getElementById('user-total-applications').textContent = data.totalApplications || 0;
     
-    // Show role-specific sections
     if (user.role === 'employee') {
         document.getElementById('employee-specific-section').classList.remove('hidden');
         document.getElementById('employer-specific-section').classList.add('hidden');
@@ -1832,7 +1697,6 @@ function renderUserReport(data) {
         renderEmployerJobs(data.jobs || []);
     }
     
-    // Update activity chart
     updateUserActivityChart(data.activityData || {});
 }
 
@@ -1905,7 +1769,6 @@ function renderEmployerJobs(jobs) {
 }
 
 function updateUserActivityChart(activityData) {
-    // Initialize user activity chart if not exists
     if (!charts.userActivityChart) {
         const ctx = document.getElementById('user-activity-chart').getContext('2d');
         charts.userActivityChart = new Chart(ctx, {
@@ -1934,7 +1797,6 @@ function updateUserActivityChart(activityData) {
         });
     }
     
-    // Update chart with activity data
     charts.userActivityChart.data.labels = activityData.labels || [];
     charts.userActivityChart.data.datasets[0].data = activityData.data || [];
     charts.userActivityChart.update();
@@ -1980,24 +1842,19 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Add window global for direct HTML access
 window.viewUserReport = generateUserReport;
 
-// Add explicit redirect when clicking reports tab
 document.addEventListener('DOMContentLoaded', function() {
-    // Target the reports tab link
     const reportsTab = document.querySelector('.tab-nav li[data-tab="reports-tab"]');
     if (reportsTab) {
         reportsTab.addEventListener('click', function() {
             console.log("Reports tab clicked");
             setTimeout(() => {
-                // First ensure we're on the reports tab
                 document.getElementById('reports-tab').classList.add('active');
                 
-                // Force chart re-render with real data
                 if (charts.mainChart) {
                     console.log("Force updating charts after tab click");
-                    loadUserGrowthData(); // This will reload all the charts
+                    loadUserGrowthData(); 
                 } else {
                     console.log("Charts not initialized yet, initializing now");
                     initializeCharts();
@@ -2012,10 +1869,8 @@ function loadApplicationStatsData() {
     fetch('/admin/reports/application-stats', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
-        // 1. Main timeseries
         updateMainChart(data.labels, data.datasets, 'Applications');
   
-        // 2. Only update the metric cards
         updateMetrics(data.metrics);
       })
       .catch(err => {
@@ -2039,13 +1894,10 @@ function loadApplicationStatsData() {
         });
       })
       .then(data => {
-        // main line chart
         updateMainChart(data.labels, data.datasets, 'Logins');
   
-        // metrics
         updateMetrics(data.metrics);
   
-        // heatmap
         if (data.heatmapData && data.heatmapData.length) {
           try {
             renderUsageHeatmap(data.heatmapData);
@@ -2062,27 +1914,7 @@ function loadApplicationStatsData() {
         showNotification(`Failed to load user activity: ${err.message}`, 'error');
       });
   }
-  
-  
-  
-  
-//   // Then in your existing updateReportView():
-//   function updateReportView() {
-//     const reportType = document.getElementById('report-type').value;
-//     switch (reportType) {
-//       case 'user-growth':
-//         loadUserGrowthData(); break;
-//       case 'job-postings':
-//         loadJobPostingsData(); break;
-//       case 'application-stats':
-//         loadApplicationStatsData(); break;
-//       case 'user-activity':
-//         loadUserActivityData(); break;
-//     }
-// }
-  
 
-// map v → color (simple blue→red scale)
 function getColorForValue(v, maxV=50) {
     const pct = Math.min(v/maxV, 1);
     const r = Math.floor(255 * pct);
@@ -2095,7 +1927,6 @@ function getColorForValue(v, maxV=50) {
     const canvas = document.getElementById('usage-heatmap');
     const ctx    = canvas.getContext('2d');
   
-    // Destroy any existing instance
     if (charts.heatmapChart) {
       charts.heatmapChart.destroy();
       charts.heatmapChart = null;
@@ -2111,11 +1942,10 @@ function getColorForValue(v, maxV=50) {
         datasets: [{
           label: 'Logins',
           data,
-          // fancier HSL scale: blue (low) → red (high)
           backgroundColor: ctx => {
             const v   = ctx.raw.v;
-            const pct = v / maxV;           // 0..1
-            const hue = (1 - pct) * 240;    // 240° (blue) → 0° (red)
+            const pct = v / maxV;           
+            const hue = (1 - pct) * 240;    
             return `hsl(${hue}, 70%, ${50 + pct*10}%)`;
           },
           borderWidth: 1,
@@ -2172,3 +2002,4 @@ function getColorForValue(v, maxV=50) {
       }
     });
   }
+  

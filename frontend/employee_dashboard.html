@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
-  <!-- Top Nav -->
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
@@ -28,9 +27,7 @@
   <div class="dashboard-container">
     <h1 class="dashboard-title">My Application Dashboard</h1>
 
-    <!-- 2x2 Grid for 4 Charts -->
     <div class="charts-grid">
-      <!-- Top row (2 charts) -->
       <div class="chart-box">
         <canvas id="statusChart"></canvas>
       </div>
@@ -38,7 +35,6 @@
         <canvas id="timeSeriesChart"></canvas>
       </div>
 
-      <!-- Bottom row (2 charts) -->
       <div class="chart-box">
         <canvas id="categoryChart"></canvas>
       </div>
@@ -50,7 +46,6 @@
     <div class="applications-container">
       <h2>My Applications</h2>
       
-      <!-- Application filter controls - MATCHING EMPLOYER DASHBOARD -->
       <div class="applications-filters">
         <div class="filter-controls">
           <label for="statusFilter">Status:</label>
@@ -65,7 +60,6 @@
           <label for="categoryFilter">Category:</label>
           <select id="categoryFilter" onchange="filterApplications()">
             <option value="all">All Categories</option>
-            <!-- Will be populated dynamically -->
           </select>
           
           <label for="salaryFilter">Salary Range:</label>
@@ -90,7 +84,6 @@
         </div>
       </div>
       
-      <!-- The applications grid will be added by JavaScript -->
     </div>
   </div>
 

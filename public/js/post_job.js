@@ -1,16 +1,12 @@
-// frontend/public/js/post_job.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const postJobForm = document.getElementById("post-job-form");
   if (postJobForm) {
     postJobForm.addEventListener("submit", submitJobForm);
   }
   
-  // Load existing jobs when the page loads
   loadEmployerJobs();
 });
 
-// Global variable to store all jobs for sorting
 let allEmployerJobs = [];
 
 function submitJobForm(event) {
@@ -36,7 +32,7 @@ function submitJobForm(event) {
     job_type: jobType,
     location: location,
     salary_range: salaryRange,
-    deadline: deadline  // Always include deadline in the payload
+    deadline: deadline  
   };
 
   fetch("/jobs/new", {
@@ -52,7 +48,6 @@ function submitJobForm(event) {
       alert("Job posted successfully!");
       document.getElementById("post-job-form").reset();
       
-      // Reload the jobs list after successfully posting a new job
       loadEmployerJobs();
     } else {
       alert("Error: " + (data.error || "Unknown error"));
@@ -61,7 +56,6 @@ function submitJobForm(event) {
   .catch(err => console.error("Error posting job:", err));
 }
 
-// Function to load employer's existing jobs
 function loadEmployerJobs() {
   const container = document.getElementById("employer-jobs-container");
   if (!container) return;
@@ -69,10 +63,8 @@ function loadEmployerJobs() {
   fetch("/jobs/employer")
     .then(res => res.json())
     .then(jobs => {
-      // Store all jobs globally for sorting
       allEmployerJobs = jobs;
       
-      // Display jobs with current sort order
       sortEmployerJobs();
     })
     .catch(err => {
@@ -81,7 +73,6 @@ function loadEmployerJobs() {
     });
 }
 
-// Function to sort and display employer jobs
 function sortEmployerJobs() {
   const sortOrder = document.getElementById("jobs-sort").value;
   const container = document.getElementById("employer-jobs-container");
@@ -95,22 +86,17 @@ function sortEmployerJobs() {
     return;
   }
   
-  // Sort the jobs based on selected criteria
   const sortedJobs = sortJobs(allEmployerJobs, sortOrder);
   
-  // Display each job
   sortedJobs.forEach(job => {
-    // Create status badge for open/closed status
     const statusBadge = job.is_open ? 
       '<span class="status-badge open">OPEN</span>' : 
       '<span class="status-badge closed">CLOSED</span>';
     
-    // Format deadline for display
     const deadlineText = job.deadline ? 
       `<p><strong>Application Deadline:</strong> ${job.deadline}</p>` : 
       '<p><strong>Application Deadline:</strong> No deadline</p>';
       
-    // Format salary range for display
     const salaryText = job.salary_range ? 
       `<p><strong>Salary Range:</strong> ${job.salary_range}</p>` : 
       '<p><strong>Salary Range:</strong> Not specified</p>';
@@ -129,43 +115,41 @@ function sortEmployerJobs() {
     `;
     container.appendChild(jobCard);
     
-    // Add event listener to the Modify button
     const modifyBtn = jobCard.querySelector(".modify-btn");
     modifyBtn.addEventListener("click", () => openEditModal(job));
   });
 }
 
-// Generic function to sort jobs
 function sortJobs(jobs, sortOrder) {
   const sortedJobs = [...jobs];
   
   switch (sortOrder) {
-    case 'date-desc': // Newest first
+    case 'date-desc': 
       return sortedJobs.sort((a, b) => new Date(b.deadline || 0) - new Date(a.deadline || 0));
     
-    case 'date-asc': // Oldest first
+    case 'date-asc': 
       return sortedJobs.sort((a, b) => new Date(a.deadline || 0) - new Date(b.deadline || 0));
     
-    case 'title-asc': // A-Z
+    case 'title-asc':
       return sortedJobs.sort((a, b) => a.title.localeCompare(b.title));
     
-    case 'title-desc': // Z-A
+    case 'title-desc':
       return sortedJobs.sort((a, b) => b.title.localeCompare(a.title));
     
-    case 'status': // Open first
+    case 'status': 
       return sortedJobs.sort((a, b) => (b.is_open ? 1 : 0) - (a.is_open ? 1 : 0));
     
-    case 'status-closed': // Closed first
+    case 'status-closed':
       return sortedJobs.sort((a, b) => (a.is_open ? 1 : 0) - (b.is_open ? 1 : 0));
     
-    case 'salary-desc': // High to low
+    case 'salary-desc': 
       return sortedJobs.sort((a, b) => {
         const salaryA = parseSalaryForSort(a.salary_range);
         const salaryB = parseSalaryForSort(b.salary_range);
         return salaryB - salaryA;
       });
     
-    case 'salary-asc': // Low to high
+    case 'salary-asc': 
       return sortedJobs.sort((a, b) => {
         const salaryA = parseSalaryForSort(a.salary_range);
         const salaryB = parseSalaryForSort(b.salary_range);
@@ -177,19 +161,15 @@ function sortJobs(jobs, sortOrder) {
   }
 }
 
-// Helper function to parse salary for sorting
 function parseSalaryForSort(salaryText) {
   if (!salaryText) return 0;
   try {
-    // Strip all currency symbols, commas, and spaces
     const cleanText = salaryText.replace(/[€$,\s]/g, '');
     
-    // Check if it's a range with a hyphen
     if (cleanText.includes('-')) {
       const parts = cleanText.split('-');
-      return parseInt(parts[0]); // Use the minimum value for sorting
+      return parseInt(parts[0]); 
     } else {
-      // It's a single value
       return parseInt(cleanText);
     }
   } catch (e) {
@@ -198,9 +178,7 @@ function parseSalaryForSort(salaryText) {
   }
 }
 
-// Function to open the edit modal with job data
 function openEditModal(job) {
-  // Fill the modal fields with the job data
   document.getElementById("edit-job-id").value = job.id;
   document.getElementById("edit-title").value = job.title;
   document.getElementById("edit-description").value = job.description;
@@ -209,23 +187,19 @@ function openEditModal(job) {
   document.getElementById("edit-location").value = job.location;
   document.getElementById("edit-salary-range").value = job.salary_range || "";
   
-  // Set deadline if available
   if (job.deadline) {
     document.getElementById("edit-deadline").value = job.deadline;
   } else {
     document.getElementById("edit-deadline").value = "";
   }
 
-  // Show the modal
   document.getElementById("edit-modal-backdrop").style.display = "flex";
 }
 
-// Function to close the edit modal
 function closeEditModal() {
   document.getElementById("edit-modal-backdrop").style.display = "none";
 }
 
-// Function to save job edits
 function saveJobEdits() {
   const jobId = document.getElementById("edit-job-id").value;
   const title = document.getElementById("edit-title").value.trim();
@@ -248,7 +222,7 @@ function saveJobEdits() {
     job_type: jobType,
     location: location,
     salary_range: salaryRange,
-    deadline: deadline  // Always include deadline in the payload
+    deadline: deadline  
   };
 
   fetch(`/jobs/${jobId}`, {
@@ -269,7 +243,6 @@ function saveJobEdits() {
   .catch(err => console.error("Error updating job:", err));
 }
 
-// Make the functions available globally for use in HTML
 window.openEditModal = openEditModal;
 window.closeEditModal = closeEditModal;
 window.saveJobEdits = saveJobEdits;

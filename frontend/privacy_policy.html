@@ -108,18 +108,15 @@
   </style>
 </head>
 <body>
-  <!-- Top Navigation -->
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
     <div class="nav-right">
-      <!-- Navigation links will be determined by JS based on user role -->
     </div>
   </div>
 
   <div class="privacy-container">
-    <!-- Back button at top -->
     <button class="back-button" onclick="goBackToProfile()">
       <img src="../public/images/arrow_icon.png" alt="Back" class="back-icon">
       Back to Profile
@@ -179,7 +176,6 @@
       if (document.referrer && document.referrer.includes('pmail')) {
         window.history.back();
       } else {
-        // Check if user role is available in localStorage
         const isEmployer = localStorage.getItem('isEmployer') === 'true';
         if (isEmployer) {
           window.location.href = 'employer_profile.html';
@@ -190,10 +186,8 @@
     }
     
     function goBackToProfile() {
-      // Check if user is employer or employee
       const isEmployer = localStorage.getItem('isEmployer') === 'true';
       
-      // Redirect to appropriate profile page
       if (isEmployer) {
         window.location.href = "employer_profile.html";
       } else {
@@ -201,7 +195,6 @@
       }
     }
     
-    // Populate nav links based on user role
     document.addEventListener('DOMContentLoaded', () => {
       const isEmployer = localStorage.getItem('isEmployer') === 'true';
       const navRight = document.querySelector('.nav-right');

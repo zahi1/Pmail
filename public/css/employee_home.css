@@ -1,22 +1,19 @@
-/* Employee Home Page Styles - Dark Theme */
-
-/* Layout Styles */
 .home-container {
   display: grid;
   grid-template-columns: 300px 1fr;
   gap: 20px;
-  margin-top: 70px; /* Space for top nav */
+  margin-top: 70px;
   padding: 20px;
   height: calc(100vh - 70px);
   overflow-y: auto;
 }
 
-/* Active nav link styling */
+
 .nav-link.active {
   background-color: #333;
 }
 
-/* Left Sidebar - Employee Profile */
+
 .company-sidebar, .profile-sidebar {
   display: flex;
   flex-direction: column;
@@ -24,7 +21,6 @@
   height: fit-content;
 }
 
-/* Profile Card Styling */
 .company-profile {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -60,7 +56,6 @@
   font-size: 14px;
 }
 
-/* Profile Stats */
 .profile-stats {
   display: flex;
   justify-content: space-around;
@@ -83,7 +78,7 @@
   color: #999;
 }
 
-/* Quick Actions */
+
 .quick-actions {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -129,7 +124,6 @@
   text-align: center;
 }
 
-/* Analytics Button (for compatibility with both class structures) */
 .analytics-btn {
   display: flex;
   align-items: center;
@@ -156,7 +150,6 @@
   height: 18px;
 }
 
-/* Activity Card */
 .activity-card {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -206,7 +199,6 @@
   color: #fff;
 }
 
-/* Main Content Area */
 .main-content-area {
   display: flex;
   flex-direction: column;
@@ -214,7 +206,6 @@
   overflow-y: auto;
 }
 
-/* Stats Summary Cards */
 .stats-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -278,7 +269,6 @@
   color: #ba68c8;
 }
 
-/* Content Sections */
 .content-section {
   background-color: #1e1e1e;
   border-radius: 8px;
@@ -309,7 +299,6 @@
   text-decoration: underline;
 }
 
-/* Job Matches */
 .job-matches {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -396,7 +385,7 @@
 
 .job-match-footer {
   display: flex;
-  justify-content: center; /* Center the apply button */
+  justify-content: center;
   padding: 10px 15px;
   border-top: 1px solid #333;
   background-color: #222;
@@ -413,7 +402,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   text-decoration: none;
-  width: 100%; /* Expand to fill available space */
+  width: 100%;
   text-align: center;
 }
 
@@ -421,7 +410,6 @@
   background-color: #6e9ad0;
 }
 
-/* Recent Applications */
 .recent-applications {
   display: flex;
   flex-direction: column;
@@ -494,7 +482,6 @@
   border: 1px solid #832722;
 }
 
-/* Supporting the old stats container structure for backwards compatibility */
 .stats-container {
   display: flex;
   justify-content: space-around;
@@ -518,7 +505,6 @@
   margin-top: 5px;
 }
 
-/* Loading indicator */
 .loading-indicator {
   display: flex;
   flex-direction: column;
@@ -556,7 +542,6 @@
   font-style: italic;
 }
 
-/* Applications Table Styles */
 .applications-table-container {
   overflow-x: auto;
   width: 100%;
@@ -637,7 +622,6 @@
   border-bottom: none;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .stats-summary {
     grid-template-columns: repeat(2, 1fr);
@@ -668,7 +652,6 @@
   }
 }
 
-/* Job Matches - Horizontal Layout - IMPROVED */
 .job-matches-slider {
   width: 100%;
   position: relative;
@@ -681,12 +664,11 @@
   padding: 5px 0 15px 0;
   overflow-x: auto;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch; 
   scrollbar-width: thin;
   scrollbar-color: #8ab4f8 #2a2a2a;
 }
 
-/* Custom scrollbar styling */
 .job-matches::-webkit-scrollbar {
   height: 8px;
 }
@@ -762,7 +744,7 @@
 
 .job-match-footer {
   display: flex;
-  justify-content: center; /* Center the apply button */
+  justify-content: center; 
   padding: 10px 15px;
   border-top: 1px solid #333;
   background-color: #222;
@@ -779,7 +761,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   text-decoration: none;
-  width: 100%; /* Expand to fill available space */
+  width: 100%; 
   text-align: center;
 }
 
@@ -787,16 +769,15 @@
   background-color: #6e9ad0;
 }
 
-/* Scroll buttons for job matches */
 .slider-controls {
-  display: none; /* Hide by default, show via JS when there's overflow */
+  display: none; 
   justify-content: space-between;
   position: absolute;
   top: 50%;
   width: 100%;
   transform: translateY(-50%);
   z-index: 5;
-  pointer-events: none; /* Don't block clicks on cards */
+  pointer-events: none; 
 }
 
 .slider-btn {
@@ -810,7 +791,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  pointer-events: auto; /* Make buttons clickable */
+  pointer-events: auto; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
 }
@@ -827,7 +808,6 @@
   margin-right: -18px;
 }
 
-/* Scroll hint for mobile */
 .scroll-hint {
   display: none;
   text-align: center;

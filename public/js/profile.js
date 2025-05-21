@@ -1,27 +1,21 @@
-// frontend/public/js/profile.js
-
 document.addEventListener("DOMContentLoaded", () => {
     fetchProfile();
     
-    // Profile picture upload functionality
     const profileUpload = document.getElementById("profile-upload");
     if (profileUpload) {
         profileUpload.addEventListener("change", handleProfilePicture);
     }
     
-    // Edit profile toggle
     const editProfileBtn = document.getElementById("edit-profile-btn");
     if (editProfileBtn) {
         editProfileBtn.addEventListener("click", toggleEditProfile);
     }
     
-    // Cancel edit button
     const cancelEditBtn = document.getElementById("cancel-edit-btn");
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener("click", cancelEdit);
     }
     
-    // Privacy policy button
     const privacyBtn = document.getElementById("privacy-btn");
     if (privacyBtn) {
         privacyBtn.addEventListener("click", () => {
@@ -29,44 +23,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    // Logout button
     const logoutBtn = document.getElementById("logout-btn");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", handleLogout);
     }
     
-    // Profile form submission
     const profileForm = document.getElementById("profile-form");
     if (profileForm) {
         profileForm.addEventListener("submit", updateProfile);
     }
     
-    // Tab navigation
     setupTabNavigation();
     
-    // Load profile picture
     loadProfilePicture();
     
-    // Load activity data
     loadActivityData();
     
-    // Load status messages if on employer profile
     const userRole = localStorage.getItem('isEmployer') === 'true' ? 'employer' : 'employee';
     if (userRole === 'employer') {
         loadEmployerJobs();
         loadReceivedApplications();
-        loadStatusMessages(); // Load the status messages
+        loadStatusMessages(); 
     } else {
         loadUserApplications();
     }
     
-    // Set up status messages form submission
     const statusMessagesForm = document.getElementById('status-messages-form');
     if (statusMessagesForm) {
         statusMessagesForm.addEventListener('submit', saveStatusMessages);
     }
     
-    // Reset status messages to default
     const resetDefaultBtn = document.getElementById('reset-default-messages');
     if (resetDefaultBtn) {
         resetDefaultBtn.addEventListener('click', resetStatusMessages);
@@ -75,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initCategories();
     initCategorySelection();
 
-    // init category selection in edit form
     document.querySelectorAll('#categories-container .category-item')
         .forEach(item => item.addEventListener('click', function() {
             this.classList.toggle('selected');
@@ -88,14 +73,11 @@ function setupTabNavigation() {
     
     tabLinks.forEach(link => {
         link.addEventListener('click', function() {
-            // Remove active class from all tabs and panes
             tabLinks.forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             
-            // Add active class to clicked tab
             this.classList.add('active');
             
-            // Show the corresponding pane
             const tabId = this.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
         });
@@ -112,7 +94,7 @@ function fetchProfile() {
         if (data.error) {
             showNotification("Error: " + data.error, "error");
         } else {
-            console.log("Profile data received:", data); // Log the data
+            console.log("Profile data received:", data); 
             populateProfileForm(data);
             populateProfileInfo(data);
             setProfileHeader(data);
@@ -126,7 +108,6 @@ function fetchProfile() {
 }
 
 function setProfileHeader(data) {
-    // Set profile name and email in header
     const nameElement = document.getElementById("profile-name");
     const emailElement = document.getElementById("profile-email");
     
@@ -156,14 +137,12 @@ function setProfileInitials(data) {
 }
 
 function populateProfileForm(data) {
-    // Employee fields
     if (data.role === "employee") {
         if (document.getElementById("first_name"))
             document.getElementById("first_name").value = data.first_name || "";
         if (document.getElementById("last_name"))
             document.getElementById("last_name").value = data.last_name || "";
     }
-    // Employer fields
     else if (data.role === "employer") {
         if (document.getElementById("company_name"))
             document.getElementById("company_name").value = data.company_name || "";
@@ -173,7 +152,6 @@ function populateProfileForm(data) {
             document.getElementById("address").value = data.address || "";
     }
     
-    // Common fields
     if (document.getElementById("birthdate"))
         document.getElementById("birthdate").value = data.birthdate || "";
     if (document.getElementById("phone"))
@@ -181,25 +159,21 @@ function populateProfileForm(data) {
     if (document.getElementById("email"))
         document.getElementById("email").value = data.email || "";
     
-    // Handle categories for employee profiles
     if (data.role === "employee" && data.user_categories) {
         console.log("Loading categories:", data.user_categories);
         const cats = data.user_categories.split(',');
         
-        // Store categories in hidden input
         const categoriesInput = document.getElementById('user_categories');
         if (categoriesInput) {
             categoriesInput.value = data.user_categories;
         }
         
-        // Mark selected categories with "selected" class
         document.querySelectorAll('#categories-container .category-item').forEach(item => {
             if (cats.includes(item.dataset.value)) {
                 item.classList.add('selected');
             }
         });
 
-        // update hidden input
         updateCategoriesValue();
     }
 }
@@ -207,14 +181,12 @@ function populateProfileForm(data) {
 function populateProfileInfo(data) {
     console.log("Populating profile info with:", data);
     
-    // Update info display section
     if (data.role === "employee") {
         if (document.getElementById("info-first-name"))
             document.getElementById("info-first-name").textContent = data.first_name || "-";
         if (document.getElementById("info-last-name"))
             document.getElementById("info-last-name").textContent = data.last_name || "-";
             
-        // Display job categories
         const infoCategories = document.getElementById("info-categories");
         console.log("Categories element:", infoCategories);
         console.log("User categories data:", data.user_categories);
@@ -246,7 +218,6 @@ function populateProfileInfo(data) {
             document.getElementById("info-address").textContent = data.address || "-";
     }
     
-    // Common fields
     if (document.getElementById("info-birthdate"))
         document.getElementById("info-birthdate").textContent = formatDate(data.birthdate) || "-";
     if (document.getElementById("info-phone"))
@@ -256,25 +227,21 @@ function populateProfileInfo(data) {
 function formatDate(dateString) {
     if (!dateString) return "";
     
-    // Convert YYYY-MM-DD to readable format
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function formatRelativeTime(dateString) {
-    // Parse the dateString into a Date object
     const date = new Date(dateString);
     
-    // Use the browser's local timezone instead of manual offset
-    // This will automatically handle DST and timezone differences
     return date.toLocaleString('en-GB', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false, // Use 24-hour format
-        timeZone: 'Europe/Helsinki' // Explicitly set timezone to Helsinki
+        hour12: false, 
+        timeZone: 'Europe/Helsinki' 
     });
 }
 
@@ -293,7 +260,6 @@ function cancelEdit() {
     formContainer.classList.add("hidden");
     infoContainer.classList.remove("hidden");
     
-    // Reload profile data to reset form values
     fetchProfile();
 }
 
@@ -302,19 +268,16 @@ function updateProfile(event) {
 
     const payload = {};
 
-    // Employee profile fields
     if (document.getElementById("first_name")) {
         payload.first_name = document.getElementById("first_name").value.trim();
         payload.last_name = document.getElementById("last_name").value.trim();
         
-        // Get categories from selected items
         const selectedCategories = [];
         document.querySelectorAll('#categories-container .category-item.selected').forEach(item => {
             selectedCategories.push(item.getAttribute('data-value'));
         });
         payload.user_categories = selectedCategories.join(',');
     }
-    // Employer profile fields
     if (document.getElementById("company_name")) {
         payload.company_name = document.getElementById("company_name").value.trim();
     }
@@ -325,7 +288,6 @@ function updateProfile(event) {
         payload.address = document.getElementById("address").value.trim();
     }
     
-    // Common fields
     payload.birthdate = document.getElementById("birthdate").value.trim();
     payload.phone = document.getElementById("phone").value.trim();
 
@@ -342,8 +304,8 @@ function updateProfile(event) {
     .then(data => {
         if (data.message) {
             showNotification("Profile updated successfully", "success");
-            fetchProfile(); // Refresh profile data
-            toggleEditProfile(); // Return to view mode
+            fetchProfile(); 
+            toggleEditProfile(); 
         } else {
             showNotification("Error: " + (data.error || "Unknown error occurred"), "error");
         }
@@ -358,32 +320,26 @@ function handleProfilePicture(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Check file type
     if (!file.type.startsWith('image/')) {
         showNotification("Please select an image file", "error");
         return;
     }
     
-    // Check file size (limit to 5MB)
     if (file.size > 5 * 1024 * 1024) {
         showNotification("Image size exceeds 5MB", "error");
         return;
     }
     
-    // Show loading state
     const profilePic = document.getElementById("profile-picture");
     if (profilePic) {
         profilePic.classList.add('uploading');
     }
     
-    // Skip server upload and directly use FileReader to store in localStorage
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            // Store image data in localStorage
             localStorage.setItem('profilePicture', e.target.result);
             
-            // Update profile picture display
             updateProfilePictureDisplay(e.target.result);
             
             showNotification("Profile picture updated successfully", "success");
@@ -397,10 +353,8 @@ function handleProfilePicture(event) {
         showNotification("Failed to read the image file", "error");
     };
     
-    // Read the file as a data URL
     reader.readAsDataURL(file);
     
-    // Remove loading state when done
     reader.onloadend = function() {
         if (profilePic) {
             profilePic.classList.remove('uploading');
@@ -422,7 +376,6 @@ function updateProfilePictureDisplay(imageUrl) {
 }
 
 function loadProfilePicture() {
-    // Only load from localStorage
     const savedPicture = localStorage.getItem('profilePicture');
     if (savedPicture) {
         updateProfilePictureDisplay(savedPicture);
@@ -433,7 +386,6 @@ function loadActivityData() {
     const activityList = document.getElementById('activity-list');
     if (!activityList) return;
     
-    // Load recent activity from server
     fetch('/profile/activity')
         .then(response => response.json())
         .then(data => {
@@ -479,7 +431,7 @@ function renderActivities(activities) {
                 iconName = 'edit_icon.png';
                 break;
             case 'login':
-                iconName = 'activity_icon.png'; // New icon for login activity
+                iconName = 'activity_icon.png';
                 break;
             default:
                 iconName = 'activity_icon.png';
@@ -565,7 +517,6 @@ function loadReceivedApplications() {
     const applicationsContainer = document.getElementById('received-applications');
     if (!applicationsContainer) return;
     
-    // Get current user ID
     const currentUserId = localStorage.getItem("user_id") || "0";
     if (currentUserId === "0") {
         applicationsContainer.innerHTML = `
@@ -576,21 +527,16 @@ function loadReceivedApplications() {
         return;
     }
     
-    // Use a dashboard-style endpoint for employers to get comprehensive application data
     fetch(`/dashboard/employer/${currentUserId}`)
         .then(response => response.json())
         .then(data => {
             if (data.applications && data.applications.length > 0) {
-                // Store applications in a global variable for filtering
                 window.employerApplications = data.applications;
                 
-                // Update the applications count
                 updateApplicationsCount(data.applications.length);
                 
-                // Populate the job filter dropdown
                 populateJobFilter(data.applications);
                 
-                // Pass the applications array to the render function
                 renderEmployerApplications(data.applications);
             } else {
                 applicationsContainer.innerHTML = `
@@ -623,14 +569,12 @@ function populateJobFilter(applications) {
     const filterDropdown = document.getElementById('job-filter');
     if (!filterDropdown) return;
     
-    // Clear existing options except "All"
     while (filterDropdown.options.length > 1) {
         filterDropdown.remove(1);
     }
     
-    // Get unique job subjects/titles
     const uniqueJobs = [...new Set(applications.map(app => {
-        // Extract the job title from "Application for: Job Title"
+  
         let subject = app.subject || '';
         if (subject.startsWith('Application for:')) {
             return subject.substring('Application for:'.length).trim();
@@ -638,9 +582,8 @@ function populateJobFilter(applications) {
         return subject;
     }))];
     
-    // Add job options to dropdown
     uniqueJobs.forEach(job => {
-        if (job) {  // Only add non-empty job titles
+        if (job) {  
             const option = document.createElement('option');
             option.value = job;
             option.textContent = job;
@@ -648,7 +591,6 @@ function populateJobFilter(applications) {
         }
     });
     
-    // Add event listener to filter applications
     filterDropdown.addEventListener('change', function() {
         const selectedJob = this.value;
         filterApplications(selectedJob);
@@ -669,14 +611,11 @@ function filterApplications(jobTitle) {
         });
     }
     
-    // Update the applications count with filtered count
     updateApplicationsCount(filteredApplications.length);
     
-    // Render the filtered applications
     renderEmployerApplications(filteredApplications);
 }
 
-// New function to render employer applications in a format similar to employee applications
 function renderEmployerApplications(applications) {
     const container = document.getElementById('received-applications');
     if (!container) return;
@@ -695,10 +634,8 @@ function renderEmployerApplications(applications) {
             case 'rejected': statusClass = 'status-rejected'; break;
         }
         
-        // Format the date nicely
         const applicationDate = app.created_at ? formatRelativeTime(app.created_at) : 'Unknown date';
         
-        // Extract job title from subject
         let jobTitle = app.subject || 'Job Position';
         if (jobTitle.startsWith('Application for:')) {
             jobTitle = jobTitle.substring('Application for:'.length).trim();
@@ -730,7 +667,6 @@ function loadUserApplications() {
     const applicationsContainer = document.getElementById('applications-container');
     if (!applicationsContainer) return;
     
-    // Get current user ID
     const currentUserId = localStorage.getItem("user_id") || "0";
     if (currentUserId === "0") {
         applicationsContainer.innerHTML = `
@@ -741,12 +677,10 @@ function loadUserApplications() {
         return;
     }
     
-    // Use the dashboard endpoint to get comprehensive application data
     fetch(`/dashboard/employee/${currentUserId}`)
         .then(response => response.json())
         .then(data => {
             if (data.applications && data.applications.length > 0) {
-                // Pass the applications array to the render function
                 renderEnhancedApplications(data.applications);
             } else {
                 applicationsContainer.innerHTML = `
@@ -769,7 +703,6 @@ function loadUserApplications() {
         });
 }
 
-// New function to render enhanced application data
 function renderEnhancedApplications(applications) {
     const container = document.getElementById('applications-container');
     if (!container) return;
@@ -788,10 +721,8 @@ function renderEnhancedApplications(applications) {
             case 'rejected': statusClass = 'status-rejected'; break;
         }
         
-        // Format the date nicely
         const applicationDate = app.created_at ? formatRelativeTime(app.created_at) : 'Unknown date';
         
-        // Create HTML content for each application - removed the View button
         appItem.innerHTML = `
             <div class="activity-icon">
                 <img src="../public/images/apply_icon.png" alt="Application">
@@ -877,15 +808,12 @@ function renderApplications(applications, viewType) {
 function handleLogout() {
     fetch("/logout", { method: "POST" })
     .then(res => {
-        // Clear all localStorage items including profile picture
         localStorage.clear();
         
-        // Redirect to login page
         window.location.href = "login.html";
     })
     .catch(err => {
         console.error("Error logging out:", err);
-        // Still clear storage and redirect on error
         localStorage.clear();
         window.location.href = "login.html";
     });
@@ -909,7 +837,6 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Function to load status messages
 function loadStatusMessages() {
     const userId = localStorage.getItem("user_id");
     if (!userId) return;
@@ -918,7 +845,6 @@ function loadStatusMessages() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update text areas with custom or default messages
                 document.getElementById('pending-message').value = data.messages.pending || '';
                 document.getElementById('under-review-message').value = data.messages.under_review || '';
                 document.getElementById('accepted-message').value = data.messages.accepted || '';
@@ -931,7 +857,6 @@ function loadStatusMessages() {
         });
 }
 
-// Function to save custom status messages
 function saveStatusMessages(event) {
     event.preventDefault();
     
@@ -967,9 +892,7 @@ function saveStatusMessages(event) {
     });
 }
 
-// Function to reset status messages to default
 function resetStatusMessages() {
-    // Default messages with placeholder for job title
     const defaultMessages = {
         pending: "Thank you for your application for {job_title}. Your application is currently in our pending queue and will be reviewed soon.",
         under_review: "Good news! Your application for {job_title} is now being reviewed by our team. We'll be in touch with updates as we evaluate your candidacy.",
@@ -977,7 +900,6 @@ function resetStatusMessages() {
         rejected: "Thank you for your interest in {job_title}. After careful consideration, we regret to inform you that we've decided to move forward with other candidates at this time.\n\nWe appreciate your interest in our organization and wish you success in your job search."
     };
     
-    // Update form fields with default messages
     document.getElementById('pending-message').value = defaultMessages.pending;
     document.getElementById('under-review-message').value = defaultMessages.under_review;
     document.getElementById('accepted-message').value = defaultMessages.accepted;
@@ -1015,7 +937,6 @@ function updateCategoriesInput() {
         selectedCategories.push(item.getAttribute('data-value'));
     });
     
-    // Update hidden input
     const categoriesInput = document.getElementById('user_categories');
     if (categoriesInput) {
         categoriesInput.value = selectedCategories.join(',');
@@ -1023,7 +944,6 @@ function updateCategoriesInput() {
     }
 }
 
-// update hidden input with selected categories
 function updateCategoriesValue() {
     const selected = Array.from(
         document.querySelectorAll('#categories-container .category-item.selected')

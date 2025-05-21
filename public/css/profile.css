@@ -1,5 +1,3 @@
-/* Modern Profile Page Styling */
-
 .profile-container {
   max-width: 1000px;
   margin: 90px auto 40px;
@@ -13,10 +11,9 @@
   margin-top: 70px;
 }
 
-/* Profile Layout */
 .profile-layout {
   display: flex;
-  max-width: 1400px; /* Increased from default width */
+  max-width: 1400px; 
   margin: 0 auto;
   padding: 30px 20px;
   width: 100%;
@@ -25,7 +22,7 @@
   gap: 30px;
 }
 
-/* Left sidebar with profile picture and actions */
+
 .profile-sidebar {
   background-color: #252525;
   padding: 40px 30px;
@@ -35,21 +32,19 @@
   align-items: center;
   min-height: 600px;
   width: 280px;
-  min-width: 280px; /* Ensure sidebar doesn't shrink */
+  min-width: 280px; 
   flex-shrink: 0;
 }
 
-/* Right content area */
 .profile-content-area {
   flex: 1;
   min-width: 0;
-  max-width: 1100px; /* Wider content area */
+  max-width: 1100px;
   margin-left: 30px;
   padding: 0;
   width: calc(100% - 310px);
 }
 
-/* Profile picture styling */
 .profile-picture-container {
   position: relative;
   width: 180px;
@@ -76,7 +71,6 @@
   overflow: hidden;
 }
 
-/* Shiny effect for profile picture border */
 .profile-picture::after {
   content: '';
   position: absolute;
@@ -100,7 +94,6 @@
   20%, 100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
-/* Picture upload styling */
 .upload-overlay {
   position: absolute;
   bottom: 5px;
@@ -124,7 +117,6 @@
   background-color: #6e9ad0;
 }
 
-/* Hide the actual file input */
 .upload-overlay input[type="file"] {
   display: none;
 }
@@ -135,7 +127,6 @@
   filter: brightness(0);
 }
 
-/* Profile name and email */
 .profile-identity {
   text-align: center;
   margin-bottom: 30px;
@@ -167,7 +158,6 @@
   display: inline-block;
 }
 
-/* Profile action buttons */
 .profile-actions {
   display: flex;
   flex-direction: column;
@@ -188,7 +178,6 @@
   align-items: center;
 }
 
-/* Fixed icon container with consistent dimensions */
 .btn-icon {
   width: 20px;
   height: 20px;
@@ -197,7 +186,7 @@
   vertical-align: middle;
   position: relative;
   top: 0;
-  object-fit: contain; /* Ensures icon maintains aspect ratio */
+  object-fit: contain; 
 }
 
 .edit-btn {
@@ -232,7 +221,6 @@
   border-color: #ff6b6b;
 }
 
-/* Tabs styling */
 .profile-tabs {
   border-bottom: 1px solid #333;
   width: 100%;
@@ -248,13 +236,13 @@
 }
 
 .tab-nav li {
-  padding: 12px 25px; /* Increase horizontal padding */
+  padding: 12px 25px; 
   cursor: pointer;
   font-weight: 500;
   color: #aaa;
   transition: all 0.2s;
   border-bottom: 3px solid transparent;
-  white-space: nowrap; /* Prevent wrapping */
+  white-space: nowrap; 
 }
 
 .tab-nav li:hover {
@@ -267,7 +255,6 @@
   border-bottom-color: #8ab4f8;
 }
 
-/* Tab content */
 .tab-content {
   padding: 30px;
   width: 100%;
@@ -288,7 +275,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* User info styling */
 .info-card {
   background-color: #252525;
   border-radius: 10px;
@@ -340,7 +326,6 @@
   border: 1px solid #333;
 }
 
-/* Form styling */
 #profile-form {
   margin-top: 20px;
 }
@@ -411,7 +396,6 @@
   color: #fff;
 }
 
-/* Activity section styling */
 .activity-card {
   background-color: #252525;
   border-radius: 10px;
@@ -477,7 +461,6 @@
   white-space: nowrap;
 }
 
-/* Utility classes */
 .hidden {
   display: none !important;
 }
@@ -494,7 +477,6 @@
   margin-top: 40px;
 }
 
-/* Status Messages Tab Styles */
 .status-subtitle {
   font-size: 13px;
   color: #999;
@@ -504,7 +486,7 @@
 
 .status-messages-container {
   margin-top: 20px;
-  width: 100%; /* Ensure full width */
+  width: 100%; 
 }
 
 .status-message-group {
@@ -543,7 +525,7 @@
   padding: 12px;
   font-size: 14px;
   resize: vertical;
-  min-height: 100px; /* Ensure reasonable height for messages */
+  min-height: 100px; 
   width: 100%;
   min-height: 100px;
   box-sizing: border-box;
@@ -557,7 +539,7 @@
   outline: none;
 }
 
-/* Profile categories styling */
+
 .categories-container {
   display: flex;
   flex-wrap: wrap;
@@ -588,7 +570,6 @@
   border-color: #4299e1;
 }
 
-/* Category badges styling for profile view */
 .category-badge {
   display: inline-block;
   background-color: #2c5282;
@@ -599,7 +580,6 @@
   font-size: 13px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1200px) {
   .profile-layout {
     max-width: 100%;

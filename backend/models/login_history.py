@@ -10,5 +10,4 @@ class LoginHistory(db.Model):
     ip_address = db.Column(db.String(50), nullable=True)
     device_info = db.Column(db.Text, nullable=True)
     
-    # Relationship with User model
     user = db.relationship('User', backref=db.backref('login_history', lazy=True))

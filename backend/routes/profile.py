@@ -1,4 +1,3 @@
-# backend/routes/profile.py
 from flask import Blueprint, request, jsonify, session
 from backend.models.database import db
 from backend.models.user import User
@@ -73,7 +72,6 @@ def get_user_activity():
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
         
-    # Get login history for the user
     login_history = LoginHistory.query.filter_by(user_id=user_id)\
                     .order_by(LoginHistory.login_time.desc())\
                     .limit(10)\
@@ -81,11 +79,9 @@ def get_user_activity():
                     
     activities = []
     for login in login_history:
-        # Extract browser and OS info from device_info (user agent string)
         device_info = login.device_info or "Unknown device"
         device_summary = "Unknown device"
         if login.device_info:
-            # Check for Edge first since Edge user agent contains Chrome too
             if "Edge" in login.device_info or "Edg/" in login.device_info:
                 device_summary = "Microsoft Edge"
             elif "Chrome" in login.device_info:

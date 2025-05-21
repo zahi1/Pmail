@@ -1,4 +1,3 @@
-<!-- frontend/home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,17 +9,13 @@
   <link rel="stylesheet" href="../public/css/inbox.css" />
   <link rel="stylesheet" href="../public/css/employee_home.css" />
   <link rel="stylesheet" href="../public/css/style.css">
-  <!-- Add Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <body>
-  <!-- Top Navigation -->
   <div class="top-nav">
-    <!-- Left: Logo -->
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
     </div>
-    <!-- Right: Links -->
     <div class="nav-right">
       <a href="employee_home.html" class="nav-link active"><img src="../public/images/home_icon.png" alt="Home" class="nav-icon"> Home</a>
       <a href="jobs.html" class="nav-link"><img src="../public/images/findjob_icon.png" alt="Find Jobs" class="nav-icon"> Find Jobs</a>
@@ -30,13 +25,10 @@
     </div>
   </div>
 
-  <!-- Main Content Layout -->
   <div class="home-container">
-    <!-- Left Sidebar: Employee Profile -->
     <div class="company-sidebar">
       <div class="company-profile">
         <div class="profile-header">
-          <!-- <img src="../public/images/employee_avatar.png" alt="Employee Avatar" class="employee-avatar-large"> -->
           <h2 id="employee-name">Loading...</h2>
           <p class="company-info" id="employee-categories">Loading categories...</p>
         </div>
@@ -48,7 +40,7 @@
           </div>
           <div class="stat-item">
             <span class="stat-number" id="interviews-count">...</span>
-            <span class="stat-label">Interviews</span>
+            <span class="stat-label">Under Review</span>
           </div>
           <div class="stat-item">
             <span class="stat-number" id="accepted-count">...</span>
@@ -76,10 +68,9 @@
       </div>
     </div>
     
-    <!-- Main Content: Job Matches -->
     <div class="main-content-area">
       
-      <!-- Similar Jobs Section -->
+  
       <div class="content-section">
         <div class="section-header">
           <h2>Job Suggestions Based On Your Profile</h2>
@@ -87,7 +78,6 @@
         </div>
         
         <div class="job-matches-slider">
-          <!-- Add navigation controls -->
           <div class="slider-controls">
             <button class="slider-btn prev" aria-label="Previous jobs">
               <i class="fas fa-chevron-left"></i>
@@ -98,7 +88,6 @@
           </div>
           
           <div class="job-matches">
-            <!-- Job cards will be dynamically loaded here -->
           </div>
           
           <div class="scroll-hint">
@@ -107,7 +96,6 @@
         </div>
       </div>
       
-      <!-- Recent Applications -->
       <div class="content-section">
         <div class="section-header">
           <h2>Your Recent Applications</h2>
@@ -126,7 +114,6 @@
               </tr>
             </thead>
             <tbody id="recent-applications-container">
-              <!-- Loading indicator -->
               <tr id="applications-loading" class="loading-indicator-row">
                 <td colspan="5">
                   <div class="loading-indicator">
@@ -135,7 +122,6 @@
                   </div>
                 </td>
               </tr>
-              <!-- Applications will be dynamically loaded here -->
             </tbody>
           </table>
         </div>

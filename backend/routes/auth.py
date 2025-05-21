@@ -9,39 +9,30 @@ from backend.models.login_history import LoginHistory
 
 auth_bp = Blueprint("auth", __name__)
 
-# --------------------- #
-# ✅ User Registration  #
-# --------------------- #
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
     
-    print("🔹 Received Data:", data)  # Debug log
+    print("🔹 Received Data:", data) 
 
-    # Ensure email is retrieved, stripped, and lowercased
     email = data.get("email", "").strip().lower()
     
-    # Validate required fields
     required_fields = ["first_name", "last_name", "birthdate", "email", "password", "phone", "role"]
     for field in required_fields:
         if not data.get(field):
             return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # Validate role
     role = data["role"]
     if role not in ["employee", "employer"]:
         return jsonify({"error": "Invalid role"}), 400
 
-    # Validate email format (must end with @pmail.com)
     email_pattern = r"^[a-zA-Z0-9._%+-]+@pmail\.com$"
     if not re.match(email_pattern, email):
-        print("❌ Invalid Email Format:", email)
+        print("Invalid Email Format:", email)
         return jsonify({"error": "Invalid email format"}), 400
 
-    # Hash the password
     hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
 
-    # Build User object
     new_user = User(
         first_name=data["first_name"],
         last_name=data["last_name"],
@@ -57,7 +48,7 @@ def register():
     try:
         db.session.add(new_user)
         db.session.commit()
-        print("✅ User Registered:", email)
+        print("User Registered:", email)
         return jsonify({"message": "User registered successfully", "role": new_user.role}), 201
 
     except IntegrityError as ie:
@@ -68,12 +59,9 @@ def register():
 
     except Exception as e:
         db.session.rollback()
-        print("❌ Database error:", e)
+        print("Database error:", e)
         return jsonify({"error": "Database error"}), 500
 
-# --------------------- #
-# ✅ User Login Route   #
-# --------------------- #
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -84,67 +72,60 @@ def login():
     email = data["email"].strip().lower()
     password = data["password"]
     
-    # Check if this is the admin email
     is_admin_email = email == "admin@pmail.com"
-    print(f"🔐 Login attempt for: {email} {'(ADMIN)' if is_admin_email else ''}")
+    print(f"Login attempt for: {email} {'(ADMIN)' if is_admin_email else ''}")
     
     user = User.query.filter(func.lower(User.email) == email).first()
     
     if not user:
-        print(f"❌ Login failed: User not found for {email}")
+        print(f"Login failed: User not found for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
-    # Try both normal password verification and direct comparison for admin
     auth_success = False
     
-    # Debug info to understand what we're working with
-    print(f"👤 User found: ID={user.id}, Role={user.role}")
+    print(f"User found: ID={user.id}, Role={user.role}")
     
-    # For admin users, use a simpler password check (especially during development)
     if is_admin_email:
-        # First try direct comparison for admin
+ 
         if user.password == password or password == "admin123":
-            print("✅ Admin password verification successful")
+            print("Admin password verification successful")
             auth_success = True
         else:
-            # If that fails, try the hash check
+           
             try:
                 auth_success = check_password_hash(user.password, password)
                 if auth_success:
-                    print("✅ Admin hash verification successful")
+                    print("Admin hash verification successful")
                 else:
-                    print("❌ Admin password verification failed")
+                    print("Admin password verification failed")
             except Exception as e:
-                print(f"⚠️ Error during admin password check: {e}")
+                print(f"Error during admin password check: {e}")
     else:
-        # For regular users, use normal hash verification
+
         try:
             auth_success = check_password_hash(user.password, password)
             if auth_success:
-                print("✅ Password hash verification successful")
+                print("Password hash verification successful")
             else:
-                print("❌ Password hash verification failed")
+                print("Password hash verification failed")
         except Exception as e:
-            print(f"⚠️ Error during password hash check: {e}")
+            print(f"Error during password hash check: {e}")
     
     if not auth_success:
-        print(f"❌ Login failed: Invalid password for {email}")
+        print(f"Login failed: Invalid password for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
-    # Login successful - set up session
     session["user_id"] = user.id
     session["email"] = user.email
     
-    # Handle role - special case for admin
     if is_admin_email:
         session["role"] = "admin"
-        print("👑 Setting admin role in session")
+        print("Setting admin role in session")
     else:
         session["role"] = user.role
 
-    print(f"✅ Login successful for: {email}, role: {session['role']}")
+    print(f"Login successful for: {email}, role: {session['role']}")
 
-    # Record login history
     user_agent = request.headers.get('User-Agent', '')
     ip_address = request.remote_addr
     try:
@@ -156,18 +137,16 @@ def login():
         db.session.add(login_record)
         db.session.commit()
     except Exception as e:
-        print(f"⚠️ Failed to record login history: {e}")
+        print(f"Failed to record login history: {e}")
         db.session.rollback()
 
-    # Determine redirect URL based on role
     if session["role"] == "employee":
         redirect_url = "/frontend/employee_inbox.html"
     elif session["role"] == "admin":
         redirect_url = "/frontend/admin_dashboard.html"
-    else: # employer
+    else: 
         redirect_url = "/frontend/employer_inbox.html"
 
-    # Prepare response data based on role
     response_data = {
         "message": "Login successful",
         "redirect": redirect_url,
@@ -175,7 +154,6 @@ def login():
         "role": session["role"]
     }
 
-    # Add role-specific data
     if session["role"] == "employee":
         response_data["first_name"] = user.first_name
         response_data["isEmployer"] = False
@@ -188,28 +166,20 @@ def login():
 
     return jsonify(response_data), 200
 
-# --------------------- #
-# ✅ User Logout Route  #
-# --------------------- #
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
-    # Clear all session data
+
     session.clear()
     return jsonify({"message": "Logged out successfully"}), 200
 
-# --------------------- #
-# ✅ Admin Auth Check   #
-# --------------------- #
 @auth_bp.route("/admin/auth-check", methods=["GET"])
 def admin_auth_check():
-    """Check if current user is an admin"""
     user_id = session.get("user_id")
     user_role = session.get("role")
     
     if not user_id:
         return jsonify({"isAdmin": False, "error": "Not authenticated"}), 401
 
-    # Check if the user has admin role
     if user_role == "admin":
         user = User.query.get(user_id)
         if user:
@@ -221,23 +191,18 @@ def admin_auth_check():
     
     return jsonify({"isAdmin": False, "error": "Not authorized"}), 403
 
-# --------------------- #
-# ✅ Check Email Availability #
-# --------------------- #
+
 @auth_bp.route("/check-email", methods=["GET"])
 def check_email():
-    """Check if an email is already registered"""
     email = request.args.get("email", "").strip().lower()
     
     if not email:
         return jsonify({"error": "No email provided"}), 400
         
-    # Validate email format (must end with @pmail.com)
     email_pattern = r"^[a-zA-Z0-9._%+-]+@pmail\.com$"
     if not re.match(email_pattern, email):
         return jsonify({"error": "Invalid email format"}), 400
         
-    # Check if the email exists
     existing_user = User.query.filter(func.lower(User.email) == email).first()
     
     if existing_user:
@@ -245,18 +210,13 @@ def check_email():
     else:
         return jsonify({"available": True, "message": "Email is available"}), 200
 
-# --------------------- #
-# ✅ Check Phone Availability #
-# --------------------- #
 @auth_bp.route("/check-phone", methods=["GET"])
 def check_phone():
-    """Check if a phone number is already registered"""
     phone = request.args.get("phone", "").strip()
     
     if not phone:
         return jsonify({"error": "No phone number provided"}), 400
         
-    # Check if the phone exists
     existing_user = User.query.filter(User.phone == phone).first()
     
     if existing_user:
@@ -264,67 +224,52 @@ def check_phone():
     else:
         return jsonify({"available": True, "message": "Phone number is available"}), 200
 
-# --------------------- #
-# ✅ Verify User Identity for Password Reset #
-# --------------------- #
 @auth_bp.route("/verify-identity", methods=["POST"])
 def verify_identity():
-    """Verify user identity for password reset"""
     data = request.get_json()
     
-    # Validate required fields
     required_fields = ["email", "first_name", "last_name", "birthdate", "phone", "role"]
     for field in required_fields:
         if not data.get(field):
             return jsonify({"success": False, "error": f"Missing field: {field}"}), 400
     
-    # Get email and convert to lowercase for case-insensitive matching
     email = data["email"].strip().lower()
     
-    # Find user by email
     user = User.query.filter(func.lower(User.email) == email).first()
     if not user:
         return jsonify({"success": False, "error": "No account found with this email"}), 404
     
-    # Verify all fields match exactly
     if (user.first_name != data["first_name"] or
         user.last_name != data["last_name"] or
         str(user.birthdate) != data["birthdate"] or
         user.phone != data["phone"] or
         user.role != data["role"]):
-        # Return generic error to prevent information leakage
+ 
         return jsonify({"success": False, "error": "Identity verification failed. Please check your information."}), 400
     
-    # All verified successfully
+
     return jsonify({"success": True, "message": "Identity verified successfully"}), 200
 
-# --------------------- #
-# ✅ Reset Password #
-# --------------------- #
 @auth_bp.route("/reset-password", methods=["POST"])
 def reset_password():
-    """Reset user password after identity verification"""
     data = request.get_json()
     
-    # Validate required fields
     if not data.get("email") or not data.get("password"):
         return jsonify({"success": False, "error": "Missing email or password"}), 400
     
-    # Get email and convert to lowercase for case-insensitive matching
     email = data["email"].strip().lower()
     
-    # Find user by email
     user = User.query.filter(func.lower(User.email) == email).first()
     if not user:
         return jsonify({"success": False, "error": "No account found with this email"}), 404
     
-    # Update password
+
     try:
-        # Hash the new password
+  
         hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
         user.password = hashed_password
         
-        # Save to database
+   
         db.session.commit()
         
         return jsonify({
@@ -333,7 +278,7 @@ def reset_password():
         }), 200
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error resetting password: {e}")
+        print(f"Error resetting password: {e}")
         return jsonify({
             "success": False, 
             "error": "An error occurred while resetting your password"

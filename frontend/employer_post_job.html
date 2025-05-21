@@ -1,4 +1,3 @@
-<!-- frontend/employer_post_job.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pmail - Post a New Job</title>
   <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
-  <!-- Reuse your dark theme CSS (e.g. inbox.css) or jobs.css -->
   <link rel="stylesheet" href="../public/css/inbox.css" />
-  <!-- Additional custom styling for fancy layout -->
   <style>
     .page-container {
       margin-top: 80px; 
@@ -64,7 +61,6 @@
       margin: 30px 0 10px;
     }
 
-    /* Job listing card styling */
     .job-listing-card h3 {
       margin-top: 0;
       color: #8ab4f8;
@@ -87,7 +83,6 @@
       background-color: #6e9ad0;
     }
 
-    /* Status badge styling */
     .status-badge {
       display: inline-block;
       padding: 4px 8px;
@@ -110,7 +105,6 @@
       border: 1px solid #9b1c1c;
     }
 
-    /* Edit Modal */
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0;
@@ -177,7 +171,6 @@
       background-color: #666;
     }
     
-    /* Coming soon message styling */
     .coming-soon-message {
       background-color: #2a2a2a;
       border: 1px solid #444;
@@ -193,7 +186,6 @@
       line-height: 1.5;
     }
     
-    /* Loading spinner */
     .loading-spinner {
       text-align: center;
       padding: 20px;
@@ -201,7 +193,6 @@
       font-style: italic;
     }
 
-    /* Improved sorting control styles */
     .job-sorting {
       margin-bottom: 20px;
       display: flex;
@@ -256,7 +247,6 @@
   <script src="../public/js/post_job.js" defer></script>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="nav-left">
       <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
@@ -271,7 +261,6 @@
   </div>
 
   <div class="page-container">
-    <!-- Post Job Form Card -->
     <div class="job-form-card">
       <h2>Post a New Job</h2>
       <form id="post-job-form">
@@ -321,10 +310,8 @@
       </form>
     </div>
 
-    <!-- Employer's Existing Jobs -->
     <h2 class="jobs-section-title">Your Posted Jobs</h2>
     
-    <!-- Enhanced sorting control -->
     <div class="job-sorting">
       <div class="sorting-control">
         <label for="jobs-sort">Sort by:</label>
@@ -345,11 +332,9 @@
     </div>
     
     <div id="employer-jobs-container">
-      <!-- Job cards will be inserted here by JS -->
     </div>
   </div>
 
-  <!-- Edit Job Modal -->
   <div class="modal-backdrop" id="edit-modal-backdrop">
     <div class="modal" id="edit-modal">
       <h2>Edit Job</h2>

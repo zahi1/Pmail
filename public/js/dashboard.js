@@ -1,5 +1,3 @@
-// frontend/public/js/dashboard.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const currentUserId = localStorage.getItem("user_id") || "0";
   if (currentUserId === "0") {
@@ -7,16 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Global variables for filtering
   window.allApplications = [];
   
   fetch(`/dashboard/employee/${currentUserId}`)
     .then(res => res.json())
     .then(data => {
-      // Store applications globally
       window.allApplications = data.applications;
       
-      // Extract unique categories for filter dropdown
       const uniqueCategories = new Set();
       data.applications.forEach(app => {
         if (app.job_category && app.job_category !== 'N/A') {
@@ -24,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // Populate category filter dropdown
       const categoryFilter = document.getElementById("categoryFilter");
       if (categoryFilter) {
         uniqueCategories.forEach(category => {
@@ -35,19 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // 1) Status distribution (pie)
       renderStatusChart(data.status_counts);
 
-      // 2) Monthly time series (line)
       renderTimeSeriesChart(data.time_series);
 
-      // 3) Category distribution (bar)
       renderCategoryChart(data.category_counts);
 
-      // 4) Day of week distribution (bar)
       renderDayOfWeekChart(data.day_of_week_counts);
 
-      // Display all applications initially
       displayApplicationCards(data.applications);
     })
     .catch(err => {
@@ -55,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Function to filter applications based on selected criteria
 function filterApplications() {
   const statusFilter = document.getElementById("statusFilter").value;
   const categoryFilter = document.getElementById("categoryFilter").value;
@@ -64,25 +52,20 @@ function filterApplications() {
   
   let filteredApps = [...window.allApplications];
   
-  // Filter by status
   if (statusFilter !== "all") {
     filteredApps = filteredApps.filter(app => app.status === statusFilter);
   }
   
-  // Filter by category
   if (categoryFilter !== "all") {
     filteredApps = filteredApps.filter(app => app.job_category === categoryFilter);
   }
   
-  // Filter by salary range
   if (salaryFilter !== "all") {
     filteredApps = filteredApps.filter(app => {
-      // Skip applications without salary data
       if (!app.salary_range || app.salary_range === "Not specified") {
         return false;
       }
       
-      // Parse the salary filter (e.g., "3000-5000" or "12000+")
       let filterMin, filterMax;
       if (salaryFilter.endsWith('+')) {
         filterMin = parseInt(salaryFilter.replace('+', ''));
@@ -91,63 +74,50 @@ function filterApplications() {
         [filterMin, filterMax] = salaryFilter.split('-').map(Number);
       }
       
-      // Parse the application's salary range
       const parsedSalary = parseSalaryRange(app.salary_range);
       
-      // Check if the ranges overlap
       return !(parsedSalary.max < filterMin || parsedSalary.min > filterMax);
     });
   }
   
-  // Apply sorting
   filteredApps = sortApplications(filteredApps, sortBy);
   
-  // Display filtered and sorted applications
   displayApplicationCards(filteredApps);
 }
 
-// New function to sort applications based on the selected criteria
 function sortApplications(applications, sortCriteria) {
   const [field, direction] = sortCriteria.split('-');
   
   return applications.sort((a, b) => {
     let comparison = 0;
     
-    // Sort by date
     if (field === 'date') {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
       comparison = dateA - dateB;
     } 
-    // Sort by title
     else if (field === 'title') {
-      // Extract job title from subject
       const titleA = a.subject ? a.subject.replace(/^Application for:\s*/i, '') : '';
       const titleB = b.subject ? b.subject.replace(/^Application for:\s*/i, '') : '';
       comparison = titleA.localeCompare(titleB);
     } 
-    // Sort by salary
     else if (field === 'salary') {
-      // Get min salary values for comparison
       const salaryA = getSalaryValue(a.salary_range);
       const salaryB = getSalaryValue(b.salary_range);
       comparison = salaryA - salaryB;
     }
     
-    // Adjust direction based on asc/desc
     return direction === 'asc' ? comparison : -comparison;
   });
 }
 
-// Helper function to extract a numeric value from salary range for sorting
 function getSalaryValue(salaryRange) {
   if (!salaryRange || salaryRange === 'Not specified') {
-    return 0; // Place unspecified salaries at the bottom/top depending on sort order
+    return 0; 
   }
   
   try {
     const parsed = parseSalaryRange(salaryRange);
-    // Use min value for comparison by default
     return parsed.min || 0;
   } catch (e) {
     console.error("Error parsing salary for sorting:", e);
@@ -155,17 +125,14 @@ function getSalaryValue(salaryRange) {
   }
 }
 
-// Parse salary range string into min and max values
 function parseSalaryRange(salaryText) {
   if (!salaryText || salaryText === "Not specified") {
     return { min: 0, max: 0 };
   }
   
   try {
-    // Strip all currency symbols, commas, and spaces
     const cleanText = salaryText.replace(/[€$,\s]/g, '');
     
-    // Check if it's a range with a hyphen
     if (cleanText.includes('-')) {
       const parts = cleanText.split('-');
       return {
@@ -173,7 +140,7 @@ function parseSalaryRange(salaryText) {
         max: parseInt(parts[1])
       };
     } else {
-      // It's a single value
+     
       const value = parseInt(cleanText);
       return { min: value, max: value };
     }
@@ -306,9 +273,7 @@ function renderCategoryChart(categoryCounts) {
 }
 
 function renderDayOfWeekChart(dayOfWeekData) {
-  // Typical day-of-week order
   const order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  // Filter out days that are not in dayOfWeekData
   const days = order.filter(d => dayOfWeekData[d] !== undefined);
   const counts = days.map(d => dayOfWeekData[d]);
 
@@ -355,7 +320,6 @@ function renderDayOfWeekChart(dayOfWeekData) {
 }
 
 function displayApplicationCards(applications) {
-  // First, find or create the applications container
   let applicationsContainer = document.querySelector('.applications-container');
   if (!applicationsContainer) {
     applicationsContainer = document.createElement('div');
@@ -370,18 +334,15 @@ function displayApplicationCards(applications) {
     }
   }
   
-  // Find existing grid or create new one
   let applicationsGrid = applicationsContainer.querySelector('.applications-grid');
   if (!applicationsGrid) {
     applicationsGrid = document.createElement('div');
     applicationsGrid.className = 'applications-grid';
     applicationsContainer.appendChild(applicationsGrid);
   } else {
-    // Clear existing cards
     applicationsGrid.innerHTML = "";
   }
   
-  // Handle empty state
   if (!applications || applications.length === 0) {
     applicationsGrid.innerHTML = `
       <div class="no-applications">
@@ -392,7 +353,6 @@ function displayApplicationCards(applications) {
     return;
   }
   
-  // Create cards for each application
   applications.forEach((app, index) => {
     const card = document.createElement('div');
     card.className = 'application-card';
@@ -400,7 +360,6 @@ function displayApplicationCards(applications) {
     
     const status = app.status || 'Pending';
     
-    // Format the date to be more readable
     const date = new Date(app.created_at);
     const formattedDate = date.toLocaleDateString('en-US', {
       year: 'numeric',

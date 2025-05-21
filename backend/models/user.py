@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, Date, Enum, TIMESTAMP
 from datetime import datetime
 
 class User(db.Model):
-    __tablename__ = "users"  # Ensure correct table name
+    __tablename__ = "users" 
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     first_name = Column(String(100), nullable=False)
@@ -19,5 +19,4 @@ class User(db.Model):
     contact_name = db.Column(db.String(100))
     address = db.Column(db.String(255))
     
-    # Employee-specific fields
-    user_categories = db.Column(db.String(500))  # Comma-separated list of categories
+    user_categories = db.Column(db.String(500))  

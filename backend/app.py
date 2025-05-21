@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from backend.routes.auth import auth_bp
-from backend.routes.jobs import jobs_bp  # Import the jobs routes blueprint
+from backend.routes.jobs import jobs_bp  
 from backend.routes.messages import messages_bp
 from backend.models.database import db
 from backend.routes.profile import profile_bp
@@ -13,27 +13,25 @@ from backend.routes.employer import employer_bp
 import os
 import logging
 
-app = Flask(__name__, static_folder="../frontend")  # Serves frontend files from Flask
+app = Flask(__name__, static_folder="../frontend") 
 app.secret_key = "ab39l0...someRandomSecret...0483y9"
 CORS(app)
 
-# Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/pmail'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Set up logging
+
 logging.basicConfig(filename='app.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Register Blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(jobs_bp, url_prefix='')  # Jobs endpoints will be available as defined (e.g., /jobs)
+app.register_blueprint(jobs_bp, url_prefix='')  
 app.register_blueprint(messages_bp, url_prefix='')
 app.register_blueprint(profile_bp, url_prefix="/")
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-app.register_blueprint(admin_bp)  # Register the admin blueprint
+app.register_blueprint(admin_bp)  
 app.register_blueprint(bulk_updates_bp, url_prefix='')
 app.register_blueprint(employer_bp) 
 

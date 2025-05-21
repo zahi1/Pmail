@@ -11,12 +11,11 @@ class Job(db.Model):
     job_type = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     company_name = db.Column(db.String(100), nullable=False)
-    salary_range = db.Column(db.String(100), nullable=True)  # Add salary range field
+    salary_range = db.Column(db.String(100), nullable=True)
     deadline = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     
     def is_open(self):
-        """Check if job is still open for applications"""
         if self.deadline is None:
             return True
         return datetime.utcnow() <= self.deadline
