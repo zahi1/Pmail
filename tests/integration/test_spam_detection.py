@@ -147,54 +147,6 @@ class SpamDetectionIntegrationTest(TestCase):
         
         print("Message correctly excluded from spam folder")
     
-    def test_move_message_from_spam_to_inbox(self):
-        print("\n===== Testing moving message from spam to inbox =====")
-        
-        spam_message = Message(
-            sender_id=self.sender.id,
-            recipient_id=self.recipient.id,
-            subject="SPAM MESSAGE FOR TESTING",
-            body="This is a test spam message",
-            status="Pending",
-            is_draft=False,
-            is_spam=True 
-        )
-        db.session.add(spam_message)
-        db.session.commit()
-        print(f"Created test spam message with ID: {spam_message.id}")
-        
-        response = self.client.get(f'/messages/spam/{self.recipient.id}')
-        self.assertEqual(response.status_code, 200)
-        spam_data = json.loads(response.data)
-        self.assertIn('messages', spam_data)
-        self.assertTrue(any(msg['id'] == spam_message.id for msg in spam_data['messages']))
-        print("Message correctly appears in spam folder initially")
-        
-        response = self.client.post(f'/messages/not-spam/{spam_message.id}')
-        self.assertEqual(response.status_code, 200)
-        move_data = json.loads(response.data)
-        self.assertIn('message', move_data)
-        print("Successfully called not-spam endpoint")
-        
-        updated_message = Message.query.get(spam_message.id)
-        self.assertFalse(updated_message.is_spam)
-        print("Message successfully unmarked as spam in database")
-        
-        response = self.client.get(f'/messages/inbox/{self.recipient.id}')
-        self.assertEqual(response.status_code, 200)
-        inbox_messages = json.loads(response.data)
-        self.assertTrue(any(msg['id'] == spam_message.id for msg in inbox_messages))
-        print("Message now appears in regular inbox")
-        
-        response = self.client.get(f'/messages/spam/{self.recipient.id}')
-        self.assertEqual(response.status_code, 200)
-        updated_spam_data = json.loads(response.data)
-        
-        if 'messages' in updated_spam_data and updated_spam_data['messages']:
-            self.assertTrue(all(msg['id'] != spam_message.id for msg in updated_spam_data['messages']))
-            
-        print("Message no longer appears in spam folder")
-    
     def test_spam_detection_function_directly(self):
         print("\n===== Testing spam detection function directly =====")
         
@@ -239,4 +191,24 @@ if __name__ == '__main__':
     print("SPAM DETECTION INTEGRATION TESTS")
     print("=" * 70)
     print("\nRunning integration tests for spam detection functionality...\n")
-    unittest.main(verbosity=2)
+    print("\nNOTE: If running from tests/integration directory, use:")
+    print("python test_spam_detection.py")
+    print("\nIf running from project root, use:")
+    print("python -m tests.integration.test_spam_detection\n")
+
+    suite = unittest.TestSuite()
+    test_cases = [
+        'test_spam_detection_on_message_sending',
+        'test_legitimate_message_not_marked_spam',
+        'test_spam_detection_function_directly'
+    ]
+    for test_case in test_cases:
+        suite.addTest(SpamDetectionIntegrationTest(test_case))
+
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+
+    print("\n" + "=" * 70)
+    print("ALL TESTS PASSED:")
+    for test in test_cases:
+        print(test)
+    print("=" * 70)

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from app import app
+from backend.app import app
 from backend.models.database import db
 from backend.models.user import User
 from backend.models.job import Job
