@@ -17,3 +17,4 @@ class Message(db.Model):
                               backref=db.backref('parent', remote_side=[id]),
                               lazy=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    status_updated_at = db.Column(db.DateTime, nullable=True)

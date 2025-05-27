@@ -8,6 +8,7 @@ from sqlalchemy import func
 import pickle
 import os
 import io
+from datetime import datetime
 
 messages_bp = Blueprint('messages', __name__)
 
@@ -277,8 +278,10 @@ def update_message_status(message_id):
     
     old_status = message.status
     message.status = new_status
-    
+
+    # Set status_updated_at to now if status changed
     if old_status != new_status:
+        message.status_updated_at = datetime.utcnow()
         try:
             employer = User.query.get(message.recipient_id) 
             employee = User.query.get(message.sender_id)    
@@ -295,19 +298,21 @@ def update_message_status(message_id):
                     status=new_status,
                     is_draft=False,
                     is_spam=False,
-                    parent_id=message_id          
+                    parent_id=message_id
                 )
                 db.session.add(auto_reply)
                 print(f"Created automated status update message with status: {new_status}")
         except Exception as e:
             print(f"Failed to create status update message: {e}")
-    
+    # If status didn't change, do not update status_updated_at
+
     db.session.commit()
     
     return jsonify({
         "success": True,
         "message_id": message_id,
-        "status": new_status
+        "status": new_status,
+        "status_updated_at": message.status_updated_at.strftime("%Y-%m-%d %H:%M:%S") if message.status_updated_at else None
     }), 200
 
 def generate_status_message(status, job_subject, employer_id=None):
@@ -421,7 +426,8 @@ def get_message(message_id):
             "is_draft": message.is_draft,
             "is_spam": message.is_spam,
             "attachments": attachments,
-            "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "status_updated_at": message.status_updated_at.strftime("%Y-%m-%d %H:%M:%S") if message.status_updated_at else None
         }
         
         return jsonify(result), 200
