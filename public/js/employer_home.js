@@ -13,7 +13,66 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
     alert('Upgrading to Pmail Premium would unlock additional features like advanced analytics, candidate matching algorithms, and prioritized job postings.');
   });
+
+  const currentUserId = localStorage.getItem("user_id") || "0";
+  if (currentUserId === "0") {
+    alert("Please log in to view your home page.");
+    return;
+  }
+
+  checkForViolationWarning();
 });
+
+function checkForViolationWarning() {
+  const warningData = localStorage.getItem("violation_warning");
+  if (warningData) {
+    try {
+      const warning = JSON.parse(warningData);
+      showViolationWarning(warning.message);
+    } catch (e) {
+      console.error("Error parsing violation warning:", e);
+    }
+  }
+}
+
+function showViolationWarning(message) {
+  const warningBanner = document.createElement('div');
+  warningBanner.className = 'violation-warning';
+  warningBanner.innerHTML = `
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-message">${message}</div>
+    <button class="warning-close" onclick="acknowledgeViolation()">×</button>
+  `;
+  
+  const homeContainer = document.querySelector('.home-container');
+  if (homeContainer) {
+    homeContainer.insertBefore(warningBanner, homeContainer.firstChild);
+  } else {
+    document.body.insertBefore(warningBanner, document.body.firstChild);
+  }
+}
+
+function acknowledgeViolation() {
+  fetch('/auth/acknowledge-violation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      localStorage.removeItem('violation_warning');
+      const warningBanner = document.querySelector('.violation-warning');
+      if (warningBanner) {
+        warningBanner.remove();
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error acknowledging violation:', error);
+  });
+}
 
 function fetchEmployerStats() {
   document.querySelector('.company-profile h2').textContent = "Loading...";

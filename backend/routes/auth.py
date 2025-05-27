@@ -4,8 +4,11 @@ from backend.models.user import User
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import func
+from sqlalchemy import func, text
+from datetime import datetime, timedelta
 from backend.models.login_history import LoginHistory
+from backend.models.employer_violation import EmployerViolation
+from backend.models.message import Message
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -81,6 +84,14 @@ def login():
         print(f"Login failed: User not found for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
+    # Block login if account is suspended - check this early
+    if getattr(user, 'is_suspended', False):
+        print(f"Login blocked: Suspended account for {email}")
+        return jsonify({
+            "error": "Account suspended",
+            "message": "Your account has been suspended due to repeated violations of our status update policy."
+        }), 403
+
     auth_success = False
     
     print(f"User found: ID={user.id}, Role={user.role}")
@@ -111,60 +122,136 @@ def login():
         except Exception as e:
             print(f"Error during password hash check: {e}")
     
-    if not auth_success:
+    if auth_success:
+        session["user_id"] = user.id
+        session["email"] = user.email
+        
+        if is_admin_email:
+            session["role"] = "admin"
+            print("Setting admin role in session")
+        else:
+            session["role"] = user.role
+
+        print(f"Login successful for: {email}, role: {session['role']}")
+
+        violation_info = None
+        is_suspended = False
+        if user.role == "employer":
+            is_suspended, violation_info = check_employer_violations(user.id)
+            if is_suspended:
+                session.clear()
+                return jsonify({
+                    "error": "Account suspended",
+                    "message": "Your account has been suspended due to multiple violations of our status update policy.",
+                    "details": "You failed to update application statuses within 7 days on multiple occasions."
+                }), 403
+
+        user_agent = request.headers.get('User-Agent', '')
+        ip_address = request.remote_addr
+        try:
+            login_record = LoginHistory(
+                user_id=user.id,
+                ip_address=ip_address,
+                device_info=user_agent
+            )
+            db.session.add(login_record)
+            db.session.commit()
+        except Exception as e:
+            print(f"Failed to record login history: {e}")
+            db.session.rollback()
+
+        if session["role"] == "employee":
+            redirect_url = "/frontend/employee_inbox.html"
+        elif session["role"] == "admin":
+            redirect_url = "/frontend/admin_dashboard.html"
+        else: 
+            redirect_url = "/frontend/employer_inbox.html"
+
+        response_data = {
+            "message": "Login successful",
+            "redirect": redirect_url,
+            "user_id": user.id,
+            "role": session["role"]
+        }
+        
+        if violation_info and violation_info.get("count", 0) > 0:
+            response_data["warning"] = {
+                "violation": True,
+                "message": "You failed to update the status of an application and our privacy policy mentions that, if this occurs one more time your account will be suspended.",
+                "violation_count": violation_info["count"]
+            }
+
+        if session["role"] == "employee":
+            response_data["first_name"] = user.first_name
+            response_data["isEmployer"] = False
+        elif session["role"] == "employer":
+            response_data["company"] = user.company_name
+            response_data["isEmployer"] = True
+        elif session["role"] == "admin":
+            response_data["isAdmin"] = True
+            response_data["name"] = "Administrator"
+
+        return jsonify(response_data), 200
+    else:
         print(f"Login failed: Invalid password for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
-    session["user_id"] = user.id
-    session["email"] = user.email
+def check_employer_violations(employer_id):
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
     
-    if is_admin_email:
-        session["role"] = "admin"
-        print("Setting admin role in session")
-    else:
-        session["role"] = user.role
-
-    print(f"Login successful for: {email}, role: {session['role']}")
-
-    user_agent = request.headers.get('User-Agent', '')
-    ip_address = request.remote_addr
-    try:
-        login_record = LoginHistory(
-            user_id=user.id,
-            ip_address=ip_address,
-            device_info=user_agent
-        )
-        db.session.add(login_record)
+    overdue_applications = Message.query.filter(
+        Message.recipient_id == employer_id,
+        Message.is_draft == False,
+        Message.is_spam == False,
+        Message.subject.like("%Application for:%"),
+        (Message.status_updated_at == None) | (Message.status_updated_at < seven_days_ago),
+        Message.created_at < seven_days_ago
+    ).all()
+    
+    existing_violations = EmployerViolation.query.filter_by(
+        employer_id=employer_id,
+        acknowledged=True
+    ).count()
+    
+    new_violations = 0
+    for app in overdue_applications:
+        existing = EmployerViolation.query.filter_by(
+            employer_id=employer_id, 
+            message_id=app.id
+        ).first()
+        
+        if not existing:
+            violation = EmployerViolation(
+                employer_id=employer_id,
+                message_id=app.id,
+                violation_date=datetime.utcnow(),
+                acknowledged=False
+            )
+            db.session.add(violation)
+            new_violations += 1
+    
+    if new_violations > 0:
         db.session.commit()
-    except Exception as e:
-        print(f"Failed to record login history: {e}")
-        db.session.rollback()
-
-    if session["role"] == "employee":
-        redirect_url = "/frontend/employee_inbox.html"
-    elif session["role"] == "admin":
-        redirect_url = "/frontend/admin_dashboard.html"
-    else: 
-        redirect_url = "/frontend/employer_inbox.html"
-
-    response_data = {
-        "message": "Login successful",
-        "redirect": redirect_url,
-        "user_id": user.id,
-        "role": session["role"]
-    }
-
-    if session["role"] == "employee":
-        response_data["first_name"] = user.first_name
-        response_data["isEmployer"] = False
-    elif session["role"] == "employer":
-        response_data["company"] = user.company_name
-        response_data["isEmployer"] = True
-    elif session["role"] == "admin":
-        response_data["isAdmin"] = True
-        response_data["name"] = "Administrator"
-
-    return jsonify(response_data), 200
+    
+    total_violations = existing_violations + new_violations
+    
+    should_suspend = existing_violations > 0 and new_violations > 0
+    
+    if should_suspend:
+        violations = EmployerViolation.query.filter_by(
+            employer_id=employer_id,
+            acknowledged=False
+        ).all()
+        for violation in violations:
+            violation.resulted_in_suspension = True
+        db.session.commit()
+        
+        user = User.query.get(employer_id)
+        if user:
+            user.is_suspended = True
+            db.session.commit()
+    
+    return should_suspend, {"count": total_violations, "new": new_violations}
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
@@ -256,8 +343,9 @@ def reset_password():
     
     if not data.get("email") or not data.get("password"):
         return jsonify({"success": False, "error": "Missing email or password"}), 400
-    
+
     email = data["email"].strip().lower()
+    password = data["password"]
     
     user = User.query.filter(func.lower(User.email) == email).first()
     if not user:
@@ -283,3 +371,23 @@ def reset_password():
             "success": False, 
             "error": "An error occurred while resetting your password"
         }), 500
+
+@auth_bp.route("/acknowledge-violation", methods=["POST"])
+def acknowledge_violation():
+    if not session.get("user_id"):
+        return jsonify({"error": "Not authenticated"}), 401
+        
+    employer_id = session["user_id"]
+    
+    violations = EmployerViolation.query.filter_by(
+        employer_id=employer_id, 
+        acknowledged=False,
+        resulted_in_suspension=False
+    ).all()
+    
+    for violation in violations:
+        violation.acknowledged = True
+    
+    db.session.commit()
+    
+    return jsonify({"success": True, "message": "Violations acknowledged"}), 200

@@ -703,3 +703,76 @@ input[type="checkbox"]:checked::after {
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+.violation-warning {
+  background-color: #ff9800;
+  color: white;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.warning-icon {
+  font-size: 24px;
+  margin-right: 15px;
+}
+
+.warning-message {
+  flex: 1;
+  font-size: 16px;
+}
+
+.warning-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.suspension-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.suspension-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 80%;
+  text-align: center;
+}
+
+.suspension-content h2 {
+  color: #e53935;
+  margin-top: 0;
+}
+
+.suspension-content button {
+  background-color: #455a64;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.suspension-content button:hover {
+  background-color: #37474f;
+}

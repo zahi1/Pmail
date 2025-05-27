@@ -29,7 +29,15 @@ function login() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: email, password: password })
   })
-    .then(response => response.json())
+    .then(response => {
+      if (response.status === 403) {
+        return response.json().then(data => {
+          showSuspensionMessage(data.message);
+          throw new Error("Account suspended");
+        });
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.message === "Login successful") {
         localStorage.setItem("user_id", data.user_id);
@@ -45,18 +53,52 @@ function login() {
         displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
         localStorage.setItem("displayName", displayName);
         
+        if (data.warning && data.warning.violation) {
+          localStorage.setItem("violation_warning", JSON.stringify(data.warning));
+        }
+        
         window.location.href = "splash.html";
       } else {
         alert("Error: " + data.error);
       }
     })
     .catch(error => {
-      console.error("Error:", error);
-      alert("An error occurred during login.");
+      if (error.message !== "Account suspended") {
+        console.error("Error:", error);
+        alert("An error occurred during login.");
+      }
     });
 }
 
+function showSuspensionMessage(message) {
+  const suspensionModal = document.createElement('div');
+  suspensionModal.className = 'suspension-modal';
+  suspensionModal.innerHTML = `
+    <div class="suspension-content">
+      <div class="suspension-icon">
+        <i class="fas fa-lock"></i>
+      </div>
+      <h2>Account Suspended</h2>
+      <div class="suspension-divider"></div>
+      <p>${message || "Your account has been suspended due to policy violations."}</p>
+      <p class="contact-support">Please contact the administrator for assistance.</p>
+      <button class="close-suspension-btn" onclick="closeSuspensionModal()">Close</button>
+    </div>
+  `;
+  document.body.appendChild(suspensionModal);
+  
+  // Add animation
+  setTimeout(() => {
+    suspensionModal.querySelector('.suspension-content').classList.add('show');
+  }, 10);
+}
 
+function closeSuspensionModal() {
+  const modal = document.querySelector('.suspension-modal');
+  if (modal) {
+    document.body.removeChild(modal);
+  }
+}
 
 function showLoginSuccessScreen(email, redirectUrl) {
   console.log("Login success screen started");

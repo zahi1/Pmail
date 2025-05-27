@@ -19,4 +19,6 @@ class User(db.Model):
     contact_name = db.Column(db.String(100))
     address = db.Column(db.String(255))
     
-    user_categories = db.Column(db.String(500))  
+    user_categories = db.Column(db.String(500))
+    
+    is_suspended = db.Column(db.Boolean, default=False)

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Please log in to view your dashboard.");
     return;
   }
-
+  
   window.allApplications = []; 
   window.openApplications = [];
   window.closedApplications = [];
