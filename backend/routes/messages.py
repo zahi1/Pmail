@@ -279,7 +279,6 @@ def update_message_status(message_id):
     old_status = message.status
     message.status = new_status
 
-    # Set status_updated_at to now if status changed
     if old_status != new_status:
         message.status_updated_at = datetime.utcnow()
         try:
@@ -304,7 +303,6 @@ def update_message_status(message_id):
                 print(f"Created automated status update message with status: {new_status}")
         except Exception as e:
             print(f"Failed to create status update message: {e}")
-    # If status didn't change, do not update status_updated_at
 
     db.session.commit()
     
@@ -313,6 +311,52 @@ def update_message_status(message_id):
         "message_id": message_id,
         "status": new_status,
         "status_updated_at": message.status_updated_at.strftime("%Y-%m-%d %H:%M:%S") if message.status_updated_at else None
+    }), 200
+
+@messages_bp.route('/messages/bulk-status-update', methods=['PUT'])
+def bulk_update_message_status():
+    data = request.get_json()
+    message_ids = data.get('message_ids', [])
+    new_status = data.get('status')
+
+    valid_statuses = ["Pending", "Under Review", "Accepted", "Rejected"]
+    if new_status not in valid_statuses:
+        return jsonify({"error": "Invalid status value"}), 400
+
+    updated_count = 0
+    for message_id in message_ids:
+        message = Message.query.get(message_id)
+        if not message:
+            continue
+        old_status = message.status
+        message.status = new_status
+        if old_status != new_status:
+            message.status_updated_at = datetime.utcnow()
+            try:
+                employer = User.query.get(message.recipient_id)
+                employee = User.query.get(message.sender_id)
+                if employer and employee:
+                    reply_subject = f"Re: {message.subject}"
+                    reply_body = generate_status_message(new_status, message.subject, employer.id)
+                    auto_reply = Message(
+                        sender_id=employer.id,
+                        recipient_id=employee.id,
+                        subject=reply_subject,
+                        body=reply_body,
+                        status=new_status,
+                        is_draft=False,
+                        is_spam=False,
+                        parent_id=message_id
+                    )
+                    db.session.add(auto_reply)
+            except Exception as e:
+                print(f"Failed to create status update message for message {message_id}: {e}")
+        updated_count += 1
+    db.session.commit()
+    return jsonify({
+        "success": True,
+        "updated_count": updated_count,
+        "status": new_status
     }), 200
 
 def generate_status_message(status, job_subject, employer_id=None):
