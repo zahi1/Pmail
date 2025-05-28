@@ -576,6 +576,12 @@
   width: 120px; 
 }
 
+.applications-table th:nth-last-child(1),
+.applications-table td:nth-last-child(1) {
+  text-align: center;
+  padding-right: 15px; 
+}
+
 .applications-table .status-badge {
   display: inline-block;
   margin: 0 auto;  
@@ -618,10 +624,12 @@
   color: #8ab4f8;
   border: 1px solid #8ab4f8;
   border-radius: 4px;
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 3px 8px; 
+  font-size: 13px; 
   cursor: pointer;
   transition: all 0.2s;
+  margin-top: -2px; 
+  display: inline-block; 
 }
 
 .view-btn:hover {
