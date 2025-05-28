@@ -569,6 +569,18 @@
   font-size: 13px;
 }
 
+
+.applications-table th:nth-child(4),
+.applications-table td:nth-child(4) {
+  text-align: center;
+  width: 120px; 
+}
+
+.applications-table .status-badge {
+  display: inline-block;
+  margin: 0 auto;  
+}
+
 .application-row {
   background-color: #2a2a2a;
   transition: background-color 0.2s;
