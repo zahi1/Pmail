@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pmail - System Status</title>
+  <link rel="icon" type="image/png" href="../public/images/Pmail1.png" />
+  <style>
+    :root {
+      --color-bg: #121212;
+      --color-card: #1e1e1e;
+      --color-text: #e0e0e0;
+      --color-text-secondary: #a0a0a0;
+      --color-operational: #4CAF50;
+      --color-maintenance: #2196F3;
+      --color-degraded: #FFC107;
+      --color-outage: #F44336;
+      --color-accent: #8ab4f8;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    .top-nav {
+      background-color: var(--color-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      box-sizing: border-box;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .pmail-logo {
+      height: 36px;
+      margin-right: 16px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--color-text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      margin-left: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-link img {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 80px auto 40px;
+      padding: 24px;
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 32px;
+      background-color: rgba(30, 30, 30, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .status-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+
+    .status-operational { background-color: var(--color-operational); }
+    .status-maintenance { background-color: var(--color-maintenance); }
+    .status-degraded { background-color: var(--color-degraded); }
+    .status-outage { background-color: var(--color-outage); }
+
+    .status-title {
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+      color: white; 
+      text-shadow: 0 0 5px rgba(0,0,0,0.9); 
+      letter-spacing: 0.5px; 
+    }
+
+    .metrics-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background-color: var(--color-card);
+      border-radius: 8px;
+      padding: 20px;
+      width: 30%;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .maintenance-card {
+      background-color: rgba(33, 150, 243, 0.1);
+      border: 1px solid var(--color-maintenance);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .maintenance-card h3 {
+      color: var(--color-maintenance);
+      margin-top: 0;
+    }
+
+    .info-section {
+      background-color: var(--color-card);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .info-section h2 {
+      margin-top: 0;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .formula {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 16px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin: 16px 0;
+    }
+
+    .last-updated {
+      text-align: right;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-nav">
+    <div class="nav-left">
+      <img src="../public/images/Pmail1.png" alt="Pmail Logo" class="pmail-logo" />
+      <h1>System Status</h1>
+    </div>
+    <div class="nav-right">
+      <a href="javascript:history.back()" class="nav-link">
+        <img src="../public/images/arrow_icon.png" alt="Back" class="nav-icon">
+        Back
+      </a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="status-header">
+      <div id="status-indicator" class="status-indicator status-operational"></div>
+      <h2 id="status-title" class="status-title">All Systems Operational</h2>
+    </div>
+
+    <div id="maintenance-card" class="maintenance-card">
+      <h3>Scheduled Maintenance</h3>
+      <p id="maintenance-message">We are currently performing scheduled maintenance. Service may be intermittently unavailable.</p>
+    </div>
+
+    <div class="metrics-container">
+      <div class="metric-card">
+        <div id="uptime-24h" class="metric-value">99.9%</div>
+        <div class="metric-label">Last 24 Hours</div>
+      </div>
+      <div class="metric-card">
+        <div id="uptime-7d" class="metric-value">99.8%</div>
+        <div class="metric-label">Last 7 Days</div>
+      </div>
+      <div class="metric-card">
+        <div id="uptime-30d" class="metric-value">99.7%</div>
+        <div class="metric-label">Last 30 Days</div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h2>Availability measurement</h2>
+      <p>
+        Pmail system availability is measured by analyzing application logs to determine periods of uptime and downtime. 
+        Planned maintenance windows are excluded from our availability calculations to provide an accurate picture of 
+        unplanned downtime.
+      </p>
+      <div class="formula">
+        Availability = (Total Time - Maintenance Time - Downtime) / (Total Time - Maintenance Time) × 100%
+      </div>
+      <p>
+        When calculating availability, we monitor:
+      </p>
+      <ul>
+        <li>Application start/stop events</li>
+        <li>Error responses (HTTP 500 status codes)</li>
+        <li>Scheduled maintenance periods</li>
+      </ul>
+    </div>
+
+    <div class="last-updated">
+      Last updated: <span id="last-updated-time">Just now</span>
+      <br>
+      <small>This page auto-refreshes every 60 seconds</small>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchStatusData();
+      
+      setInterval(fetchStatusData, 60000);
+    });
+    
+    function fetchStatusData() {
+      fetch('/status')
+        .then(response => response.json())
+        .then(data => {
+          updateStatusIndicator(data.status);
+          updateMetrics(data.availability);
+          updateLastUpdated(data.last_updated);
+        })
+        .catch(error => {
+          console.error('Error fetching status data:', error);
+          updateStatusIndicator('degraded');
+        });
+    }
+    
+    function updateStatusIndicator(status) {
+      const indicator = document.getElementById('status-indicator');
+      const title = document.getElementById('status-title');
+      const maintenanceCard = document.getElementById('maintenance-card');
+      
+      indicator.className = 'status-indicator';
+      
+      switch(status) {
+        case 'operational':
+          indicator.classList.add('status-operational');
+          title.textContent = 'All Systems Operational';
+          maintenanceCard.style.display = 'none';
+          break;
+        case 'maintenance':
+          indicator.classList.add('status-maintenance');
+          title.textContent = 'Scheduled Maintenance';
+          maintenanceCard.style.display = 'block';
+          break;
+        case 'degraded':
+          indicator.classList.add('status-degraded');
+          title.textContent = 'Degraded Performance';
+          maintenanceCard.style.display = 'none';
+          break;
+        case 'outage':
+          indicator.classList.add('status-outage');
+          title.textContent = 'System Outage';
+          maintenanceCard.style.display = 'none';
+          break;
+      }
+    }
+    
+    function updateMetrics(availability) {
+      document.getElementById('uptime-24h').textContent = availability.last_24h.toFixed(2) + '%';
+      document.getElementById('uptime-7d').textContent = availability.last_7d.toFixed(2) + '%';
+      document.getElementById('uptime-30d').textContent = availability.last_30d.toFixed(2) + '%';
+    }
+    
+    function updateLastUpdated(timestamp) {
+      const date = new Date(timestamp);
+      document.getElementById('last-updated-time').textContent = date.toLocaleTimeString();
+    }
+  </script>
+</body>
+</html>
