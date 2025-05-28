@@ -234,7 +234,9 @@ function formatDate(dateString) {
 function formatRelativeTime(dateString) {
     const date = new Date(dateString);
     
-    return date.toLocaleString('en-GB', { 
+    const adjustedDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    
+    return adjustedDate.toLocaleString('en-GB', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric',
