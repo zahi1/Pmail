@@ -84,12 +84,11 @@ def login():
         print(f"Login failed: User not found for {email}")
         return jsonify({"error": "Invalid credentials"}), 400
 
-    # Block login if account is suspended - check this early
     if getattr(user, 'is_suspended', False):
         print(f"Login blocked: Suspended account for {email}")
         return jsonify({
             "error": "Account suspended",
-            "message": "Your account has been suspended due to repeated violations of our status update policy."
+            "message": "Your account has been suspended due to repeated violations of our policy regarding applications' status update."
         }), 403
 
     auth_success = False

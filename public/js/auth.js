@@ -81,7 +81,6 @@ function showSuspensionMessage(message) {
       <h2>Account Suspended</h2>
       <div class="suspension-divider"></div>
       <p>${message || "Your account has been suspended due to policy violations."}</p>
-      <p class="contact-support">Please contact the administrator for assistance.</p>
       <button class="close-suspension-btn" onclick="closeSuspensionModal()">Close</button>
     </div>
   `;
