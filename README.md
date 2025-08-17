@@ -106,4 +106,4 @@ Once the installation is complete:
 
 ### Support
 
-For issues or questions, please refer to the project documentation or contact the development team.
+For issues or questions, please refer to the project documentation or contact me.
