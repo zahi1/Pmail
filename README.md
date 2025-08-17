@@ -1,6 +1,11 @@
-# Pmail - Professional Email System for Job Applications
+# Pmail - An Emailing System for Job Applications
 
-Pmail is a comprehensive email system designed specifically for job applications and employer-employee communication. It features spam detection using machine learning, job application tracking, and a user-friendly interface for both employees and employers.
+Pmail is a comprehensive email system designed specifically for job applications and employer-employee communication. It features spam detection using machine learning, job application tracking, and a user-friendly interface for employees, employers, and administrators.
+
+The system supports three distinct user roles:
+- **Employees**: Can browse and apply for jobs, manage their applications, and communicate with employers
+- **Employers**: Can post job listings, review applications, and are required to update job application statuses (Pending, Under Review, Accepted, Rejected) to keep applicants informed
+- **Administrators**: Have system-wide oversight capabilities for managing users and monitoring platform activity
 
 ## 4.1. Installation Guide
 
@@ -76,19 +81,21 @@ The following instructions will guide you through running and configuring the Pm
 
 Once the installation is complete:
 
-1. Register as a new user (Employee or Employer)
-2. Log in to access your dashboard
-3. Employees can browse jobs and send applications
-4. Employers can post jobs and manage applications
-5. The system automatically detects and filters spam messages
+1. Register as a new user (Employee, Employer, or Administrator)
+2. Log in to access your role-specific dashboard
+3. **Employees** can browse jobs and send applications
+4. **Employers** can post jobs, manage applications, and must update application statuses to keep candidates informed
+5. **Administrators** can oversee system operations and manage users
+6. The system automatically detects and filters spam messages
 
 ### Features
 
 - **Spam Detection**: Machine learning-powered spam filtering using RandomForest and TF-IDF
 - **Job Management**: Post, browse, and apply for jobs
 - **Message System**: Complete email-like messaging between users
-- **User Roles**: Separate interfaces for employees and employers
-- **Application Tracking**: Monitor job application status in real-time
+- **Three User Roles**: Separate interfaces and capabilities for employees, employers, and administrators
+- **Application Status Tracking**: Employers are required to update application statuses (Pending, Under Review, Accepted, Rejected), with automatic notifications sent to applicants
+- **Real-time Updates**: Monitor job application progress and receive status notifications
 
 ### Troubleshooting
 
